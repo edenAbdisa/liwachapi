@@ -20,9 +20,8 @@ class CreateAddressesTable extends Migration
             $table->string('district',50);
             $table->string('landmark',50);
             $table->string('type',10);
-            $table->bigIncrements('id')->unsigned();
-            $table->timestamp('timestamp');
-            $table->primary('id');
+            $table->bigIncrements('id')->unsigned()->primary();
+            $table->timestamp('timestamp'); 
         });
     }
 
