@@ -14,7 +14,11 @@ class CreateFlagsTable extends Migration
     public function up()
     {
         Schema::create('flags', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id')->unsigned();
+		    $table->string('reason',50);
+		    $table->bigInteger('flagged_item_id',20)->unsigned();
+		    $table->string('type',30);
+		    $table->primary('id');
             $table->timestamps();
         });
     }

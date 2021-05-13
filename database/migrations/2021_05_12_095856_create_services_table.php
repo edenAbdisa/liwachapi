@@ -14,8 +14,16 @@ class CreateServicesTable extends Migration
     public function up()
     {
         Schema::create('services', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id')->unsigned();
+            $table->string('name',50);
+            $table->text('picture');
+            $table->string('status',10)->default('UNBARTERED');
+            $table->integer('number_of_flag',);
+            $table->integer('number_of_request',);
+            $table->integer('bartering_location_id',);
+            $table->primary('id');
             $table->timestamps();
+            $table->foreign('bartering_location_id')->references('id')->on('addresses');
         });
     }
 

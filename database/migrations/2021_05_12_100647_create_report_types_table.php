@@ -14,7 +14,10 @@ class CreateReportTypesTable extends Migration
     public function up()
     {
         Schema::create('report_types', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id')->unsigned();
+		$table->string('report',50);
+		$table->string('type_for',30)->default('GOODS');
+		$table->primary('id');
             $table->timestamps();
         });
     }
