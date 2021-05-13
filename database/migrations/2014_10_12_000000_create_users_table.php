@@ -29,7 +29,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps(); 
-            $table->foreign('address_id')->references('id')->on('addresses');
+            //$table->foreign('address_id')->references('id')->on('addresses');
         });
     }
 
