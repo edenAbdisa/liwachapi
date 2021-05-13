@@ -20,7 +20,7 @@ class CreateServicesTable extends Migration
             $table->string('status',10)->default('UNBARTERED');
             $table->integer('number_of_flag',);
             $table->integer('number_of_request',);
-            $table->integer('bartering_location_id',);
+            $table->integer('bartering_location_id');
             $table->primary('id');
             $table->timestamps();
             $table->foreign('bartering_location_id')->references('id')->on('addresses');

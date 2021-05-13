@@ -16,10 +16,11 @@ class CreateFlagsTable extends Migration
         Schema::create('flags', function (Blueprint $table) {
             $table->bigIncrements('id')->unsigned();
 		    $table->string('reason',50);
-		    $table->bigInteger('flagged_item_id',20)->unsigned();
+		    $table->bigInteger('flagged_item_id')->unsigned();
 		    $table->string('type',30);
 		    $table->primary('id');
             $table->timestamps();
+            $table->foreign('reason')->references('report_detail')->on('report_types');
         });
     }
 

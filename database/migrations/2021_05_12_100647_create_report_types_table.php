@@ -15,7 +15,7 @@ class CreateReportTypesTable extends Migration
     {
         Schema::create('report_types', function (Blueprint $table) {
             $table->bigIncrements('id')->unsigned();
-		$table->string('report',50);
+		$table->string('report_detail',50);
 		$table->string('type_for',30)->default('GOODS');
 		$table->primary('id');
             $table->timestamps();

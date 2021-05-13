@@ -18,9 +18,10 @@ class CreateChatsTable extends Migration
             $table->text('message');
             $table->string('type',10)->default('TEXT');
             $table->text('chat_id');
-            $table->bigInteger('sender_id',20)->unsigned();
+            $table->bigInteger('sender_id')->unsigned();
             $table->foreign('sender_id')->references('id')->on('users');
             $table->timestamps();
+            $table->foreign('chat_id')->references('token')->on('requests');
         });
     }
 
