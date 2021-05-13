@@ -25,11 +25,11 @@ class CreateUsersTable extends Migration
             $table->string('status',10);
             $table->date('birthdate');
             $table->string('type',10)->default('USER');
-            $table->bigInteger('address_id',20)->unsigned();
+            $table->bigInteger('address_id',20);
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps(); 
-            //$table->foreign('address_id')->references('id')->on('addresses');
+            $table->foreign('address_id')->references('id')->on('addresses');
         });
     }
 
