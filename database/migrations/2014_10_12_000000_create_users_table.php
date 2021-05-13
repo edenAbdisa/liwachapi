@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('status',10);
             $table->date('birthdate');
             $table->string('type',10)->default('USER');
-            $table->bigInteger('address_id',20);
+            $table->bigInteger('address_id')->unsigned();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps(); 
