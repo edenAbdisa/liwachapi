@@ -4,17 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use Illuminate\Http\Request;
+use Gate;
+use Symfony\Component\HttpFoundation\Response;
 
 class AddressController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/addresses",
+     *      operationId="getAddressesList",
+     *      tags={"Address"},
+     *      summary="Get list of Address",
+     *      description="Returns list of Address",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/ProjectResource")
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     *     )
      */
     public function index()
     {
-        //
+        //abort_if(Gate::denies('project_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+      return Address::all();
     }
 
     /**
@@ -24,7 +45,7 @@ class AddressController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -80,6 +101,6 @@ class AddressController extends Controller
      */
     public function destroy(Address $address)
     {
-        //
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

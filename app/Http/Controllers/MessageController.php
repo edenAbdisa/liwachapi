@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Good;
+use App\Models\Message;
 use Illuminate\Http\Request;
 
-class GoodController extends Controller
+class MessageController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -41,10 +41,10 @@ class GoodController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Good  $good
+     * @param  \App\Models\Message  $Message
      * @return \Illuminate\Http\Response
      */
-    public function show(Good $good)
+    public function show(Message $message)
     {
         //
     }
@@ -52,10 +52,10 @@ class GoodController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Good  $good
+     * @param  \App\Models\Message  $message
      * @return \Illuminate\Http\Response
      */
-    public function edit(Good $good)
+    public function edit(Message $message)
     {
         //
     }
@@ -64,10 +64,10 @@ class GoodController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Good  $good
+     * @param  \App\Models\Message  $message
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Good $good)
+    public function update(Request $request, Message $message)
     {
         //
     }
@@ -75,10 +75,10 @@ class GoodController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Good  $good
+     * @param  \App\Models\Message  $message
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Good $good)
+    public function destroy(Message $message)
     {
         //
     }

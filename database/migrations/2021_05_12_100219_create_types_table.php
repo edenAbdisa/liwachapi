@@ -16,8 +16,8 @@ class CreateTypesTable extends Migration
         Schema::create('types', function (Blueprint $table) {
             $table->bigIncrements('id')->unsigned()->primary();
 		    $table->string('name',50);
-            $table->string('category',50); 
-            $table->foreign('category')->references('name')->on('categories');
+            $table->bigInteger('category_id',50); 
+            $table->foreign('category_id')->references('id')->on('categories');
         });
     }
 

@@ -17,9 +17,11 @@ class CreateFlagsTable extends Migration
             $table->bigIncrements('id')->unsigned()->primary();
 		    $table->string('reason',50);
 		    $table->bigInteger('flagged_item_id')->unsigned();
-		    $table->string('type',30); 
+            $table->bigInteger('flagged_by_id')->unsigned();
+		    $table->string('type',30)->default('item'); 
             $table->timestamps();
             $table->foreign('reason')->references('report_detail')->on('report_types');
+            $table->foreign('flagged_by_id')->references('id')->on('users');
         });
     }
 

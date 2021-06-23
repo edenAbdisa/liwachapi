@@ -27,9 +27,11 @@ class CreateUsersTable extends Migration
             $table->string('type',10)->default('USER');
             $table->bigInteger('address_id')->unsigned();
             $table->timestamp('email_verified_at')->nullable();
+            $table->bigInteger('membership_id')->unsigned();
             $table->rememberToken();
             $table->timestamps(); 
             $table->foreign('address_id')->references('id')->on('addresses');
+            $table->foreign('membership_id')->references('id')->on('memberships');
         });
     }
 

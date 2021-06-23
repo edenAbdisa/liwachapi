@@ -14,7 +14,7 @@ class FlagController extends Controller
      */
     public function index()
     {
-        //
+        return Flag::all();
     }
 
     /**

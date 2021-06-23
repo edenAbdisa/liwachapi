@@ -13,13 +13,13 @@ class CreateGoodsTable extends Migration
      */
     public function up()
     {
-        Schema::create('goods', function (Blueprint $table) {
-            $table->bigIncrements('id')->unsigned()->primary();
+        Schema::create('items', function (Blueprint $table) {
+        $table->bigIncrements('id')->unsigned()->primary();
 		$table->text('picture');
 		$table->string('status',30);
 		$table->integer('number_of_flag',);
 		$table->integer('number_of_request',);
-		$table->integer('bartering_location_id'); 
+		$table->bigInteger('bartering_location_id'); 
         $table->timestamps();
         $table->foreign('bartering_location_id')->references('id')->on('addresses');
         });

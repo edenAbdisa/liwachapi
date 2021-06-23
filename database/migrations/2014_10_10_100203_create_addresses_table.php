@@ -21,6 +21,7 @@ class CreateAddressesTable extends Migration
             $table->string('district',50);
             $table->string('landmark',50);
             $table->string('type',10);
+            $table->text('api',255);
             $table->timestamp('timestamp'); 
         });
     }
