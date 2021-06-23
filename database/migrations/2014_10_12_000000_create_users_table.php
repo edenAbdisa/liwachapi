@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->text('TIN_picture');
             $table->string('status',10);
             $table->date('birthdate');
-            $table->string('type',10)->default('USER');
+            $table->string('type',10)->default('user');
             $table->bigInteger('address_id')->unsigned();
             $table->timestamp('email_verified_at')->nullable();
             $table->bigInteger('membership_id')->unsigned();

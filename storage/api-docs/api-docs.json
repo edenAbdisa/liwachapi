@@ -1,8 +1,8 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "API Documentation FOR LIWACH system",
-        "description": "API Documentation FOR LIWACH system",
+        "title": "API Documentation for LIWACH system",
+        "description": "API Documentation for LIWACH system",
         "contact": {
             "email": "edenabdisa90@yahoo.com"
         },
@@ -222,14 +222,458 @@
     },
     "components": {
         "schemas": {
-            "Project": {
-                "title": "Project",
-                "description": "Project model",
+            "Address": {
+                "title": "Address",
+                "description": "Address model",
                 "properties": {
                     "id": {
                         "title": "ID",
                         "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "country": {
+                        "title": "Country",
+                        "description": "Country name",
+                        "type": "string",
+                        "example": "Ethiopia"
+                    },
+                    "city": {
+                        "title": "City",
+                        "description": "City name",
+                        "type": "string",
+                        "example": "Addis Ababa"
+                    },
+                    "subcity": {
+                        "title": "Subcity",
+                        "description": "Subcity",
+                        "type": "string", 
+                        "example": "Yeka"
+                    },
+                    "district": {
+                        "title": "District",
+                        "description": "This the area name",
+                        "type": "string", 
+                        "example": "Summit, 4kilo"
+                    },
+                    "landmark": {
+                        "title": "Landmark",
+                        "description": "This is a famous lanmark name around the area",
+                        "type": "string",
+                        "example": "Firdebet, Next to the parlament, Adwa adebaby"
+                    },
+                    "api": {
+                        "title": "Api",
+                        "description": "This is the exact location api link",
+                        "type": "text", 
+                        "example": "https://google.maps/dhjsdbshf"
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "Category": {
+                "title": "Category",
+                "description": "Category model",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "title": "Category name",
+                        "description": "Category name",
+                        "type": "string", 
+                        "example": "Garments, Mens"
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "Category"
+                }
+            },
+            "Flag": {
+                "title": "Flag",
+                "description": "Flag items",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "reason": {
+                        "title": "Reason",
+                        "description": "Report name fetched from report type",
+                        "type": "string",
+                        "example": "Fake Item"
+                    },
+                    "flagged_item_id": {
+                        "title": "Flagged Item Id",
+                        "description": "The Id of the item that was flagged",
+                        "type": "big integer",
+                        "example": 2
+                    },
+                    "flagged_by_id": {
+                        "title": "Flagged by Id",
+                        "description": "The Id of the user that flagged the item",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "type": {
+                        "title": "Type",
+                        "description": "Is the flagged item service or item it will make it easier for the backend to choose which table to query",
+                        "type": "string",
+                        "example": "item or service"
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "Item": {
+                "title": "Item",
+                "description": "Item model ",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "picture": {
+                        "title": "Picture file name",
+                        "description": "This name will be concated with the image collection folder",
+                        "type": "string",
+                        "example": "mybag.jpg"
+                    },
+                    "status": {
+                        "title": "status",
+                        "description": "Status of the item whether it is bartered,unbartered,blocked. Automatically all user item are set to unbartered but company is set to blocked",
+                        "type": "string",
+                        "example": "bartered,unbartered,blocked"
+                    },
+                    "number_of_flag": {
+                        "title": "Number of Flag",
+                        "description": "Keeps count of the flag that this item recieved",
                         "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "number_of_request": {
+                        "title": "Number of request",
+                        "description": "Keeps count of the request that this item recieved",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "bartering_location_id": {
+                        "title": "Bartering location",
+                        "description": "After saving the location at address the id will be assocated with this item",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "type_id": {
+                        "title": "Type",
+                        "description": "Categorize the item into a type and from this type we can decide the category",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "Membership": {
+                "title": "Membership",
+                "description": "Membership model",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the membership",
+                        "type": "string",
+                        "example": "normal,premium,gold"
+                    },
+                    "limit_of_post": {
+                        "title": "Limit of post",
+                        "description": "Limit of post that this memebrship is allowed",
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "transaction_limit": {
+                        "title": "Transation Limit",
+                        "description": "Transation Limit in a day or in a week",
+                        "type": "integer",
+                        "example": 6
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "Message": {
+                "title": "Messages",
+                "description": "Message model",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "content": {
+                        "title": "Text Content",
+                        "description": "The text message",
+                        "type": "string",
+                        "example": "Hello, I want this item"
+                    },
+                    "type": {
+                        "title": "Type",
+                        "description": "It identified if the content is text or an image path",
+                        "type": "string",
+                        "example": "text or picture"
+                    },
+                    "chat_id": {
+                        "title": "Chat Id",
+                        "description": "The token gotten when the item was requested. Identifies the chat ID(token in company case) two user may have many chat id if they are bartering many item between them",
+                        "type": "string", 
+                        "example": "randomcreateduniquetoken"
+                    },
+                    "sender_id": {
+                        "title": "Sender user id",
+                        "description": "Sender user id",
+                        "type": "big integer", 
+                        "example": 4
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "ReportType": {
+                "title": "ReportType",
+                "description": "Report type model",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "report_detail": {
+                        "title": "Name",
+                        "description": "Small text that will be displayed to user so that they can choose from the list",
+                        "type": "string",
+                        "example": "Spam, Fake Item, Violence, Child Abuse, Other, "
+                    },
+                    "type_for": {
+                        "title": "Type for",
+                        "description": "The item that this report can be associated with",
+                        "type": "string",
+                        "example": "item or service or user"
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "Request": {
+                "title": "Request",
+                "description": "Request model",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Whether the user has accepted it or not",
+                        "type": "string",
+                        "example": "accepted or declined or expired"
+                    },
+                    "requester_id": {
+                        "title": "Requester User Id",
+                        "description": "The ID of the person who requested for the item",
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "requested_item_id": {
+                        "title": "Requested Item Id",
+                        "description": "The ID of the Item that we wanted",
+                        "type": "integer",
+                        "example": 7
+                    },
+                    "requester_item_id": {
+                        "title": "Requester Item Id",
+                        "description": "The ID of the Item that we are offering",
+                        "type": "integer",
+                        "example": "2020-01-27 17:50:45"
+                    },
+                    "rating": {
+                        "title": "Rating",
+                        "description": "The rating given by the user after the status is changed to barter",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "token": {
+                        "title": "Token",
+                        "description": "A unique generated token that will be accessed by chat_id in case of user to user barter and can be used as ticket for organization.",
+                        "type": "string", 
+                        "example": "srrwgwrgt"
+                    },
+                    "type": {
+                        "title": "type",
+                        "description": "Type of items that are being exchanged. This will make it easy to decide on which table to query,",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 9
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "Service": {
+                "title": "Service",
+                "description": "Service model",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the service",
+                        "type": "string",
+                        "example": "Plumbering"
+                    },
+                    "picture": {
+                        "title": "Picture file name",
+                        "description": "This name will be concated with the image collection folder",
+                        "type": "string",
+                        "example": "mybag.jpg"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Describes if the bartering offer is bartred and open. For case where user select to reopen this the status can be changed to open unlike item",
+                        "type": "string",
+                        "example": "bartered or bartered or blocked"
+                    },
+                    "number_of_flag": {
+                        "title": "Number of Flag",
+                        "description": "Keeps count of the flag that this service recieved",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "number_of_request": {
+                        "title": "Number of request",
+                        "description": "Keeps count of the request that this service recieved",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "bartering_location_id": {
+                        "title": "Bartering location",
+                        "description": "After saving the location at address the id will be assocated with this service",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "type_id": {
+                        "title": "Type",
+                        "description": "Categorize the service into a type and from this type we can decide the category",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "Project"
+                }
+            },
+            "Type": {
+                "title": "Type",
+                "description": "Type model",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
                         "format": "int64",
                         "example": 1
                     },
@@ -239,49 +683,19 @@
                         "type": "string",
                         "example": "A nice project"
                     },
-                    "description": {
-                        "title": "Description",
-                        "description": "Description of the new project",
-                        "type": "string",
-                        "example": "This is new project's description"
+                    "category_id": {
+                        "title": "Category ID",
+                        "description": "This type is under a certain category.",
+                        "type": "big integer",
+                        "example": 123
                     },
-                    "created_at": {
-                        "title": "Created at",
-                        "description": "Created at",
-                        "type": "string",
-                        "format": "datetime",
-                        "example": "2020-01-27 17:50:45"
-                    },
-                    "updated_at": {
-                        "title": "Updated at",
-                        "description": "Updated at",
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
-                    },
-                    "deleted_at": {
-                        "title": "Deleted at",
-                        "description": "Deleted at",
-                        "type": "string",
-                        "format": "datetime",
-                        "example": "2020-01-27 17:50:45"
-                    },
-                    "author_id": {
-                        "title": "Author ID",
-                        "description": "Author's id of the new project",
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 1
-                    },
-                    "author": {
-                        "title": "Author",
-                        "description": "Project author's user model",
-                        "$ref": "#/components/schemas/User"
                     }
-                },
-                "type": "object",
-                "xml": {
-                    "name": "Project"
                 }
             },
             "User": {
@@ -291,20 +705,77 @@
                     "id": {
                         "title": "ID",
                         "description": "ID",
-                        "type": "integer",
+                        "type": "big integer",
                         "format": "int64",
                         "example": 1
                     },
-                    "name": {
-                        "title": "Name",
-                        "description": "Name",
-                        "type": "string"
+                    "first_name": {
+                        "title": "Last Name",
+                        "description": "The first Name",
+                        "type": "string",
+                        "example": "Eden "
+                    },
+                    "last_name": {
+                        "title": "Last Name",
+                        "description": "The last Name",
+                        "type": "string",
+                        "example": "Abdisa "
                     },
                     "email": {
                         "title": "Email",
                         "description": "Email",
                         "type": "string",
-                        "format": "email"
+                        "format": "eden@yahoo.com"
+                    },
+                    "profile_picture": {
+                        "title": "Picture file name",
+                        "description": "This name will be concated with the image collection folder",
+                        "type": "string",
+                        "example": "myprofile.jpg"
+                    },
+                    "phone_number": {
+                        "title": "Phone Number",
+                        "description": "Phone number including country/city code",
+                        "type": "string", 
+                        "example": "+2519443322"
+                    },
+                    "TIN_picture": {
+                        "title": "Picture file name",
+                        "description": "This name will be concated with the image collection folder and the tin number will be viewed by the admin to approve the user",
+                        "type": "string",
+                        "example": "mytin.jpg"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "The user is active at first for user and blocked for company",
+                        "type": "string",
+                        "example": "active or blocked"
+                    },
+                    "birthdate": {
+                        "title": "Birthdate",
+                        "description": "The birthdate of the user",
+                        "type": "string",
+                        "format": "date",
+                        "example":"2020-01-27"
+                    },
+                    "type": {
+                        "title": "Type of user",
+                        "description": "This name will be concated with the image collection folder",
+                        "type": "string",
+                        "example": "user or admin or company"
+                    },
+                    
+                    "address_id": {
+                        "title": "Address ID",
+                        "description": "The ID of the address",
+                        "type": "big integer",
+                        "format": 99
+                    },
+                    "membership_id": {
+                        "title": "Membership ID ",
+                        "description": "This is the ID of the membership that the user or organization choose",
+                        "type": "big integer",
+                        "example": 8
                     },
                     "email_verified_at": {
                         "title": "Email verified at",
@@ -313,112 +784,28 @@
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
                     },
-                    "created_at": {
-                        "title": "Created at",
-                        "description": "Created at",
+                    "rememberToken": {
+                        "title": "Login Token",
+                        "description": "The token optained when user logged in",
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
                     },
-                    "updated_at": {
-                        "title": "Updated at",
-                        "description": "Updated at",
-                        "type": "string",
-                        "format": "datetime",
-                        "example": "2020-01-27 17:50:45"
-                    },
-                    "deleted_at": {
-                        "title": "Deleted at",
-                        "description": "Deleted at",
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
                     }
-                },
-                "type": "object"
-            },
-            "ProjectResource": {
-                "title": "ProjectResource",
-                "description": "Project resource",
-                "properties": {
-                    "data": {
-                        "title": "Data",
-                        "description": "Data wrapper",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Project"
-                        }
-                    }
-                },
-                "type": "object",
-                "xml": {
-                    "name": "ProjectResource"
                 }
-            },
-            "StoreProjectRequest": {
-                "title": "Store Project request",
-                "description": "Store Project request body data",
-                "required": [
-                    "name"
-                ],
-                "properties": {
-                    "name": {
-                        "title": "name",
-                        "description": "Name of the new project",
-                        "type": "string",
-                        "example": "A nice project"
-                    },
-                    "description": {
-                        "title": "description",
-                        "description": "Description of the new project",
-                        "type": "string",
-                        "example": "This is new project's description"
-                    },
-                    "author_id": {
-                        "title": "author_id",
-                        "description": "Author's id of the new project",
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 1
-                    }
-                },
-                "type": "object"
-            },
-            "UpdateProjectRequest": {
-                "title": "Update Project request",
-                "description": "Update Project request body data",
-                "required": [
-                    "name"
-                ],
-                "properties": {
-                    "name": {
-                        "title": "name",
-                        "description": "Name of the new project",
-                        "type": "string",
-                        "example": "A nice project"
-                    },
-                    "description": {
-                        "title": "description",
-                        "description": "Description of the new project",
-                        "type": "string",
-                        "example": "This is new project's description"
-                    },
-                    "author_id": {
-                        "title": "author_id",
-                        "description": "Author's id of the new project",
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 1
-                    }
-                },
-                "type": "object"
             }
         }
     },
     "tags": [
         {
-            "name": "Projects",
-            "description": "API Endpoints of Projects"
+            "name": "Liwach API",
+            "description": "API Endpoints of Liwach"
         }
     ]
 }

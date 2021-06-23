@@ -19,10 +19,11 @@ class CreateGoodsTable extends Migration
 		$table->string('status',30);
 		$table->integer('number_of_flag',);
 		$table->integer('number_of_request',);
-		$table->bigInteger('bartering_location_id'); 
+		$table->integer('bartering_location_id'); 
+        $table->bigInteger('type_id');
         $table->timestamps();
         $table->foreign('bartering_location_id')->references('id')->on('addresses');
-        });
+        $table->foreign('type_id')->references('id')->on('types');});
     }
 
     /**

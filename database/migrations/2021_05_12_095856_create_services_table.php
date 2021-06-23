@@ -17,7 +17,7 @@ class CreateServicesTable extends Migration
             $table->bigIncrements('id')->unsigned()->primary();
             $table->string('name',50);
             $table->text('picture');
-            $table->string('status',10)->default('UNBARTERED');
+            $table->string('status',10)->default('unbartered');
             $table->integer('number_of_flag',);
             $table->integer('number_of_request',);
             $table->bigInteger('bartering_location_id');
