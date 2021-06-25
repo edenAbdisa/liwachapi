@@ -760,7 +760,7 @@
                     },
                     "type": {
                         "title": "Type of user",
-                        "description": "This name will be concated with the image collection folder",
+                        "description": "This identify the account whether it is an organizations or a user or admin",
                         "type": "string",
                         "example": "user or admin or company"
                     },
@@ -790,6 +790,38 @@
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            }, "Subscription": {
+                "title": "Subscription",
+                "description": "Subscription model",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "type_id": {
+                        "title": "Type ID",
+                        "description": "This is the type that the user subscribed for ",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    
+                    "user_id": {
+                        "title": "User ID",
+                        "description": "The user Id",
+                        "type": "big integer",
+                        "example": 99
                     },
                     "timestamp": {
                         "title": "Timestamp",
