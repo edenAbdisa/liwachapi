@@ -14,7 +14,7 @@ class CreateGoodsTable extends Migration
     public function up()
     {
         Schema::create('items', function (Blueprint $table) {
-        $table->bigIncrements('id')->unsigned()->primary();
+        $table->bigIncrements('id');
 		$table->text('picture');
 		$table->string('status',30);
 		$table->integer('number_of_flag',);

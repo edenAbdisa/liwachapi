@@ -14,7 +14,7 @@ class CreateMembershipsTable extends Migration
     public function up()
     {
         Schema::create('memberships', function (Blueprint $table) {
-            $table->bigIncrements('id')->unsigned()->primary();
+            $table->bigIncrements('id');
 		$table->string('name',30);
 		$table->integer('limit_of_post');
 		$table->integer('transaction_limit'); 
