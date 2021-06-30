@@ -17,5 +17,18 @@ class Address extends Model
     public String $district;
     public String $landmark;
     public String $type; */
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'country',
+        'city',
+        'subcity',
+        'district',
+        'landmark',
+        'type'
+    ];
 
 }

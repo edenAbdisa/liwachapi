@@ -14,7 +14,7 @@
     },
     "servers": [
         {
-            "url": "http://project.test/api/v1",
+            "url": "http://liwachapi.herokuapp.com/api",
             "description": "Demo API Server"
         }
     ],
@@ -50,15 +50,15 @@
                 "tags": [
                     "Address"
                 ],
-                "summary": "Store new project",
-                "description": "Returns project data",
-                "operationId": "storeProject",
+                "summary": "Store new Address",
+                "description": "Returns Address data",
+                "operationId": "storeAddress",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/StoreProjectRequest"
+                                "$ref": "#/components/schemas/Address"
                             }
                         }
                     }
@@ -69,7 +69,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Project"
+                                    "$ref": "#/components/schemas/Address"
                                 }
                             }
                         }

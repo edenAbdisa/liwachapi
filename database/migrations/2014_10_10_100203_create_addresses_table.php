@@ -22,7 +22,7 @@ class CreateAddressesTable extends Migration
             $table->string('landmark',50);
             $table->string('type',10);
             $table->text('api',255);
-            $table->timestamp('timestamp'); 
+            $table->timestamps(); 
         });
     }
 
