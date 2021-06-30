@@ -20,7 +20,7 @@ class CreateRequestsTable extends Migration
 		$table->bigInteger('requested_item_id')->unsigned();
 		$table->bigInteger('requester_item_id')->unsigned();
 		$table->integer('rating');
-		$table->text('token'); 
+		$table->text('token')->unique(); 
         $table->text('type')->default('item');
 		$table->foreign('requester_id')->references('id')->on('users');
         //$table->foreign('requester_id')->references('id')->on('users');
