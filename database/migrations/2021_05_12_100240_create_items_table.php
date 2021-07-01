@@ -15,12 +15,12 @@ class CreateItemsTable extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
         $table->bigIncrements('id');
-		$table->text('picture');
-		$table->string('status',30);
-		$table->integer('number_of_flag',);
-		$table->integer('number_of_request',);
-		$table->bigInteger('bartering_location_id')->unsigned(); 
-        $table->bigInteger('type_id')->unsigned();
+		$table->text('picture')->nullable();
+		$table->string('status',30)->nullable();
+		$table->integer('number_of_flag')->nullable();
+		$table->integer('number_of_request')->nullable();
+		$table->bigInteger('bartering_location_id')->unsigned()->nullable(); 
+        $table->bigInteger('type_id')->unsigned()->nullable();
         $table->timestamps();
         $table->foreign('bartering_location_id')->references('id')->on('addresses');
         $table->foreign('type_id')->references('id')->on('types');});

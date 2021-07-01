@@ -15,13 +15,13 @@ class CreateMessagesTable extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->text('content');
-            $table->string('type',10)->default('text');
-            $table->text('chat_id');
-            $table->bigInteger('sender_id')->unsigned();
+            $table->text('content')->nullable();
+            $table->string('type',10)->default('text')->nullable();
+            $table->text('chat_id')->unique()->nullable();
+            $table->bigInteger('sender_id')->unsigned()->nullable();
             $table->foreign('sender_id')->references('id')->on('users');
             $table->timestamps();
-            $table->foreign('chat_id','chat_id_fk_896871')->references('token')->on('requests');
+            $table->foreign('chat_id')->references('token')->on('requests');
         });
     }
 

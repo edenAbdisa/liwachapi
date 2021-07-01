@@ -15,19 +15,19 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('first_name',10);
-            $table->string('last_name',10);        
-            $table->string('email')->unique();
-            $table->text('password');
-            $table->text('profile_picture');
-            $table->string('phone_number',30);
-            $table->text('TIN_picture');
-            $table->string('status',10);
-            $table->date('birthdate');
-            $table->string('type',10)->default('user');
-            $table->bigInteger('address_id')->unsigned();
+            $table->string('first_name',10)->nullable();
+            $table->string('last_name',10)->nullable();        
+            $table->string('email')->unique()->nullable();
+            $table->text('password')->nullable();
+            $table->text('profile_picture')->nullable();
+            $table->string('phone_number',30)->nullable();
+            $table->text('TIN_picture')->nullable();
+            $table->string('status',10)->nullable();
+            $table->date('birthdate')->nullable();
+            $table->string('type',10)->default('user')->nullable();
+            $table->bigInteger('address_id')->unsigned()->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->bigInteger('membership_id')->unsigned();
+            $table->bigInteger('membership_id')->unsigned()->nullable();
             $table->rememberToken();
             $table->timestamps(); 
             $table->foreign('address_id')->references('id')->on('addresses');

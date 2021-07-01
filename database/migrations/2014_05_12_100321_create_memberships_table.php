@@ -15,9 +15,9 @@ class CreateMembershipsTable extends Migration
     {
         Schema::create('memberships', function (Blueprint $table) {
             $table->bigIncrements('id');
-		$table->string('name',30);
-		$table->integer('limit_of_post');
-		$table->integer('transaction_limit'); 
+		$table->string('name',30)->nullable();
+		$table->integer('limit_of_post')->nullable();
+		$table->integer('transaction_limit')->nullable(); 
             $table->timestamps();
         });
     }
