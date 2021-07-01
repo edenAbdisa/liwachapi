@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Models\Category; 
 use Illuminate\Http\Request;
+use Gate;
+use App\Http\Resources\CategoryResource;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class CategoryController extends Controller
 {
@@ -14,7 +18,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return Category::all();
+        return (new CategoryResource(Category::all()))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -28,14 +34,50 @@ class CategoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @OA\Post(
+     *      path="/address",
+     *      operationId="storeAddress",
+     *      tags={"Address"},
+     *      summary="Store new Address",
+     *      description="Returns address data",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/Address")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Address")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
      */
     public function store(Request $request)
     {
-        //
+        $category = Category::create($request->all());
+        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
+         
+        if($category->save()){ 
+            return (new CategoryResource($category))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+        }else{ 
+            return (new CategoryResource($category))
+            ->response()
+            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**

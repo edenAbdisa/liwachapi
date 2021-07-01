@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Membership;
 use Illuminate\Http\Request;
+use Gate;
+use App\Http\Resources\MembershipResource;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class MembershipController extends Controller
 {

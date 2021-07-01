@@ -78,15 +78,12 @@ class AddressController extends Controller
         $address = Address::create($request->all());
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        dd("line 81");
-        dd($address);
-        if($address->save()){
-            dd("line84");
+        //dd("line 81"); 
+        if($address->save()){ 
             return (new AddressResource($address))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
-        }else{
-            dd("line 89");
+        }else{ 
             return (new AddressResource($address))
             ->response()
             ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);

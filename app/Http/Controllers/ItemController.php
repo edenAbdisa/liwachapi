@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Gate;
+use App\Http\Resources\ItemResource;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class ItemController extends Controller
 {

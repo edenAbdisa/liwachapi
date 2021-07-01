@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Request;
+use App\Models\RequestOrder;
 use Illuminate\Http\Request;
+use Gate;
+use App\Http\Resources\RequestResource;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class RequestController extends Controller
 {
@@ -67,7 +71,7 @@ class RequestController extends Controller
      * @param  \App\Models\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Request $request)
+    public function update(Request $request)
     {
         //
     }

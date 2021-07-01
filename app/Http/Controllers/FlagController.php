@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Flag;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; 
+use Gate;
+use App\Http\Resources\FlagResource;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class FlagController extends Controller
 {

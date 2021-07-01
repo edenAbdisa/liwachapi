@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Type;
 use Illuminate\Http\Request;
+use Gate;
+use App\Http\Resources\TypeResource;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class TypeController extends Controller
 {
@@ -14,7 +18,9 @@ class TypeController extends Controller
      */
     public function index()
     {
-        //
+        return (new TypeResource(Type::all()))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -35,7 +41,19 @@ class TypeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $type = Type::create($request->all());
+        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
+         
+        if($type->save()){ 
+            return (new TypeResource($type))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+        }else{ 
+            return (new TypeResource($type))
+            ->response()
+            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**

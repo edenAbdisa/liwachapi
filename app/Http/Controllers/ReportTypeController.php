@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\ReportType;
 use Illuminate\Http\Request;
+use Gate;
+use App\Http\Resources\ReportTypeResource;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class ReportTypeController extends Controller
 {
