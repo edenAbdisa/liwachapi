@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
+use App\Models\Type;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use Gate;
@@ -18,7 +20,9 @@ class ItemController extends Controller
      */
     public function index()
     {
-        //
+        return (new ItemResource(Item::all()))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -39,7 +43,43 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //if organization or user do smt on status. Check if 
+            //the memebrship of this user enables the user to enter a new product
+        $address = $request->address;
+        $address['type']='item'; 
+        $address = Address::create($address);
+        if($address->save()){ 
+            $type= Type::where('name',$request->type_name)->first();
+            if($type){
+                $input = $request->all();            
+                $input['status']='open';
+                $input['number_of_flag']=0;
+                $input['number_of_request']=0; 
+                $input['bartering_location_id']=$address->id;            
+                $input['type_id']=$type->id;
+                $item=Item::create($input);
+                if($item->save()){ 
+                    return (new ItemResource($item))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_CREATED);
+                }else{ 
+                    return (new ItemResource($item))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+                }            
+           }else{
+            return ("No such type")
+            ->response()
+            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+      
+           }
+        }
+        
+        //$item = Item::create($request->all());
+        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
+        //dd("line 81"); 
+        
     }
 
     /**

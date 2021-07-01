@@ -218,6 +218,206 @@
                     }
                 }
             }
+        },
+        "/item": {
+            "get": {
+                "tags": [
+                    "Item"
+                ],
+                "summary": "Get list of Item",
+                "description": "Returns list of Item",
+                "operationId": "getItemList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Item"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Item"
+                ],
+                "summary": "Store new Item",
+                "description": "Returns Item data",
+                "operationId": "storeItem",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Item"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/Item/{id}": {
+            "get": {
+                "tags": [
+                    "Item"
+                ],
+                "summary": "Get Item information",
+                "description": "Returns Item data",
+                "operationId": "getItemById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Item id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Item"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Item"
+                ],
+                "summary": "Update existing Item",
+                "description": "Returns updated Item data",
+                "operationId": "updateItem",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Item id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Item"
+                ],
+                "summary": "Delete existing Item",
+                "description": "Deletes a record and returns no content",
+                "operationId": "deleteProject",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -275,6 +475,48 @@
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "AddressRequest": {
+                "title": "Address",
+                "description": "Address model",
+                "properties": {
+                    "country": {
+                        "title": "Country",
+                        "description": "Country name",
+                        "type": "string",
+                        "example": "Ethiopia"
+                    },
+                    "city": {
+                        "title": "City",
+                        "description": "City name",
+                        "type": "string",
+                        "example": "Addis Ababa"
+                    },
+                    "subcity": {
+                        "title": "Subcity",
+                        "description": "Subcity",
+                        "type": "string", 
+                        "example": "Yeka"
+                    },
+                    "district": {
+                        "title": "District",
+                        "description": "This the area name",
+                        "type": "string", 
+                        "example": "Summit, 4kilo"
+                    },
+                    "landmark": {
+                        "title": "Landmark",
+                        "description": "This is a famous lanmark name around the area",
+                        "type": "string",
+                        "example": "Firdebet, Next to the parlament, Adwa adebaby"
+                    },
+                    "api": {
+                        "title": "Api",
+                        "description": "This is the exact location api link",
+                        "type": "text", 
+                        "example": "https://google.maps/dhjsdbshf"
                     }
                 }
             },
@@ -353,6 +595,31 @@
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "ItemRequest": {
+                "title": "Item",
+                "description": "Item model ",
+                "required": [
+                    "name"
+                ],
+                "properties": { 
+                    "picture": {
+                        "title": "Picture file name",
+                        "description": "This name will be concated with the image collection folder",
+                        "type": "string",
+                        "example": "mybag.jpg"
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/AddressRequest"
+                    },
+                    "type_name": {
+                        "title": "Type",
+                        "description": "Categorize the item into a type and from this type we can decide the category",
+                        "type": "big integer",
+                        "format": "string",
+                        "example": "Mobile"
                     }
                 }
             },
