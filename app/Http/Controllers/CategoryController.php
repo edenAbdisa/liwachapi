@@ -65,6 +65,8 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $category= Category::where('name',$request->name)->first();
+        if(!$category){
         $category = Category::create($request->all());
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
@@ -78,6 +80,7 @@ class CategoryController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
     }
 
     /**
@@ -120,8 +123,9 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy($id)
     {
-        //
+        $category = Category::findOrFail($id);
+        $category->delete();
     }
 }

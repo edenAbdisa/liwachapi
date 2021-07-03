@@ -41,6 +41,8 @@ class TypeController extends Controller
      */
     public function store(Request $request)
     {
+        $type= Type::where('name',$request->name)->first();
+        if(!$type){
         $type = Type::create($request->all());
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
@@ -54,6 +56,7 @@ class TypeController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+     }
     }
 
     /**
@@ -63,17 +66,6 @@ class TypeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Type $type)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Type  $type
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Type $type)
     {
         //
     }
@@ -96,8 +88,9 @@ class TypeController extends Controller
      * @param  \App\Models\Type  $type
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Type $type)
+    public function destroy($id)
     {
-        //
+        $type = Type::findOrFail($id);
+        $type->delete();
     }
 }

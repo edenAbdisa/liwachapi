@@ -26,16 +26,6 @@ class ItemController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -70,36 +60,22 @@ class ItemController extends Controller
            }else{
             return ("No such type")
             ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-      
+            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);      
            }
-        }
-        
+        }        
         //$item = Item::create($request->all());
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        //dd("line 81"); 
-        
+        //dd("line 81");         
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Good  $good
+     * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function show(Good $good)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Good  $good
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Good $good)
+    public function show(Item $item)
     {
         //
     }
@@ -108,22 +84,40 @@ class ItemController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Good  $good
+     * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Good $good)
-    {
-        //
+    public function update(Request $request, $id)
+    {        
+        $input = $request->all();
+        $address_to_be_updated = $request->address;
+        $type_to_be_updated = $request->type_name;         
+        $item= Item::where('id',$id)->first();
+        if($address_to_be_updated){
+            $address= Address::where('id',$item->bartering_location_id)->first();
+            $address->fill($address_to_be_updated)->save();
+        }
+        if($type_to_be_updated){            
+            $type= Type::where('name',$request->type_name)->first();
+            $input['type_id']=$type->id;
+        }
+        if($item->fill($input)->save()){
+            return ($item)
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+        }  
+        //Item::where('id', $id)->update(['delayed' => 1]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Good  $good
+     * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Good $good)
+    public function destroy( $id)
     {
-        //
+        $item = Item::findOrFail($id);
+        $item->delete();
     }
 }
