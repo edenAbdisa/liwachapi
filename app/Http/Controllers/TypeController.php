@@ -8,36 +8,72 @@ use Gate;
 use App\Http\Resources\TypeResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 class TypeController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/type",
+     *      operationId="getTypeList",
+     *      tags={"Type"},
+     *      summary="Get list of Type",
+     *      description="Returns list of Type",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/TypeResource")
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     *     )
      */
     public function index()
     {
+        //abort_if(Gate::denies('type_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //User::with(['roles'])->get() 
         return (new TypeResource(Type::all()))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @OA\Post(
+     *      path="/type",
+     *      operationId="storeType",
+     *      tags={"Type"},
+     *      summary="Store new Type",
+     *      description="Returns type data",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/Type")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Type")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
      */
     public function store(Request $request)
     {
@@ -60,37 +96,150 @@ class TypeController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Type  $type
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/type/{id}",
+     *      operationId="getTypeById",
+     *      tags={"Type"},
+     *      summary="Get type information",
+     *      description="Returns type data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Type id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Type")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
      */
-    public function show(Type $type)
-    {
-        //
+    public function search(Request $request)
+    { 
+        $input = $request->all();
+        $types = Type::all();  
+        $col=DB::getSchemaBuilder()->getColumnListing('types'); 
+        $requestKeys = collect($request->all())->keys();       
+        foreach ($requestKeys as $key) { 
+            if(empty($types)){
+                return response()->json($types, 200);
+            }
+            if(in_array($key,$col)){ 
+                $types = $types->where($key,$input[$key]);
+            }            
+        } 
+        return response()->json($types, 200); 
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Type  $type
-     * @return \Illuminate\Http\Response
+     * @OA\Put(
+     *      path="/type/{id}",
+     *      operationId="updateType",
+     *      tags={"Type"},
+     *      summary="Update existing type",
+     *      description="Returns updated type data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Type id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/UpdateTypeRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=202,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Type")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
      */
-    public function update(Request $request, Type $type)
+    public function update(Request $request, $id)
     {
-        //
+        $input = $request->all();          
+        $type= Type::where('id',$id)->first();
+        if($type->fill($input)->save()){
+            return ($type)
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+        } 
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Type  $type
-     * @return \Illuminate\Http\Response
+     * @OA\Delete(
+     *      path="/type/{id}",
+     *      operationId="deleteType",
+     *      tags={"Type"},
+     *      summary="Delete existing type",
+     *      description="Deletes a record and returns no content",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Type id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=204,
+     *          description="Successful operation",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
      */
     public function destroy($id)
     {
-        $type = Type::findOrFail($id);
+        $type = Type::findOrFail(id);
         $type->delete();
-    }
+        return response(null, Response::HTTP_NO_CONTENT);
+    }    
 }

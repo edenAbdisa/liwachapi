@@ -10,6 +10,9 @@ use Gate;
 use App\Http\Resources\ItemResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class ItemController extends Controller
 {
@@ -68,16 +71,22 @@ class ItemController extends Controller
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81");         
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Item  $item
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Item $item)
-    {
-        //
+ 
+    public function show(Request $request)
+    { 
+        $input = $request->all();
+        $items = Item::all();  
+        $col=DB::getSchemaBuilder()->getColumnListing('items'); 
+        $requestKeys = collect($request->all())->keys();       
+        foreach ($requestKeys as $key) { 
+            if(empty($items)){
+                return response()->json($items, 200);
+            }
+            if(in_array($key,$col)){ 
+                $items = $items->where($key,$input[$key]);
+            }            
+        } 
+        return response()->json($items, 200); 
     }
 
     /**

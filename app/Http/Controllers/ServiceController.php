@@ -8,7 +8,9 @@ use Gate;
 use App\Http\Resources\ServiceResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 class ServiceController extends Controller
 {
     /**

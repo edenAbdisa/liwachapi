@@ -8,46 +8,58 @@ use Gate;
 use App\Http\Resources\CategoryResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/categories",
+     *      operationId="getAddressesList",
+     *      tags={"Category"},
+     *      summary="Get list of Category",
+     *      description="Returns list of Category",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/AddressResource")
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     *     )
      */
     public function index()
     {
-        return (new CategoryResource(Category::all()))
+        //abort_if(Gate::denies('category_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //User::with(['roles'])->get() 
+        return (new AddressResource(Category::all()))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
+       /**
      * @OA\Post(
-     *      path="/address",
+     *      path="/category",
      *      operationId="storeAddress",
-     *      tags={"Address"},
-     *      summary="Store new Address",
-     *      description="Returns address data",
+     *      tags={"Category"},
+     *      summary="Store new Category",
+     *      description="Returns category data",
      *      @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/Address")
+     *          @OA\JsonContent(ref="#/components/schemas/Category")
      *      ),
      *      @OA\Response(
      *          response=201,
      *          description="Successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/Address")
+     *          @OA\JsonContent(ref="#/components/schemas/Category")
      *       ),
      *      @OA\Response(
      *          response=400,
@@ -65,6 +77,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        //Str::upper(str)
         $category= Category::where('name',$request->name)->first();
         if(!$category){
         $category = Category::create($request->all());
@@ -80,52 +93,154 @@ class CategoryController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
+        }
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/categoryes/{id}",
+     *      operationId="getAddressById",
+     *      tags={"Categories"},
+     *      summary="Get category information",
+     *      description="Returns category data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Category id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Category")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
      */
-    public function show(Category $category)
-    {
-        //
+    public function search(Request $request)
+    { 
+        $input = $request->all();
+        $categories = Category::all();  
+        $col=DB::getSchemaBuilder()->getColumnListing('categories'); 
+        $requestKeys = collect($request->all())->keys();       
+        foreach ($requestKeys as $key) { 
+            if(empty($categories)){
+                return response()->json($categories, 200);
+            }
+            if(in_array($key,$col)){ 
+                $categories = $categories->where($key,$input[$key]);
+            }            
+        } 
+        return response()->json($categories, 200); 
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
+     * @OA\Put(
+     *      path="/categories/{id}",
+     *      operationId="updateAddress",
+     *      tags={"Addresss"},
+     *      summary="Update existing category",
+     *      description="Returns updated category data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Category id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/UpdateAddressRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=202,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Category")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
      */
-    public function edit(Category $category)
+    public function update(Request $request, $id)
     {
-        //
+        $input = $request->all();          
+        $category= Category::where('id',$id)->first();
+        if($category->fill($input)->save()){
+            return ($category)
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+        } 
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Category $category)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
+     * @OA\Delete(
+     *      path="/categories/{id}",
+     *      operationId="deleteAddress",
+     *      tags={"Addressess"},
+     *      summary="Delete existing category",
+     *      description="Deletes a record and returns no content",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Category id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=204,
+     *          description="Successful operation",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
      */
     public function destroy($id)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::findOrFail(id);
         $category->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

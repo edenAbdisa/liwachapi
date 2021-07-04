@@ -8,7 +8,9 @@ use Gate;
 use App\Http\Resources\AddressResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 class AddressController extends Controller
 {
     /**
@@ -21,7 +23,7 @@ class AddressController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/ProjectResource")
+     *          @OA\JsonContent(ref="#/components/schemas/AddressResource")
      *       ),
      *      @OA\Response(
      *          response=401,
@@ -35,7 +37,7 @@ class AddressController extends Controller
      */
     public function index()
     {
-        //abort_if(Gate::denies('project_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //abort_if(Gate::denies('address_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
         return (new AddressResource(Address::all()))
             ->response()
@@ -91,39 +93,149 @@ class AddressController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Address  $address
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/addresses/{id}",
+     *      operationId="getAddressById",
+     *      tags={"Addresses"},
+     *      summary="Get address information",
+     *      description="Returns address data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Address id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Address")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
      */
-    public function show(Address $address)
-    {
-        return Address::find($address);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Address  $address
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Address $address)
-    {
-        $address = Address::findOrFail($request->id);
+    public function search(Request $request)
+    { 
         $input = $request->all();
-        return $address->fill($input)->save(); 
+        $addresses = Address::all();  
+        $col=DB::getSchemaBuilder()->getColumnListing('addresses'); 
+        $requestKeys = collect($request->all())->keys();       
+        foreach ($requestKeys as $key) { 
+            if(empty($addresses)){
+                return response()->json($addresses, 200);
+            }
+            if(in_array($key,$col)){ 
+                $addresses = $addresses->where($key,$input[$key]);
+            }            
+        } 
+        return response()->json($addresses, 200); 
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Address  $address
-     * @return \Illuminate\Http\Response
+     * @OA\Put(
+     *      path="/addresses/{id}",
+     *      operationId="updateAddress",
+     *      tags={"Addresss"},
+     *      summary="Update existing address",
+     *      description="Returns updated address data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Address id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/UpdateAddressRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=202,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Address")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
      */
-    public function destroy(Address $address)
+    public function update(Request $request, $id)
     {
-        $address = Address::findOrFail($address->id);
+        $input = $request->all();          
+        $address= Address::where('id',$id)->first();
+        if($address->fill($input)->save()){
+            return ($address)
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+        } 
+    }
+
+    /**
+     * @OA\Delete(
+     *      path="/addresses/{id}",
+     *      operationId="deleteAddress",
+     *      tags={"Addressess"},
+     *      summary="Delete existing address",
+     *      description="Deletes a record and returns no content",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Address id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=204,
+     *          description="Successful operation",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
+     */
+    public function destroy($id)
+    {
+        $address = Address::findOrFail(id);
         $address->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

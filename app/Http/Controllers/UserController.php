@@ -7,8 +7,265 @@ use Gate;
 use App\Http\Resources\UserResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str; 
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
-    //
+    /**
+     * @OA\Get(
+     *      path="/users",
+     *      operationId="getUsersList",
+     *      tags={"User"},
+     *      summary="Get list of User",
+     *      description="Returns list of User",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/UserResource")
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     *     )
+     */
+    public function index()
+    {
+        return User::all();
+    }
+    public function login(Request $request){
+    	$user= User::where('email',$request->email)->first();
+    	$response=['user'=> $user];
+    	if( $user) {
+    		if(Hash::check($request->password,$user->password)){
+    		   $token=$user->createToken('Laravel Password Grant Client')->accessToken;
+    		   $user['remember_token']= $token;
+    		   $response=['user'=> $user];
+    		   return $user->save()? response($response,200):
+    			  "Couldn't provide token for user"; 
+    		}else{
+    		   $response=["message"=>"Password mismatch"];
+          		   return response($response,422);
+    		}
+    	}else{
+    		$response=['message'=>'User doesnt not exist'];
+    		return response($response,422);
+    	}
+    }
+    public function logout(Request $request){ 
+	$token= $request->user()->token();
+	$token->revoke();
+	$user= User::where('id',$token->user_id)->first();
+	$user['remember_token']='';
+	$response['message'] = $user->save()? 'You have been successfully logged out!':'We could not successfully log out your account please try again!';
+	return response($response,200);	
+    }
+     /**
+     * @OA\Post(
+     *      path="/user",
+     *      operationId="storeUser",
+     *      tags={"User"},
+     *      summary="Store new User",
+     *      description="Returns user data",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/User")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/User")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
+     */
+    public function store(Request $request)
+    {    
+        $input = $request->all(); 
+	$user= User::where('email',$request->email)->first();
+	if(!$user){
+	$input['password']=Hash::make($input['password']);
+    	$input['remember_token'] = Str::random(10);   
+        $user=User::create($input);
+    	$token = $user->createToken('Laravel Password Grant Client')->accessToken;
+    	$user['remember_token']= $token;
+	$saveduser= $user->save();
+	  if($saveduser){
+        	$response=['user'=> $saveduser];
+		$response=['message'=>'Successfully registered'];
+          }else{
+		$response=['user'=> $saveduser];
+		$response=['message'=>'Could not register user'];
+	  }
+	}else{
+		$response=['message'=>'An account already exist by this email please login'];
+	}
+   	return response($response,200);
+    }
+
+        /**
+     * @OA\Get(
+     *      path="/users/{id}",
+     *      operationId="getUserById",
+     *      tags={"Users"},
+     *      summary="Get user information",
+     *      description="Returns user data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="User id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/User")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
+     */
+    public function search(Request $request)
+    { 
+        $input = $request->all();
+        $users = User::all();  
+        $col=DB::getSchemaBuilder()->getColumnListing('users'); 
+        $requestKeys = collect($request->all())->keys();       
+        foreach ($requestKeys as $key) { 
+            if(empty($users)){
+                return response()->json($users, 200);
+            }
+            if(in_array($key,$col)){ 
+                $users = $users->where($key,$input[$key]);
+            }            
+        } 
+        return response()->json($users, 200); 
+    }
+
+     /**
+     * @OA\Put(
+     *      path="/users/{id}",
+     *      operationId="updateUser",
+     *      tags={"Users"},
+     *      summary="Update existing user",
+     *      description="Returns updated user data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="User id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/UpdateUserRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=202,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/User")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
+     */
+    public function update(Request $request, $id)
+    {
+        $input = $request->all();          
+        $user= User::where('id',$id)->first();
+        if($user->fill($input)->save()){
+            return ($user)
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+        } 
+    }
+     /**
+     * @OA\Delete(
+     *      path="/users/{id}",
+     *      operationId="deleteUser",
+     *      tags={"Userss"},
+     *      summary="Delete existing user",
+     *      description="Deletes a record and returns no content",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="User id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=204,
+     *          description="Successful operation",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
+     */
+    public function destroy($id)
+    {
+        $user = User::findOrFail(id);
+        $user->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
+    }
 }

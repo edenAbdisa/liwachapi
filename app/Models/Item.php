@@ -15,5 +15,5 @@ class Item extends Model
         'number_of_request',
         'bartering_location_id',
         'type_id'
-    ];
+    ]; 
 }

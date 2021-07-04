@@ -8,82 +8,235 @@ use Gate;
 use App\Http\Resources\SubscriptionResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 class SubscriptionController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/subscription",
+     *      operationId="getSubscriptionList",
+     *      tags={"Subscription"},
+     *      summary="Get list of Subscription",
+     *      description="Returns list of Subscription",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/SubscriptionResource")
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     *     )
      */
     public function index()
     {
-        //
+        //abort_if(Gate::denies('subscription_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //User::with(['roles'])->get() 
+        return (new SubscriptionResource(Subscription::all()))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @OA\Post(
+     *      path="/subscription",
+     *      operationId="storeSubscription",
+     *      tags={"Subscription"},
+     *      summary="Store new Subscription",
+     *      description="Returns subscription data",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/Subscription")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Subscription")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
      */
     public function store(Request $request)
     {
-        //
+        $subscription = Subscription::create($request->all());
+        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
+        //dd("line 81"); 
+        if($subscription->save()){ 
+            return (new SubscriptionResource($subscription))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+        }else{ 
+            return (new SubscriptionResource($subscription))
+            ->response()
+            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Subscription  $subscription
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/subscription/{id}",
+     *      operationId="getSubscriptionById",
+     *      tags={"Subscription"},
+     *      summary="Get subscription information",
+     *      description="Returns subscription data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Subscription id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Subscription")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
      */
-    public function show(Subscription $subscription)
-    {
-        //
+    public function search(Request $request)
+    { 
+        $input = $request->all();
+        $subscriptions = Subscription::all();  
+        $col=DB::getSchemaBuilder()->getColumnListing('subscriptions'); 
+        $requestKeys = collect($request->all())->keys();       
+        foreach ($requestKeys as $key) { 
+            if(empty($subscriptions)){
+                return response()->json($subscriptions, 200);
+            }
+            if(in_array($key,$col)){ 
+                $subscriptions = $subscriptions->where($key,$input[$key]);
+            }            
+        } 
+        return response()->json($subscriptions, 200); 
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Subscription  $subscription
-     * @return \Illuminate\Http\Response
+     * @OA\Put(
+     *      path="/subscription/{id}",
+     *      operationId="updateSubscription",
+     *      tags={"Subscription"},
+     *      summary="Update existing subscription",
+     *      description="Returns updated subscription data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Subscription id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/UpdateSubscriptionRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=202,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Subscription")
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
      */
-    public function edit(Subscription $subscription)
+    public function update(Request $request, $id)
     {
-        //
+        $input = $request->all();          
+        $subscription= Subscription::where('id',$id)->first();
+        if($subscription->fill($input)->save()){
+            return ($subscription)
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+        } 
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Subscription  $subscription
-     * @return \Illuminate\Http\Response
+     * @OA\Delete(
+     *      path="/subscription/{id}",
+     *      operationId="deleteSubscription",
+     *      tags={"Subscription"},
+     *      summary="Delete existing subscription",
+     *      description="Deletes a record and returns no content",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Subscription id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=204,
+     *          description="Successful operation",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Resource Not Found"
+     *      )
+     * )
      */
-    public function update(Request $request, Subscription $subscription)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Subscription  $subscription
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Subscription $subscription)
-    {
-        //
+        $subscription = Subscription::findOrFail(id);
+        $subscription->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
