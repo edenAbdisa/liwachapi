@@ -128,5 +128,6 @@ class ItemController extends Controller
     {
         $item = Item::findOrFail($id);
         $item->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

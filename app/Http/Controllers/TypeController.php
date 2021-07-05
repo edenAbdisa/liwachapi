@@ -238,7 +238,7 @@ class TypeController extends Controller
      */
     public function destroy($id)
     {
-        $type = Type::findOrFail(id);
+        $type = Type::findOrFail($id);
         $type->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }    

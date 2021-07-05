@@ -235,7 +235,7 @@ class RequestController extends Controller
      */
     public function destroy($id)
     {
-        $request = Request::findOrFail(id);
+        $request = Request::findOrFail($id);
         $request->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

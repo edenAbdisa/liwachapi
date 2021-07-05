@@ -235,7 +235,7 @@ class ReportTypeController extends Controller
      */
     public function destroy($id)
     {
-        $reporttype = ReportType::findOrFail(id);
+        $reporttype = ReportType::findOrFail($id);
         $reporttype->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

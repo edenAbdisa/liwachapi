@@ -235,7 +235,7 @@ class FlagController extends Controller
      */
     public function destroy($id)
     {
-        $flag = Flag::findOrFail(id);
+        $flag = Flag::findOrFail($id);
         $flag->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

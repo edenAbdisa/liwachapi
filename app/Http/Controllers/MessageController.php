@@ -235,7 +235,7 @@ class MessageController extends Controller
      */
     public function destroy($id)
     {
-        $membership = Membership::findOrFail(id);
+        $membership = Membership::findOrFail($id);
         $membership->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

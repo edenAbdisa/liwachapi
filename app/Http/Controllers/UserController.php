@@ -264,7 +264,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail(id);
+        $user = User::findOrFail($id);
         $user->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

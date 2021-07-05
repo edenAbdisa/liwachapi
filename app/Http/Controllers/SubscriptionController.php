@@ -235,7 +235,7 @@ class SubscriptionController extends Controller
      */
     public function destroy($id)
     {
-        $subscription = Subscription::findOrFail(id);
+        $subscription = Subscription::findOrFail($id);
         $subscription->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }
