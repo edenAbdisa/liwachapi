@@ -39,7 +39,11 @@ class TypeController extends Controller
     {
         //abort_if(Gate::denies('type_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new TypeResource(Type::all()))
+        $type= Type::all()
+                    ->each(function($item, $key) {
+                         $item->category ;
+                    });
+        return (new TypeResource($type))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -83,14 +87,14 @@ class TypeController extends Controller
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
          
-        if($type->save()){ 
+        if($type->save()){
+            $type->category; 
             return (new TypeResource($type))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
         }else{ 
-            return (new TypeResource($type))
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()
+                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
      }
     }
@@ -133,7 +137,7 @@ class TypeController extends Controller
     public function search(Request $request)
     { 
         $input = $request->all();
-        $types = Type::all();  
+        $types = Type::all();         
         $col=DB::getSchemaBuilder()->getColumnListing('types'); 
         $requestKeys = collect($request->all())->keys();       
         foreach ($requestKeys as $key) { 
@@ -144,6 +148,9 @@ class TypeController extends Controller
                 $types = $types->where($key,$input[$key]);
             }            
         } 
+        $types->each(function($item, $key) {
+            $item->category ;
+        });
         return response()->json($types, 200); 
     }
 
@@ -195,6 +202,7 @@ class TypeController extends Controller
         $input = $request->all();          
         $type= Type::where('id',$id)->first();
         if($type->fill($input)->save()){
+            $type->category;
             return ($type)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);

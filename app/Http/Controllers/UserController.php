@@ -39,7 +39,14 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::all();
+        $user= User::all()
+                         ->each(function($item, $key) {
+                            $item->address;
+                            $item->membership; 
+                        });
+        return (new UserResource($user))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_OK); 
     }
     public function login(Request $request){
     	$user= User::where('email',$request->email)->first();
@@ -49,6 +56,8 @@ class UserController extends Controller
     		   $token=$user->createToken('Laravel Password Grant Client')->accessToken;
     		   $user['remember_token']= $token;
     		   $response=['user'=> $user];
+               $user->address;
+               $user->membership; 
     		   return $user->save()? response($response,200):
     			  "Couldn't provide token for user"; 
     		}else{
@@ -61,12 +70,12 @@ class UserController extends Controller
     	}
     }
     public function logout(Request $request){ 
-	$token= $request->user()->token();
-	$token->revoke();
-	$user= User::where('id',$token->user_id)->first();
-	$user['remember_token']='';
-	$response['message'] = $user->save()? 'You have been successfully logged out!':'We could not successfully log out your account please try again!';
-	return response($response,200);	
+        $token= $request->user()->token();
+        $token->revoke();
+        $user= User::where('id',$token->user_id)->first();
+        $user['remember_token']='';
+        $response['message'] = $user->save()? 'You have been successfully logged out!':'We could not successfully log out your account please try again!';
+        return response($response,200);	
     }
      /**
      * @OA\Post(
@@ -101,25 +110,27 @@ class UserController extends Controller
     public function store(Request $request)
     {    
         $input = $request->all(); 
-	$user= User::where('email',$request->email)->first();
-	if(!$user){
-	$input['password']=Hash::make($input['password']);
-    	$input['remember_token'] = Str::random(10);   
-        $user=User::create($input);
-    	$token = $user->createToken('Laravel Password Grant Client')->accessToken;
-    	$user['remember_token']= $token;
-	$saveduser= $user->save();
-	  if($saveduser){
-        	$response=['user'=> $saveduser];
-		$response=['message'=>'Successfully registered'];
-          }else{
-		$response=['user'=> $saveduser];
-		$response=['message'=>'Could not register user'];
-	  }
-	}else{
-		$response=['message'=>'An account already exist by this email please login'];
-	}
-   	return response($response,200);
+        $user= User::where('email',$request->email)->first();
+        if(!$user){
+        $input['password']=Hash::make($input['password']);
+            $input['remember_token'] = Str::random(10);   
+            $user=User::create($input);
+            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+            $user['remember_token']= $token;
+            $saveduser= $user->save();
+        if($saveduser){
+            $user->address;
+            $user->membership; 
+            $response=['user'=> $saveduser];
+            $response=['message'=>'Successfully registered'];
+            }else{ 
+                return response()
+                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }else{
+            $response=['message'=>'An account already exist by this email please login'];
+        }
+        return response($response,200);
     }
 
         /**
@@ -171,6 +182,10 @@ class UserController extends Controller
                 $users = $users->where($key,$input[$key]);
             }            
         } 
+        $users->each(function($item, $key) {
+                            $item->address;
+                            $item->membership; 
+                        });
         return response()->json($users, 200); 
     }
 
@@ -222,7 +237,9 @@ class UserController extends Controller
         $input = $request->all();          
         $user= User::where('id',$id)->first();
         if($user->fill($input)->save()){
-            return ($user)
+            $user->address;
+            $user->membership; 
+            return (new UserResponse($user))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
         } 

@@ -39,7 +39,12 @@ class SubscriptionController extends Controller
     {
         //abort_if(Gate::denies('subscription_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new SubscriptionResource(Subscription::all()))
+        $subscription= Subscription::all()
+                         ->each(function($item, $key) {
+                            $item->type;
+                            $item->user; 
+                        }); 
+        return (new SubscriptionResource($subscription))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -81,14 +86,15 @@ class SubscriptionController extends Controller
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
-        if($subscription->save()){ 
+        if($subscription->save()){
+            $subscription->type;
+            $subscription->user; 
             return (new SubscriptionResource($subscription))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
         }else{ 
-            return (new SubscriptionResource($subscription))
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()
+                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -141,6 +147,10 @@ class SubscriptionController extends Controller
                 $subscriptions = $subscriptions->where($key,$input[$key]);
             }            
         } 
+        $subscriptions->each(function($item, $key) {
+                            $item->type;
+                            $item->user; 
+                        }); 
         return response()->json($subscriptions, 200); 
     }
 
@@ -192,6 +202,8 @@ class SubscriptionController extends Controller
         $input = $request->all();          
         $subscription= Subscription::where('id',$id)->first();
         if($subscription->fill($input)->save()){
+            $subscription->type;
+            $subscription->user; 
             return ($subscription)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);

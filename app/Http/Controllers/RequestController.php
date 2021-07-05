@@ -39,7 +39,13 @@ class RequestController extends Controller
     {
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new RequestResource(Request::all()))
+        $requestOrder= RequestOrder::all()
+                         ->each(function($item, $key) {
+                            $item->requester;
+                            $item->requested_item; 
+                            $item->requester_item;
+                        });
+        return (new RequestResource($requestOrder))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -82,13 +88,15 @@ class RequestController extends Controller
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
         if($request->save()){ 
+            $request->requester;
+            $request->requested_item; 
+            $request->requester_item;
             return (new RequestResource($request))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
         }else{ 
-            return (new RequestResource($request))
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()
+                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -141,6 +149,11 @@ class RequestController extends Controller
                 $requests = $requests->where($key,$input[$key]);
             }            
         } 
+        $requests->each(function($item, $key) {
+            $item->requester;
+            $item->requested_item; 
+            $item->requester_item;
+        });
         return response()->json($requests, 200); 
     }
 
@@ -192,6 +205,9 @@ class RequestController extends Controller
         $input = $request->all();          
         $request= Request::where('id',$id)->first();
         if($request->fill($input)->save()){
+            $request->requester;
+            $request->requested_item; 
+            $request->requester_item;
             return ($request)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);

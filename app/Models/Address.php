@@ -8,15 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Address extends Model
 {
     use HasFactory;
-    /* protected Bigint $primaryKey = 'id';
-    public $incrementing = true;
-    public $timestamps = true;
-    public String $country;
-    public String $city;
-    public String $subcity;
-    public String $district;
-    public String $landmark;
-    public String $type; */
     /**
      * The attributes that are mass assignable.
      *
@@ -30,5 +21,12 @@ class Address extends Model
         'landmark',
         'type'
     ];
-
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
+    public function item()
+    {
+        return $this->hasOne(Item::class);
+    }
 }

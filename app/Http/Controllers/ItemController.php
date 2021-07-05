@@ -23,7 +23,11 @@ class ItemController extends Controller
      */
     public function index()
     {
-        return (new ItemResource(Item::all()))
+        $items= Item::all()->each(function($item, $key) {
+            $item->bartering_location ;
+            $item->type ; 
+       });
+        return (new ItemResource($items))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -52,13 +56,14 @@ class ItemController extends Controller
                 $input['type_id']=$type->id;
                 $item=Item::create($input);
                 if($item->save()){ 
+                    $item->bartering_location ;
+                    $item->type ;
                     return (new ItemResource($item))
                     ->response()
                     ->setStatusCode(Response::HTTP_CREATED);
                 }else{ 
-                    return (new ItemResource($item))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+                    return response()
+                           ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
                 }            
            }else{
             return ("No such type")
@@ -72,7 +77,7 @@ class ItemController extends Controller
         //dd("line 81");         
     }
  
-    public function show(Request $request)
+    public function search(Request $request)
     { 
         $input = $request->all();
         $items = Item::all();  
@@ -86,6 +91,10 @@ class ItemController extends Controller
                 $items = $items->where($key,$input[$key]);
             }            
         } 
+        $items->each(function($item, $key) {
+            $item->bartering_location ;
+            $item->type ;
+       });
         return response()->json($items, 200); 
     }
 
@@ -111,6 +120,8 @@ class ItemController extends Controller
             $input['type_id']=$type->id;
         }
         if($item->fill($input)->save()){
+            $item->bartering_location ;
+            $item->type ;
             return ($item)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);

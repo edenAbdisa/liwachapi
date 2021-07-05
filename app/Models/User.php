@@ -10,30 +10,19 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
-    /* protected String $primaryKey = 'id';
-    public String $incrementing = true;
-    public Timestamp $timestamps = true;
-    public String $firstName ;
-    public String $lastName ;
-    public String $email;
-    public String $profilePicture;
-    public String $phoneNumber;
-    public String $TINPicture;
-    public String $status;
-    public Date $birthDate;
-    public String $type;
-    public BigInt $addressId;
-    public Timestamp $emailVerifiedAt;
-    public String $token; */ 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
+        'profile_picture',
+        'phone_number',
+        'TIN_picture',
+        'status',
+        'birthdate',
+        'type',
+        'address_id',
+        'membership_id'
     ];
 
     /**
@@ -54,4 +43,28 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function address()
+    {
+        return $this->belongsTo(Address::class);
+    }
+    public function membership()
+    {
+        return $this->belongsTo(Membership::class);
+    }
+    public function flag()
+    {
+        return $this->hasMany(Flag::class);
+    }
+    public function message()
+    {
+        return $this->hasMany(Message::class);
+    }
+    public function request()
+    {
+        return $this->hasMany(RequestOrder::class);
+    }
+    public function subscription()
+    {
+        return $this->hasMany(Subscription::class);
+    }
 }

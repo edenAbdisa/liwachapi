@@ -38,8 +38,13 @@ class ServiceController extends Controller
     public function index()
     {
         //abort_if(Gate::denies('service_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        //User::with(['roles'])->get() 
-        return (new ServiceResource(Service::all()))
+        //User::with(['roles'])->get()
+        $service= Service::all()
+                         ->each(function($item, $key) {
+                            $item->bartering_location;
+                            $item->type; 
+                        }); 
+        return (new ServiceResource($service))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -84,13 +89,14 @@ class ServiceController extends Controller
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
          
         if($service->save()){ 
+            $service->bartering_location;
+            $service->type; 
             return (new ServiceResource($service))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
         }else{ 
-            return (new ServiceResource($service))
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()
+                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
      }
     }
@@ -144,6 +150,10 @@ class ServiceController extends Controller
                 $services = $services->where($key,$input[$key]);
             }            
         } 
+        $services->each(function($item, $key) {
+                            $item->bartering_location;
+                            $item->type; 
+                        });
         return response()->json($services, 200); 
     }
 
@@ -195,6 +205,8 @@ class ServiceController extends Controller
         $input = $request->all();          
         $service= Service::where('id',$id)->first();
         if($service->fill($input)->save()){
+            $service->bartering_location;
+            $service->type;
             return ($service)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);

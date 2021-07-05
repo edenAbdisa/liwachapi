@@ -1,4 +1,4 @@
-Deployed at 
+Deployed at http://liwachapi.herokuapp.com/api/documentation
 
 Commands
 php artisan make:model Todo -mcr

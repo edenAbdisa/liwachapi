@@ -16,14 +16,14 @@ class MembershipController extends Controller
     /**
      * @OA\Get(
      *      path="/memberships",
-     *      operationId="getAddressesList",
+     *      operationId="getMembershipesList",
      *      tags={"Membership"},
      *      summary="Get list of Membership",
      *      description="Returns list of Membership",
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/AddressResource")
+     *          @OA\JsonContent(ref="#/components/schemas/MembershipResource")
      *       ),
      *      @OA\Response(
      *          response=401,
@@ -37,9 +37,9 @@ class MembershipController extends Controller
      */
     public function index()
     {
-        //abort_if(Gate::denies('address_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //abort_if(Gate::denies('membership_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new AddressResource(Membership::all()))
+        return (new MembershipResource(Membership::all()))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -48,7 +48,7 @@ class MembershipController extends Controller
     /**
      * @OA\Post(
      *      path="/membership",
-     *      operationId="storeAddress",
+     *      operationId="storeMembership",
      *      tags={"Membership"},
      *      summary="Store new Membership",
      *      description="Returns membership data",
@@ -82,20 +82,19 @@ class MembershipController extends Controller
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
         if($membership->save()){ 
-            return (new AddressResource($membership))
+            return (new MembershipResource($membership))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
         }else{ 
-            return (new AddressResource($membership))
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()
+                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
      * @OA\Get(
      *      path="/memberships/{id}",
-     *      operationId="getAddressById",
+     *      operationId="getMembershipById",
      *      tags={"Memberships"},
      *      summary="Get membership information",
      *      description="Returns membership data",
@@ -147,8 +146,8 @@ class MembershipController extends Controller
     /**
      * @OA\Put(
      *      path="/memberships/{id}",
-     *      operationId="updateAddress",
-     *      tags={"Addresss"},
+     *      operationId="updateMembership",
+     *      tags={"Memberships"},
      *      summary="Update existing membership",
      *      description="Returns updated membership data",
      *      @OA\Parameter(
@@ -162,7 +161,7 @@ class MembershipController extends Controller
      *      ),
      *      @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/UpdateAddressRequest")
+     *          @OA\JsonContent(ref="#/components/schemas/UpdateMembershipRequest")
      *      ),
      *      @OA\Response(
      *          response=202,
@@ -201,8 +200,8 @@ class MembershipController extends Controller
     /**
      * @OA\Delete(
      *      path="/memberships/{id}",
-     *      operationId="deleteAddress",
-     *      tags={"Addressess"},
+     *      operationId="deleteMembership",
+     *      tags={"Membershipess"},
      *      summary="Delete existing membership",
      *      description="Deletes a record and returns no content",
      *      @OA\Parameter(

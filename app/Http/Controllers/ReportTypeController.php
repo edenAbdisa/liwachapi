@@ -86,9 +86,8 @@ class ReportTypeController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
         }else{ 
-            return (new ReportTypeResource($reporttype))
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()
+                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

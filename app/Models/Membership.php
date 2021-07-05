@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Membership extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'limit_of_post',
+        'transaction_limit'
+    ];
+    public function user()
+    {
+        return $this->hasMany(User::class);
+    }
 }

@@ -39,7 +39,13 @@ class FlagController extends Controller
     {
         //abort_if(Gate::denies('flag_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new FlagResource(Flag::all()))
+        $flag= Flag::all();
+        foreach($flag as $f){
+          $flag['reason_id']= $f->reason;
+          $flag['flagged_by_id']= $f->flagged_by;
+          $flag['flagged_item_id']= $f->flagged_item;
+        }
+        return (new FlagResource($flag))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -82,13 +88,15 @@ class FlagController extends Controller
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
         if($flag->save()){ 
+            $flag['reason_id']= $flag->reason;
+            $flag['flagged_by_id']= $flag->flagged_by;
+            $flag['flagged_item_id']= $flag->flagged_item;
             return (new FlagResource($flag))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
         }else{ 
-            return (new FlagResource($flag))
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()
+                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -139,8 +147,16 @@ class FlagController extends Controller
             }
             if(in_array($key,$col)){ 
                 $flags = $flags->where($key,$input[$key]);
+                $flag['reason_id']= $f->reason;
+                $flag['flagged_by_id']= $f->flagged_by;
+                $flag['flagged_item_id']= $f->flagged_item;
             }            
         } 
+        foreach($flags as $f){
+            $flags['reason_id']= $f->reason;
+            $flags['flagged_by_id']= $f->flagged_by;
+            $flags['flagged_item_id']= $f->flagged_item;
+        }
         return response()->json($flags, 200); 
     }
 
@@ -192,10 +208,16 @@ class FlagController extends Controller
         $input = $request->all();          
         $flag= Flag::where('id',$id)->first();
         if($flag->fill($input)->save()){
+            $flag['reason_id']= $flag->reason;
+            $flag['flagged_by_id']= $flag->flagged_by;
+            $flag['flagged_item_id']= $flag->flagged_item;
             return ($flag)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
-        } 
+        }else{ 
+            return response()
+                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
