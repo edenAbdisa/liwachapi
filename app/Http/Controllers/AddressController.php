@@ -192,7 +192,7 @@ class AddressController extends Controller
         $input = $request->all();          
         $address= Address::where('id',$id)->first();
         if($address->fill($input)->save()){
-            return ($address)
+            return (new AddressResource($address))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
         } 
@@ -233,10 +233,12 @@ class AddressController extends Controller
      *      )
      * )
      */
-    public function destroy($id)
+   /* public function destroy($id)
     {
-        $address = Address::findOrFail(id);
+        $address = Address::findOrFail($id);
         $address->delete();
         return response(null, Response::HTTP_NO_CONTENT);
-    }
+    }*/
+    //cant be deletd alone since it violates foreign key no need
+    //to delete this data by an end point
 }

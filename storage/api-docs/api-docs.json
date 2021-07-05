@@ -14,7 +14,7 @@
     },
     "servers": [
         {
-            "url": "http://liwachapi.herokuapp.com/api",
+            "url": "http://127.0.0.1:8000/api",
             "description": "Demo API Server"
         }
     ],
@@ -26,7 +26,7 @@
                 ],
                 "summary": "Get list of address",
                 "description": "Returns list of address",
-                "operationId": "getProjectsList",
+                "operationId": "getAddressList",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -58,7 +58,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Address"
+                                "$ref": "#/components/schemas/AddressRequest"
                             }
                         }
                     }
@@ -86,59 +86,19 @@
                 }
             }
         },
-        "/address/{id}": {
-            "get": {
-                "tags": [
-                    "Address"
-                ],
-                "summary": "Get project information",
-                "description": "Returns project data",
-                "operationId": "getProjectById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Address"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
+        "/address/{id}": {            
             "put": {
                 "tags": [
                     "Address"
                 ],
-                "summary": "Update existing project",
-                "description": "Returns updated project data",
-                "operationId": "updateProject",
+                "summary": "Update existing address",
+                "description": "Returns updated address data",
+                "operationId": "updateAddress",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Project id",
+                        "description": "Address id",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -150,7 +110,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateProjectRequest"
+                                "$ref": "#/components/schemas/AddressRequest"
                             }
                         }
                     }
@@ -161,51 +121,13 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Project"
+                                    "$ref": "#/components/schemas/Address"
                                 }
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Resource Not Found"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Address"
-                ],
-                "summary": "Delete existing project",
-                "description": "Deletes a record and returns no content",
-                "operationId": "deleteProject",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -267,7 +189,7 @@
                 ],
                 "summary": "Get list of category",
                 "description": "Returns list of category",
-                "operationId": "getProjectsList",
+                "operationId": "getCategoryList",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -299,7 +221,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Category"
+                                "$ref": "#/components/schemas/CategoryRequest"
                             }
                         }
                     }
@@ -328,46 +250,6 @@
             }
         },
         "/category/{id}": {
-            "get": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Get project information",
-                "description": "Returns project data",
-                "operationId": "getProjectById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Category"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Category"
@@ -569,46 +451,6 @@
             }
         },
         "/flag/{id}": {
-            "get": {
-                "tags": [
-                    "Flag"
-                ],
-                "summary": "Get project information",
-                "description": "Returns project data",
-                "operationId": "getProjectById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Flag"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Flag"
@@ -749,7 +591,7 @@
                 ],
                 "summary": "Get list of membership",
                 "description": "Returns list of membership",
-                "operationId": "getProjectsList",
+                "operationId": "getMembershipList",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -810,53 +652,13 @@
             }
         },
         "/membership/{id}": {
-            "get": {
-                "tags": [
-                    "Membership"
-                ],
-                "summary": "Get project information",
-                "description": "Returns project data",
-                "operationId": "getProjectById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Membership"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Membership"
                 ],
                 "summary": "Update existing project",
                 "description": "Returns updated project data",
-                "operationId": "updateProject",
+                "operationId": "updateMembership",
                 "parameters": [
                     {
                         "name": "id",
@@ -990,7 +792,7 @@
                 ],
                 "summary": "Get list of message",
                 "description": "Returns list of message",
-                "operationId": "getProjectsList",
+                "operationId": "getMessageList",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -1051,53 +853,13 @@
             }
         },
         "/message/{id}": {
-            "get": {
-                "tags": [
-                    "Message"
-                ],
-                "summary": "Get project information",
-                "description": "Returns project data",
-                "operationId": "getProjectById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Message"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Message"
                 ],
-                "summary": "Update existing project",
-                "description": "Returns updated project data",
-                "operationId": "updateProject",
+                "summary": "Update existing Message",
+                "description": "Returns updated Message data",
+                "operationId": "updateMessage",
                 "parameters": [
                     {
                         "name": "id",
@@ -1292,46 +1054,6 @@
             }
         },
         "/reporttype/{id}": {
-            "get": {
-                "tags": [
-                    "Reporttype"
-                ],
-                "summary": "Get project information",
-                "description": "Returns project data",
-                "operationId": "getProjectById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Reporttype"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Reporttype"
@@ -1533,46 +1255,6 @@
             }
         },
         "/request/{id}": {
-            "get": {
-                "tags": [
-                    "Request"
-                ],
-                "summary": "Get project information",
-                "description": "Returns project data",
-                "operationId": "getProjectById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Request"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Request"
@@ -1774,46 +1456,6 @@
             }
         },
         "/service/{id}": {
-            "get": {
-                "tags": [
-                    "Service"
-                ],
-                "summary": "Get project information",
-                "description": "Returns project data",
-                "operationId": "getProjectById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Service"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Service"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Service"
@@ -2015,46 +1657,6 @@
             }
         },
         "/type/{id}": {
-            "get": {
-                "tags": [
-                    "Type"
-                ],
-                "summary": "Get project information",
-                "description": "Returns project data",
-                "operationId": "getProjectById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Project id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Type"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Type"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Type"
@@ -2256,46 +1858,6 @@
             }
         },
         "/item/{id}": {
-            "get": {
-                "tags": [
-                    "Item"
-                ],
-                "summary": "Get Item information",
-                "description": "Returns Item data",
-                "operationId": "getItemById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Item id",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Item"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Item"
@@ -2419,6 +1981,289 @@
                     },
                     "400": {
                         "description": "Bad Type"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get list of user",
+                "description": "Returns list of user",
+                "operationId": "getUsersList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Store new User",
+                "description": "Returns User data",
+                "operationId": "storeUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/user/{id}": {            
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update existing user",
+                "description": "Returns updated user data",
+                "operationId": "updateUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Delete existing user",
+                "description": "Deletes a record and returns no content",
+                "operationId": "deleteUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            }
+        },
+        "/user/search": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get list of user",
+                "description": "Returns list of user",
+                "operationId": "searchUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/user/logout": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get list of user",
+                "description": "Returns list of user",
+                "operationId": "searchUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get list of user",
+                "description": "Returns list of user",
+                "operationId": "searchUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -2553,6 +2398,22 @@
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "Category"
+                }
+            },
+            "CategoryRequest": {
+                "title": "Category",
+                "description": "Category model",
+                "properties": {
+                    "name": {
+                        "title": "Category name",
+                        "description": "Category name",
+                        "type": "string", 
+                        "example": "Garments"
                     }
                 },
                 "type": "object",

@@ -39,7 +39,7 @@ class CategoryController extends Controller
     {
         //abort_if(Gate::denies('category_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new AddressResource(Category::all()))
+        return (new CategoryResource(Category::all()))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -80,25 +80,27 @@ class CategoryController extends Controller
         //Str::upper(str)
         $category= Category::where('name',$request->name)->first();
         if(!$category){
-        $category = Category::create($request->all());
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-         
-        if($category->save()){ 
-            return (new CategoryResource($category))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        }else{ 
-            return (new CategoryResource($category))
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+            $input=$request->all();
+            $input['name']=Str::ucfirst($input['name']);
+            $category = Category::create($input);
+            //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+            //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST            
+            if($category->save()){ 
+                return (new CategoryResource($category))
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+            }else{ 
+                return response()
+                       ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }else{
+            return response()->json("This resource already exist.", Response::HTTP_CONFLICT); 
         }
     }
 
     /**
      * @OA\Get(
-     *      path="/categoryes/{id}",
+     *      path="/categories/{id}",
      *      operationId="getAddressById",
      *      tags={"Categories"},
      *      summary="Get category information",
@@ -142,10 +144,13 @@ class CategoryController extends Controller
                 return response()->json($categories, 200);
             }
             if(in_array($key,$col)){ 
+                if(strcmp($key,'name')){
+                    $input[$key]= Str::ucfirst($input[$key]);
+                }
                 $categories = $categories->where($key,$input[$key]);
             }            
         } 
-        return response()->json($categories, 200); 
+        return response()->json($categories, Response::HTTP_OK); 
     }
 
     /**
