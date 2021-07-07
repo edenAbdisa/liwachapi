@@ -200,13 +200,19 @@ class TypeController extends Controller
     public function update(Request $request, $id)
     {
         $input = $request->all();          
-        $type= Type::where('id',$id)->first();
-        if($type->fill($input)->save()){
-            $type->category;
-            return ($type)
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+        $type_to_be_updated= Type::where('id',$id)->first();
+        if(in_array('name',$input)){
+            $type= Type::where('name',Str::ucfirst($request->name))->first();
+            if($type){
+                return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);      
+            }
+            $input['name']=Str::ucfirst($input['name']);
         } 
+        if($type_to_be_updated->fill($input)->save()){
+            return (new TypeResource($type_to_be_updated))
+                 ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        }
     }
 
     /**

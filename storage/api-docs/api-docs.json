@@ -14,7 +14,7 @@
     },
     "servers": [
         {
-            "url": "http://liwachapi.herokuapp.com/api",
+            "url": "http://127.0.0.1:8000/api",
             "description": "Demo API Server"
         }
     ],
@@ -273,7 +273,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Category"
+                                "$ref": "#/components/schemas/CategoryRequest"
                             }
                         }
                     }
@@ -422,7 +422,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Flag"
+                                "$ref": "#/components/schemas/FlagRequest"
                             }
                         }
                     }
@@ -474,7 +474,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateProjectRequest"
+                                "$ref": "#/components/schemas/FlagRequest"
                             }
                         }
                     }
@@ -623,7 +623,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Membership"
+                                "$ref": "#/components/schemas/MembershipRequest"
                             }
                         }
                     }
@@ -675,7 +675,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateProjectRequest"
+                                "$ref": "#/components/schemas/MembershipRequest"
                             }
                         }
                     }
@@ -824,7 +824,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Message"
+                                "$ref": "#/components/schemas/MessageRequest"
                             }
                         }
                     }
@@ -876,7 +876,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateProjectRequest"
+                                "$ref": "#/components/schemas/MessageRequest"
                             }
                         }
                     }
@@ -989,7 +989,7 @@
         "/reporttype": {
             "get": {
                 "tags": [
-                    "Reporttype"
+                    "ReportType"
                 ],
                 "summary": "Get list of reporttype",
                 "description": "Returns list of reporttype",
@@ -1000,7 +1000,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Reporttype"
+                                    "$ref": "#/components/schemas/ReportType"
                                 }
                             }
                         }
@@ -1015,17 +1015,17 @@
             },
             "post": {
                 "tags": [
-                    "Reporttype"
+                    "ReportType"
                 ],
-                "summary": "Store new Reporttype",
-                "description": "Returns Reporttype data",
-                "operationId": "storeReporttype",
+                "summary": "Store new ReportType",
+                "description": "Returns ReportType data",
+                "operationId": "storeReportType",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Reporttype"
+                                "$ref": "#/components/schemas/ReportTypeRequest"
                             }
                         }
                     }
@@ -1036,7 +1036,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Reporttype"
+                                    "$ref": "#/components/schemas/ReportType"
                                 }
                             }
                         }
@@ -1056,7 +1056,7 @@
         "/reporttype/{id}": {
             "put": {
                 "tags": [
-                    "Reporttype"
+                    "ReportType"
                 ],
                 "summary": "Update existing project",
                 "description": "Returns updated project data",
@@ -1077,7 +1077,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateProjectRequest"
+                                "$ref": "#/components/schemas/ReportTypeRequest"
                             }
                         }
                     }
@@ -1088,7 +1088,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Project"
+                                    "$ref": "#/components/schemas/ReportType"
                                 }
                             }
                         }
@@ -1109,16 +1109,16 @@
             },
             "delete": {
                 "tags": [
-                    "Reporttype"
+                    "ReportType"
                 ],
-                "summary": "Delete existing project",
+                "summary": "Delete existing ReportType",
                 "description": "Deletes a record and returns no content",
-                "operationId": "deleteProject",
+                "operationId": "deleteReportType",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Project id",
+                        "description": "ReportType id",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1149,17 +1149,17 @@
         "/reporttype/search": {
             "post": {
                 "tags": [
-                    "Reporttype"
+                    "ReportType"
                 ],
                 "summary": "Get list of reporttype",
                 "description": "Returns list of reporttype",
-                "operationId": "searchReporttype",
+                "operationId": "searchReportType",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Reporttype"
+                                "$ref": "#/components/schemas/ReportType"
                             }
                         }
                     }
@@ -1170,7 +1170,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Reporttype"
+                                    "$ref": "#/components/schemas/ReportType"
                                 }
                             }
                         }
@@ -1226,7 +1226,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Request"
+                                "$ref": "#/components/schemas/RequestRequest"
                             }
                         }
                     }
@@ -1259,14 +1259,14 @@
                 "tags": [
                     "Request"
                 ],
-                "summary": "Update existing project",
-                "description": "Returns updated project data",
-                "operationId": "updateProject",
+                "summary": "Update existing Request",
+                "description": "Returns updated Request data",
+                "operationId": "updateRequest",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Project id",
+                        "description": "Request id",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1278,7 +1278,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateProjectRequest"
+                                "$ref": "#/components/schemas/RequestRequest"
                             }
                         }
                     }
@@ -1289,7 +1289,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Project"
+                                    "$ref": "#/components/schemas/Request"
                                 }
                             }
                         }
@@ -1312,14 +1312,14 @@
                 "tags": [
                     "Request"
                 ],
-                "summary": "Delete existing project",
+                "summary": "Delete existing Request",
                 "description": "Deletes a record and returns no content",
-                "operationId": "deleteProject",
+                "operationId": "deleteRequest",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Project id",
+                        "description": "Request id",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1422,12 +1422,12 @@
                 "summary": "Store new Service",
                 "description": "Returns Service data",
                 "operationId": "storeService",
-                "serviceBody": {
+                "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/Service"
+                                "$ref": "#/components/schemas/ServiceRequest"
                             }
                         }
                     }
@@ -1460,26 +1460,26 @@
                 "tags": [
                     "Service"
                 ],
-                "summary": "Update existing project",
-                "description": "Returns updated project data",
+                "summary": "Update existing Service",
+                "description": "Returns updated Service data",
                 "operationId": "updateProject",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Project id",
+                        "description": "Service id",
                         "required": true,
                         "schema": {
                             "type": "integer"
                         }
                     }
                 ],
-                "serviceBody": {
+                "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateProjectService"
+                                "$ref": "#/components/schemas/ServiceRequest"
                             }
                         }
                     }
@@ -1490,7 +1490,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Project"
+                                    "$ref": "#/components/schemas/Service"
                                 }
                             }
                         }
@@ -1513,14 +1513,14 @@
                 "tags": [
                     "Service"
                 ],
-                "summary": "Delete existing project",
+                "summary": "Delete existing Service",
                 "description": "Deletes a record and returns no content",
-                "operationId": "deleteProject",
+                "operationId": "deleteService",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Project id",
+                        "description": "Service id",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1556,7 +1556,7 @@
                 "summary": "Get list of service",
                 "description": "Returns list of service",
                 "operationId": "searchService",
-                "serviceBody": {
+                "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
@@ -1623,12 +1623,12 @@
                 "summary": "Store new Type",
                 "description": "Returns Type data",
                 "operationId": "storeType",
-                "typeBody": {
+                "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/Type"
+                                "$ref": "#/components/schemas/ItemRequest"
                             }
                         }
                     }
@@ -1675,12 +1675,12 @@
                         }
                     }
                 ],
-                "typeBody": {
+                "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateProjectType"
+                                "$ref": "#/components/schemas/TypeRequest"
                             }
                         }
                     }
@@ -1691,7 +1691,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Project"
+                                    "$ref": "#/components/schemas/Type"
                                 }
                             }
                         }
@@ -1714,14 +1714,14 @@
                 "tags": [
                     "Type"
                 ],
-                "summary": "Delete existing project",
+                "summary": "Delete existing type",
                 "description": "Deletes a record and returns no content",
-                "operationId": "deleteProject",
+                "operationId": "deleteType",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Project id",
+                        "description": "Type id",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1757,7 +1757,7 @@
                 "summary": "Get list of type",
                 "description": "Returns list of type",
                 "operationId": "searchType",
-                "typeBody": {
+                "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
@@ -1881,7 +1881,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateItemRequest"
+                                "$ref": "#/components/schemas/ItemRequest"
                             }
                         }
                     }
@@ -1892,7 +1892,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Project"
+                                    "$ref": "#/components/schemas/Item"
                                 }
                             }
                         }
@@ -1917,12 +1917,12 @@
                 ],
                 "summary": "Delete existing Item",
                 "description": "Deletes a record and returns no content",
-                "operationId": "deleteProject",
+                "operationId": "deleteItem",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Project id",
+                        "description": "Item id",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1953,17 +1953,17 @@
         "/item/search": {
             "post": {
                 "tags": [
-                    "Type"
+                    "Item"
                 ],
                 "summary": "Get list of type",
                 "description": "Returns list of type",
                 "operationId": "searchType",
-                "typeBody": {
+                "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Type"
+                                "$ref": "#/components/schemas/Item"
                             }
                         }
                     }
@@ -1974,7 +1974,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Type"
+                                    "$ref": "#/components/schemas/Item"
                                 }
                             }
                         }
@@ -2030,7 +2030,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/User"
+                                "$ref": "#/components/schemas/UserRequest"
                             }
                         }
                     }
@@ -2082,7 +2082,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateUserRequest"
+                                "$ref": "#/components/schemas/UserRequest"
                             }
                         }
                     }
@@ -2246,7 +2246,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/User"
+                                "$ref": "#/components/schemas/UserRequest"
                             }
                         }
                     }
@@ -2469,6 +2469,40 @@
                     }
                 }
             },
+            "FlagRequest": {
+                "title": "Flag",
+                "description": "Flag items",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "reason": {
+                        "title": "Reason",
+                        "description": "Report name fetched from report type",
+                        "type": "string",
+                        "example": "Fake Item"
+                    },
+                    "flagged_item_id": {
+                        "title": "Flagged Item Id",
+                        "description": "The Id of the item that was flagged",
+                        "type": "big integer",
+                        "example": 2
+                    },
+                    "flagged_by_id": {
+                        "title": "Flagged by Id",
+                        "description": "The Id of the user that flagged the item",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "type": {
+                        "title": "Type",
+                        "description": "Is the flagged item service or item it will make it easier for the backend to choose which table to query",
+                        "type": "string",
+                        "example": "item or service"
+                    }
+                }
+            },
             "ItemRequest": {
                 "title": "Item",
                 "description": "Item model ",
@@ -2595,6 +2629,30 @@
                     }
                 }
             },
+            "MembershipRequest": {
+                "title": "Membership",
+                "description": "Membership model",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the membership",
+                        "type": "string",
+                        "example": "normal,premium,gold"
+                    },
+                    "limit_of_post": {
+                        "title": "Limit of post",
+                        "description": "Limit of post that this memebrship is allowed",
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "transaction_limit": {
+                        "title": "Transation Limit",
+                        "description": "Transation Limit in a day or in a week",
+                        "type": "integer",
+                        "example": 6
+                    }
+                }
+            },
             "Message": {
                 "title": "Messages",
                 "description": "Message model",
@@ -2639,6 +2697,36 @@
                     }
                 }
             },
+            "MessageRequest": {
+                "title": "Messages",
+                "description": "Message model",
+                "properties": {
+                    "content": {
+                        "title": "Text Content",
+                        "description": "The text message",
+                        "type": "string",
+                        "example": "Hello, I want this item"
+                    },
+                    "type": {
+                        "title": "Type",
+                        "description": "It identified if the content is text or an image path",
+                        "type": "string",
+                        "example": "text or picture"
+                    },
+                    "chat_id": {
+                        "title": "Chat Id",
+                        "description": "The token gotten when the item was requested. Identifies the chat ID(token in company case) two user may have many chat id if they are bartering many item between them",
+                        "type": "string", 
+                        "example": "randomcreateduniquetoken"
+                    },
+                    "sender_id": {
+                        "title": "Sender user id",
+                        "description": "Sender user id",
+                        "type": "big integer", 
+                        "example": 4
+                    }
+                }
+            },
             "ReportType": {
                 "title": "ReportType",
                 "description": "Report type model",
@@ -2668,6 +2756,24 @@
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "ReportTypeRequest": {
+                "title": "ReportType",
+                "description": "Report type model",
+                "properties": {
+                    "report_detail": {
+                        "title": "Name",
+                        "description": "Small text that will be displayed to user so that they can choose from the list",
+                        "type": "string",
+                        "example": "Spam, Fake Item, Violence, Child Abuse, Other, "
+                    },
+                    "type_for": {
+                        "title": "Type for",
+                        "description": "The item that this report can be associated with",
+                        "type": "string",
+                        "example": "item or service or user"
                     }
                 }
             },
@@ -2731,6 +2837,55 @@
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "RequestRequest": {
+                "title": "Request",
+                "description": "Request model",
+                "properties": {
+                    "status": {
+                        "title": "Status",
+                        "description": "Whether the user has accepted it or not",
+                        "type": "string",
+                        "example": "accepted or declined or expired"
+                    },
+                    "requester_id": {
+                        "title": "Requester User Id",
+                        "description": "The ID of the person who requested for the item",
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "requested_item_id": {
+                        "title": "Requested Item Id",
+                        "description": "The ID of the Item that we wanted",
+                        "type": "integer",
+                        "example": 7
+                    },
+                    "requester_item_id": {
+                        "title": "Requester Item Id",
+                        "description": "The ID of the Item that we are offering",
+                        "type": "integer",
+                        "example": "2020-01-27 17:50:45"
+                    },
+                    "rating": {
+                        "title": "Rating",
+                        "description": "The rating given by the user after the status is changed to barter",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "token": {
+                        "title": "Token",
+                        "description": "A unique generated token that will be accessed by chat_id in case of user to user barter and can be used as ticket for organization.",
+                        "type": "string", 
+                        "example": "srrwgwrgt"
+                    },
+                    "type": {
+                        "title": "type",
+                        "description": "Type of items that are being exchanged. This will make it easy to decide on which table to query,",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 9
                     }
                 }
             },
@@ -2804,6 +2959,58 @@
                     "name": "Project"
                 }
             },
+            "ServiceRequest": {
+                "title": "Service",
+                "description": "Service model",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the service",
+                        "type": "string",
+                        "example": "Plumbering"
+                    },
+                    "picture": {
+                        "title": "Picture file name",
+                        "description": "This name will be concated with the image collection folder",
+                        "type": "string",
+                        "example": "mybag.jpg"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Describes if the bartering offer is bartred and open. For case where user select to reopen this the status can be changed to open unlike item",
+                        "type": "string",
+                        "example": "bartered or bartered or blocked"
+                    },
+                    "number_of_flag": {
+                        "title": "Number of Flag",
+                        "description": "Keeps count of the flag that this service recieved",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "number_of_request": {
+                        "title": "Number of request",
+                        "description": "Keeps count of the request that this service recieved",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "bartering_location_id": {
+                        "title": "Bartering location",
+                        "description": "After saving the location at address the id will be assocated with this service",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "type_id": {
+                        "title": "Type",
+                        "description": "Categorize the service into a type and from this type we can decide the category",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    }
+                }
+            },
             "Type": {
                 "title": "Type",
                 "description": "Type model",
@@ -2833,6 +3040,24 @@
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "TypeRequest": {
+                "title": "Type",
+                "description": "Type model",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the new project",
+                        "type": "string",
+                        "example": "A nice project"
+                    },
+                    "category_id": {
+                        "title": "Category ID",
+                        "description": "This type is under a certain category.",
+                        "type": "big integer",
+                        "example": 123
                     }
                 }
             },
@@ -2937,7 +3162,96 @@
                         "example": "2020-01-27 17:50:45"
                     }
                 }
-            }, "Subscription": {
+            },
+            "UserRequest": {
+                "title": "User",
+                "description": "User model",
+                "properties": {
+                    "first_name": {
+                        "title": "Last Name",
+                        "description": "The first Name",
+                        "type": "string",
+                        "example": "Eden "
+                    },
+                    "last_name": {
+                        "title": "Last Name",
+                        "description": "The last Name",
+                        "type": "string",
+                        "example": "Abdisa "
+                    },
+                    "email": {
+                        "title": "Email",
+                        "description": "Email",
+                        "type": "string",
+                        "format": "eden@yahoo.com"
+                    },
+                    "profile_picture": {
+                        "title": "Picture file name",
+                        "description": "This name will be concated with the image collection folder",
+                        "type": "string",
+                        "example": "myprofile.jpg"
+                    },
+                    "phone_number": {
+                        "title": "Phone Number",
+                        "description": "Phone number including country/city code",
+                        "type": "string", 
+                        "example": "+2519443322"
+                    },
+                    "TIN_picture": {
+                        "title": "Picture file name",
+                        "description": "This name will be concated with the image collection folder and the tin number will be viewed by the admin to approve the user",
+                        "type": "string",
+                        "example": "mytin.jpg"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "The user is active at first for user and blocked for company",
+                        "type": "string",
+                        "example": "active or blocked"
+                    },
+                    "birthdate": {
+                        "title": "Birthdate",
+                        "description": "The birthdate of the user",
+                        "type": "string",
+                        "format": "date",
+                        "example":"2020-01-27"
+                    },
+                    "type": {
+                        "title": "Type of user",
+                        "description": "This identify the account whether it is an organizations or a user or admin",
+                        "type": "string",
+                        "example": "user or admin or company"
+                    },
+                    
+                    "address_id": {
+                        "title": "Address ID",
+                        "description": "The ID of the address",
+                        "type": "big integer",
+                        "format": 99
+                    },
+                    "membership_id": {
+                        "title": "Membership ID ",
+                        "description": "This is the ID of the membership that the user or organization choose",
+                        "type": "big integer",
+                        "example": 8
+                    },
+                    "email_verified_at": {
+                        "title": "Email verified at",
+                        "description": "Email verified at",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    },
+                    "rememberToken": {
+                        "title": "Login Token",
+                        "description": "The token optained when user logged in",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "Subscription": {
                 "title": "Subscription",
                 "description": "Subscription model",
                 "properties": {
@@ -2969,13 +3283,26 @@
                         "example": "2020-01-27 17:50:45"
                     }
                 }
+            },
+            "SubscriptionRequest": {
+                "title": "Subscription",
+                "description": "Subscription model",
+                "properties": {
+                    "type_id": {
+                        "title": "Type ID",
+                        "description": "This is the type that the user subscribed for ",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    
+                    "user_id": {
+                        "title": "User ID",
+                        "description": "The user Id",
+                        "type": "big integer",
+                        "example": 99
+                    }
+                }
             }
         }
-    },
-    "tags": [
-        {
-            "name": "Liwach API",
-            "description": "API Endpoints of Liwach"
-        }
-    ]
+    }
 }

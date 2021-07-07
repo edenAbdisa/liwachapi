@@ -200,19 +200,20 @@ class CategoryController extends Controller
     {
         $input = $request->all();          
         $category_to_be_updated= Category::where('id',$id)->first();
-        $category= Category::where('name',Str::ucfirst($request->name))->first();
-        if(!$category){
-            $input['name']=Str::ucfirst($input['name']);
-            if($category_to_be_updated->fill($input)->save()){
-                return (new CategoryResource($category_to_be_updated))
+        if(in_array('name',$input)){            
+          $category= Category::where('name',Str::ucfirst($request->name))->first();
+          if($category){
+            return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);
+          }          
+          $input['name']=Str::ucfirst($input['name']);
+        }
+        if($category_to_be_updated->fill($input)->save()){
+            return (new CategoryResource($category_to_be_updated))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
-            }else{ 
-                return response()
-                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-        }else{
-            return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT); 
+        }else{ 
+            return response()
+                  ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

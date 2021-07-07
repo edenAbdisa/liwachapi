@@ -77,7 +77,9 @@ class MembershipController extends Controller
      */
     public function store(Request $request)
     {
-        $membership = Membership::create($request->all());
+        $input=$request->all();
+        $input['name']=Str::ucfirst($input['name']);
+        $membership = Membership::create($input);
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
@@ -137,6 +139,9 @@ class MembershipController extends Controller
                 return response()->json($memberships, 200);
             }
             if(in_array($key,$col)){ 
+                if($key=='name'){
+                    $input[$key]= Str::ucfirst($input[$key]);
+                }
                 $memberships = $memberships->where($key,$input[$key]);
             }            
         } 
@@ -189,11 +194,19 @@ class MembershipController extends Controller
     public function update(Request $request, $id)
     {
         $input = $request->all();          
-        $membership= Membership::where('id',$id)->first();
-        if($membership->fill($input)->save()){
-            return ($membership)
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+        $membership_to_be_updated= Membership::where('id',$id)->first();
+        if(in_array('name',$input)){
+            $membership= Membership::where('name',Str::ucfirst($request->name))->first();
+            if($membership){
+                return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);      
+            }
+            $input['name']=Str::ucfirst($input['name']);
+        }
+        
+        if($membership_to_be_updated->fill($input)->save()){
+            return (new MembershipResource($membership_to_be_updated))
+                 ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
         } 
     }
 

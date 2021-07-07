@@ -126,15 +126,13 @@ class ItemController extends Controller
      */
     public function update(Request $request, $id)
     {        
-        $input = $request->all();
-        $address_to_be_updated = $request->address;
-        $type_to_be_updated = $request->type_name;         
+        $input = $request->all();           
         $item= Item::where('id',$id)->first();
-        if($address_to_be_updated){
+        if(in_array('address',$input)){
             $address= Address::where('id',$item->bartering_location_id)->first();
             $address->fill($address_to_be_updated)->save();
         }
-        if($type_to_be_updated){            
+        if(in_array('type_name',$input)){            
             $type= Type::where('name',$request->type_name)->first();
             $input['type_id']=$type->id;
         }
