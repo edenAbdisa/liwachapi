@@ -82,23 +82,43 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $service= Service::where('name',$request->name)->first();
-        if(!$service){
-        $service = Service::create($request->all());
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-         
-        if($service->save()){ 
-            $service->bartering_location;
-            $service->type; 
-            return (new ServiceResource($service))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        }else{ 
-            return response()
-                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+        $file=$request->file('file');
+        if($file) {            
+            $filename = time().'_'.$file->getClientOriginalName();
+            if(!HelperClass::uploadFile($file,$filename, 'files/services')){
+                return response()
+                            ->json("The picture couldn't be uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+            $address = $request->address;
+            $address=json_decode( $address, true);
+            $address['type'] = 'service'; 
+            $address = Address::create($address);
+            if($address->save()){ 
+                $type= Type::where('name',$request->type_name)->first();
+                if($type){
+                    $input = $request->all();            
+                    $input['status']='open';
+                    $input['number_of_flag']=0;
+                    $input['number_of_request']=0; 
+                    $input['bartering_location_id']=$address->id;            
+                    $input['type_id']=$type->id;
+                    $input['picture']=$filename;
+                    $service = Service::create($input);
+                    //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+                    //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST                
+                    if($service->save()){ 
+                        $service->bartering_location;
+                        $service->type; 
+                        return (new ServiceResource($service))
+                        ->response()
+                        ->setStatusCode(Response::HTTP_CREATED);
+                    }else{ 
+                        return response()
+                            ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                    }
+                }
+            }
         }
-     }
     }
 
     /**

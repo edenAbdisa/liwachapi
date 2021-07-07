@@ -16,6 +16,8 @@ use Illuminate\Support\Str;
 
 class ItemController extends Controller
 {
+    
+
     /**
      * Display a listing of the resource.
      *
@@ -42,41 +44,58 @@ class ItemController extends Controller
     {
         //if organization or user do smt on status. Check if 
             //the memebrship of this user enables the user to enter a new product
-        $address = $request->address;
-        $address['type']='item'; 
-        $address = Address::create($address);
-        if($address->save()){ 
-            $type= Type::where('name',$request->type_name)->first();
-            if($type){
-                $input = $request->all();            
-                $input['status']='open';
-                $input['number_of_flag']=0;
-                $input['number_of_request']=0; 
-                $input['bartering_location_id']=$address->id;            
-                $input['type_id']=$type->id;
-                $item=Item::create($input);
-                if($item->save()){ 
-                    $item->bartering_location ;
-                    $item->type ;
-                    return (new ItemResource($item))
+        $file=$request->file('file');
+        if($file) {            
+            $filename = time().'_'.$file->getClientOriginalName();
+            if(!HelperClass::uploadFile($file,$filename, 'files/items')){
+                return response()
+                            ->json("The picture couldn't be uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }                       
+            $address = $request->address;
+            $address=json_decode( $address, true);
+            $address['type'] = 'item'; 
+            $address = Address::create($address);
+            if($address->save()){ 
+                $type= Type::where('name',$request->type_name)->first();
+                if($type){
+                    $input = $request->all();            
+                    $input['status']='open';
+                    $input['number_of_flag']=0;
+                    $input['number_of_request']=0; 
+                    $input['bartering_location_id']=$address->id;            
+                    $input['type_id']=$type->id;
+                    $input['picture']=$filename;
+                    $item=Item::create($input);
+                    if($item->save()){ 
+                        $item->bartering_location ;
+                        $item->type ;
+                        return (new ItemResource($item))
+                        ->response()
+                        ->setStatusCode(Response::HTTP_CREATED);
+                    }else{ 
+                        return response()
+                            ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                    }            
+                }else{
+                    return ("No such type")
                     ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
-                }else{ 
-                    return response()
-                           ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
-                }            
-           }else{
-            return ("No such type")
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);      
-           }
-        }        
-        //$item = Item::create($request->all());
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        //dd("line 81");         
+                    ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);      
+                }           
+            }else{
+                return response()
+                        ->json("The address couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } else{
+            return response()
+                        ->json("The image files isnt uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
+            
+        }       
+            //$item = Item::create($request->all());
+            //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+            //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
+            //dd("line 81");         
     }
- 
+    
     public function search(Request $request)
     { 
         $input = $request->all();

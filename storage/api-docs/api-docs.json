@@ -1827,7 +1827,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "$ref": "#/components/schemas/ItemRequest"
                             }
@@ -2477,10 +2477,10 @@
                 ],
                 "properties": { 
                     "picture": {
-                        "title": "Picture file name",
-                        "description": "This name will be concated with the image collection folder",
+                        "title": "Picture file using multipart",
+                        "description": "This name will be concated with the current time and saved on database.The file wll be uploaded",
                         "type": "string",
-                        "example": "mybag.jpg"
+                        "format" : "binary"
                     },
                     "address": {
                         "$ref": "#/components/schemas/AddressRequest"

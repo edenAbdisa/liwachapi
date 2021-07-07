@@ -18,13 +18,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::middleware('auth:api')->group(function (){
-    Route::post('/users/logout','UserController@logout');
-    Route::get('/users','UserController@index');
-    Route::get('/users/search','UserController@search');
-    Route::put('/users/{id}','UserController@update');
-    Route::delete('/users/{id}','UserController@destroy');
-    Route::post('/users/login','UserController@login');
+    Route::post('/user/logout','UserController@logout');
+    Route::get('/user','UserController@index');
+    Route::get('/user/search','UserController@search');
+    Route::put('/user/{id}','UserController@update');
+    Route::delete('/user/{id}','UserController@destroy');
+    Route::post('/user/login','UserController@login');
+    Route::post('/user/uploadPicture','FileController@uploadFile');
 });
+
 Route::get('/address','AddressController@index');
 Route::post('/address/search','AddressController@search');
 Route::post('/address','AddressController@store');
@@ -48,7 +50,7 @@ Route::post('/item/search','ItemController@search');
 Route::post('/item','ItemController@store');
 Route::put('/item/{id}','ItemController@update');
 Route::delete('/item/{id}','ItemController@destroy');
-
+ 
 Route::get('/membership','MembershipController@index');
 Route::post('/membership/search','MembershipController@search');
 Route::post('/membership','MembershipController@store');
@@ -78,6 +80,7 @@ Route::post('/service/search','ServiceController@search');
 Route::post('/service','ServiceController@store');
 Route::put('/service/{id}','ServiceController@update');
 Route::delete('/service/{id}','ServiceController@destroy');
+Route::post('/service/uploadPicture','FileController@uploadFile');
 
 Route::get('/type','TypeController@index');
 Route::post('/type/search','TypeController@search');
