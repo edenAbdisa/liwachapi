@@ -247,7 +247,12 @@ class MembershipController extends Controller
      */
     public function destroy($id)
     {
-        $membership = Membership::findOrFail($id);
+        $membership = Membership::find($id);
+        if(!$membership){
+            return response()
+                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+     
+        }
         $membership->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

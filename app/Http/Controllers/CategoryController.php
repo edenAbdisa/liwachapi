@@ -254,7 +254,12 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::find($id);
+        if(!$category){
+            return response()
+                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+     
+        }
         $category->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

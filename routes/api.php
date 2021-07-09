@@ -17,7 +17,7 @@ use Illuminate\Http\Controllers;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::middleware('auth:api')->group(function (){
+//Route::middleware('auth:api')->group(function (){
     Route::post('/user/logout','UserController@logout');
     Route::get('/user','UserController@index');
     Route::get('/user/search','UserController@search');
@@ -25,7 +25,7 @@ Route::middleware('auth:api')->group(function (){
     Route::delete('/user/{id}','UserController@destroy');
     Route::post('/user/login','UserController@login');
     Route::post('/user/uploadPicture','FileController@uploadFile');
-});
+//});
 
 Route::get('/address','AddressController@index');
 Route::post('/address/search','AddressController@search');

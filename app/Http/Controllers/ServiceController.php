@@ -270,7 +270,12 @@ class ServiceController extends Controller
      */
     public function destroy($id)
     {
-        $service = Service::findOrFail($id);
+        $service = Service::find($id);
+        if(!$service){
+            return response()
+                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+     
+        }
         $service->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     } 

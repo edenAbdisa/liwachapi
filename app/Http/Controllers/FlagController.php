@@ -257,7 +257,12 @@ class FlagController extends Controller
      */
     public function destroy($id)
     {
-        $flag = Flag::findOrFail($id);
+        $flag = Flag::find($id);
+        if(!$flag){
+            return response()
+                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+     
+        }
         $flag->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

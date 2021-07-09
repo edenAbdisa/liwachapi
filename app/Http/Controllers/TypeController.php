@@ -252,7 +252,12 @@ class TypeController extends Controller
      */
     public function destroy($id)
     {
-        $type = Type::findOrFail($id);
+        $type = Type::find($id);
+        if(!$type){
+            return response()
+                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+     
+        }
         $type->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }    

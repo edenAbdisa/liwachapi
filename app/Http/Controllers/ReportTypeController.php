@@ -245,7 +245,12 @@ class ReportTypeController extends Controller
      */
     public function destroy($id)
     {
-        $reporttype = ReportType::findOrFail($id);
+        $reporttype = ReportType::find($id);
+        if(!$reporttype){
+            return response()
+                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+     
+        }
         $reporttype->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

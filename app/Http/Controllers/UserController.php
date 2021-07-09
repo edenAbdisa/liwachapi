@@ -112,25 +112,29 @@ class UserController extends Controller
         $input = $request->all(); 
         $user= User::where('email',$request->email)->first();
         if(!$user){
-        $input['password']=Hash::make($input['password']);
+            $input['password']=Hash::make($input['password']);
             $input['remember_token'] = Str::random(10);   
             $user=User::create($input);
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $user['remember_token']= $token;
+            $address = Address::create($address);
+            if(!$address->save()){
+                return response()
+                ->json("The address resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
             $saveduser= $user->save();
-        if($saveduser){
             $user->address;
-            $user->membership; 
-            $response=['user'=> $saveduser];
-            $response=['message'=>'Successfully registered'];
+            $user->membership;
+            if($saveduser){
+                return response(new UserResource($saveduser),Response::HTTP_CREATED);
             }else{ 
                 return response()
-                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                       ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }else{
-            $response=['message'=>'An account already exist by this email please login'];
+            return response()
+                ->json("An account already exist by this email.", Response::HTTP_INTERNAL_SERVER_ERROR);          
         }
-        return response($response,200);
     }
 
         /**
@@ -281,7 +285,12 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
+        if(!$user){
+            return response()
+                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+     
+        }
         $user->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

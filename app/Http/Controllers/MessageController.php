@@ -247,7 +247,12 @@ class MessageController extends Controller
      */
     public function destroy($id)
     {
-        $message = Message::findOrFail($id);
+        $message = Message::find($id);
+        if(!$message){
+            return response()
+                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+     
+        }
         $message->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

@@ -1058,14 +1058,14 @@
                 "tags": [
                     "ReportType"
                 ],
-                "summary": "Update existing project",
-                "description": "Returns updated project data",
-                "operationId": "updateProject",
+                "summary": "Update existing ReportType",
+                "description": "Returns updated ReportType data",
+                "operationId": "updatePReportType",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Project id",
+                        "description": "ReportType id",
                         "required": true,
                         "schema": {
                             "type": "integer"

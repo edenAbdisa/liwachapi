@@ -251,7 +251,12 @@ class RequestController extends Controller
      */
     public function destroy($id)
     {
-        $request = Request::findOrFail($id);
+        $request = Request::find($id);
+        if(!$request){
+            return response()
+                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+     
+        }
         $request->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }
