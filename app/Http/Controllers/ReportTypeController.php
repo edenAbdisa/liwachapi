@@ -193,12 +193,12 @@ class ReportTypeController extends Controller
         $input = $request->all();          
         $reporttype_to_be_edited= ReportType::where('id',$id)->first();
         if($reporttype_to_be_edited){        
-            if(in_array('name',$input)){
-                $reporttype= ReportType::where('name',Str::ucfirst($request->name))->first();
+            if(in_array('report_detail',$input)){
+                $reporttype= ReportType::where('report_detail',Str::ucfirst($request->name))->first();
                 if($reporttype){
                     return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);      
                 }
-                $input['name']=Str::ucfirst($input['name']);
+                $input['report_detail']=Str::ucfirst($input['report_detail']);
             } 
             if($reporttype_to_be_edited->fill($input)->save()){
                 return (new ReportType($reporttype))
