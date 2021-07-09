@@ -77,7 +77,9 @@ class ReportTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $reporttype = ReportType::create($request->all());
+        $input=$request->all();
+        $reporttype = ReportType::create($input);
+        $input['name']=Str::ucfirst($input['name']);
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
@@ -189,12 +191,21 @@ class ReportTypeController extends Controller
     public function update(Request $request, $id)
     {
         $input = $request->all();          
-        $reporttype= ReportType::where('id',$id)->first();
-        if($reporttype->fill($input)->save()){
-            return ($reporttype)
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        } 
+        $reporttype_to_be_edited= ReportType::where('id',$id)->first();
+        if($reporttype_to_be_edited){        
+            if(in_array('name',$input)){
+                $reporttype= ReportType::where('name',Str::ucfirst($request->name))->first();
+                if($reporttype){
+                    return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);      
+                }
+                $input['name']=Str::ucfirst($input['name']);
+            } 
+            if($reporttype_to_be_edited->fill($input)->save()){
+                return (new ReportType($reporttype))
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+            } 
+        }
     }
 
     /**
