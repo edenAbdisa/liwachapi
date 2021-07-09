@@ -117,14 +117,15 @@ class UserController extends Controller
             $user=User::create($input);
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $user['remember_token']= $token;
-            $address = Address::create($address);
+            $address = Address::create($request->address);
             if(!$address->save()){
+                $user['address_id']=$address->id;
                 return response()
                 ->json("The address resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
             }
             $saveduser= $user->save();
-            $user->address;
-            $user->membership;
+            $saveduser->address;
+            $saveduser->membership;
             if($saveduser){
                 return response(new UserResource($saveduser),Response::HTTP_CREATED);
             }else{ 
