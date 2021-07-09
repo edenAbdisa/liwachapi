@@ -201,7 +201,7 @@ class ReportTypeController extends Controller
                 $input['report_detail']=Str::ucfirst($input['report_detail']);
             } 
             if($reporttype_to_be_edited->fill($input)->save()){
-                return (new ReportType($reporttype))
+                return (new ReportType($reporttype_to_be_edited))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
             } 
