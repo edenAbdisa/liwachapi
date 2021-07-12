@@ -43,7 +43,8 @@ class ServiceController extends Controller
         $service= Service::all()
                          ->each(function($item, $key) {
                             $item->bartering_location;
-                            $item->type; 
+                            $item->type;
+                            $item->serviceSwapType; 
                         }); 
         return (new ServiceResource($service))
             ->response()

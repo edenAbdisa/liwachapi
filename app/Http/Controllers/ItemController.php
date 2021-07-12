@@ -27,7 +27,8 @@ class ItemController extends Controller
     {
         $items= Item::all()->each(function($item, $key) {
             $item->bartering_location ;
-            $item->type ; 
+            $item->type ;
+            $item->itemSwapType; 
        });
         return (new ItemResource($items))
             ->response()

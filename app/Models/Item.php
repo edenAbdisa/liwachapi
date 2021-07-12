@@ -18,9 +18,9 @@ class Item extends Model
         'bartering_location_id',
         'type_id'
     ]; 
-    public function itemTypes()
+    public function itemSwapType()
     {
-        return $this->belongsToMany(Type::class);
+        return $this->belongsToMany(ItemSwapType::class);
     }
     public function bartering_location()
     {
