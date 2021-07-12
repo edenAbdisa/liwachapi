@@ -109,14 +109,11 @@ class ServiceController extends Controller
                     //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
                     //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST                
                     if($service->save()){ 
-                        $serviceSwapType=$input["swap_type"];
+                        $serviceSwapType=json_decode($input["swap_type"]);
                         foreach ($serviceSwapType as $t) {
-                            //check if the sent type id is in there
-			    $data = array(
- 				 "type_id" => $t,
- 				 "service_id" => $service->id
-			    );                     
-                            if(!ServiceSwapType::create($serviceSwap)->save()){
+                            //check if the sent type id is in there      
+                            if(!ServiceSwapType::create(["type_id" => $t],
+                            ["service_id" => $service->id])->save()){
                                 return response()
                                 ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     
                              }

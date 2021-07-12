@@ -19,10 +19,10 @@ class Service extends Model
         'type_id'
     ];
     
-    public function serviceSwapType()
+    /* public function serviceSwapType()
     {
         return $this->belongsToMany(ServiceSwapType::class);
-    }
+    } */
 
     public function bartering_location()
     {

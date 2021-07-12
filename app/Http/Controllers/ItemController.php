@@ -27,8 +27,7 @@ class ItemController extends Controller
     {
         $items= Item::all()->each(function($item, $key) {
             $item->bartering_location ;
-            $item->type ;
-            $item->itemSwapType; 
+            $item->type ;  
        });
         return (new ItemResource($items))
             ->response()
@@ -68,14 +67,12 @@ class ItemController extends Controller
                     $input['picture']=$filename;
                     $item=Item::create($input);
                     if($item->save()){
-			$itemSwapType=$input['swap_type']; 
+			            $itemSwapType=json_decode($input['swap_type']); 
                         foreach ($itemSwapType as $t) {
-                            //check if the sent type id is in there
-			    $data = array(
- 				 "type_id" => $t,
- 				 "item_id" => $item->id
-			    );                      
-                            if(!ItemSwapType::create($data)->save()){
+                            //check if the sent type id is in there  
+                            $id=$item->id;                                                
+                            if(!ItemSwapType::create(["type_id" => $t],
+                            ["item_id" => $id])->save()){
                                 return response()
                                 ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     
                              }
