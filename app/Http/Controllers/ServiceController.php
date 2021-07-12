@@ -108,7 +108,7 @@ class ServiceController extends Controller
                     //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
                     //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST                
                     if($service->save()){ 
-                        $serviceSwapType=$input["swap_type"]
+                        $serviceSwapType=$input["swap_type"];
                         foreach ($serviceSwapType as $t) {
                             //check if the sent type id is in there
                             $serviceSwap['type_id']=$t;
