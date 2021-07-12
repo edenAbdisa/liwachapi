@@ -16,6 +16,14 @@ class Type extends Model
     {
         return $this->belongsTo(Category::class);
     }
+    public function itemSwap()
+    {
+        return $this->belongsToMany(Item::class);
+    }
+    public function serviceSwap()
+    {
+        return $this->belongsToMany(Service::class);
+    }
     public function item()
     {
         return $this->hasMany(Item::class);
@@ -28,4 +36,5 @@ class Type extends Model
     {
         return $this->hasMany(Subscription::class);
     }
+    
 }

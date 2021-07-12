@@ -18,6 +18,12 @@ class Service extends Model
         'bartering_location_id',
         'type_id'
     ];
+    
+    public function serviceTypes()
+    {
+        return $this->belongsToMany(SwapTypes::class);
+    }
+
     public function bartering_location()
     {
         return $this->belongsTo(Address::class);

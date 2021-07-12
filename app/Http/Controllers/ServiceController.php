@@ -185,6 +185,7 @@ class ServiceController extends Controller
                             $item->bartering_location;
                             $item->type; 
                         });
+         
         return response()->json($services, 200); 
     }
 
