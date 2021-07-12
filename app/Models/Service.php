@@ -12,6 +12,7 @@ class Service extends Model
         'name',
         'picture',
         'status',
+        'description',
         'number_of_flag',
         'number_of_request',
         'bartering_location_id',

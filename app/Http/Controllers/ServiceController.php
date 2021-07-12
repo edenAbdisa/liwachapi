@@ -82,7 +82,7 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $file=$request->file('file');
+        $file=$request->file('picture');
         if($file) {            
             $filename = time().'_'.$file->getClientOriginalName();
             if(!HelperClass::uploadFile($file,$filename, 'files/services')){

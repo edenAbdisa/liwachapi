@@ -44,7 +44,7 @@ class ItemController extends Controller
     {
         //if organization or user do smt on status. Check if 
             //the memebrship of this user enables the user to enter a new product
-        $file=$request->file('file');
+        $file=$request->file('picture');
         if($file) {            
             $filename = time().'_'.$file->getClientOriginalName();
             if(!HelperClass::uploadFile($file,$filename, 'files/items')){

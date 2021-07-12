@@ -2510,6 +2510,18 @@
                     "name"
                 ],
                 "properties": { 
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the item",
+                        "type": "string",
+                        "example": "car"
+                    },
+                    "description": {
+                        "title": "Description",
+                        "description": "Description of the item",
+                        "type": "string",
+                        "example": "Car is machine used to...."
+                    },
                     "picture": {
                         "title": "Picture file using multipart",
                         "description": "This name will be concated with the current time and saved on database.The file wll be uploaded",
@@ -2969,31 +2981,17 @@
                         "type": "string",
                         "example": "Plumbering"
                     },
+                    "description": {
+                        "title": "Description",
+                        "description": "Description of the service",
+                        "type": "string",
+                        "example": "Plumbering is type of service that...."
+                    },
                     "picture": {
                         "title": "Picture file name",
                         "description": "This name will be concated with the image collection folder",
                         "type": "string",
                         "example": "mybag.jpg"
-                    },
-                    "status": {
-                        "title": "Status",
-                        "description": "Describes if the bartering offer is bartred and open. For case where user select to reopen this the status can be changed to open unlike item",
-                        "type": "string",
-                        "example": "bartered or bartered or blocked"
-                    },
-                    "number_of_flag": {
-                        "title": "Number of Flag",
-                        "description": "Keeps count of the flag that this service recieved",
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 1
-                    },
-                    "number_of_request": {
-                        "title": "Number of request",
-                        "description": "Keeps count of the request that this service recieved",
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 1
                     },
                     "bartering_location_id": {
                         "title": "Bartering location",

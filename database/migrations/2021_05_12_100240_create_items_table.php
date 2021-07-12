@@ -16,6 +16,8 @@ class CreateItemsTable extends Migration
         Schema::create('items', function (Blueprint $table) {
         $table->bigIncrements('id');
 		$table->text('picture')->nullable();
+        $table->string('name',50)->nullable();
+        $table->string('description',255)->nullable();
 		$table->string('status',30)->nullable();
 		$table->integer('number_of_flag')->nullable();
 		$table->integer('number_of_request')->nullable();

@@ -16,6 +16,7 @@ class CreateServicesTable extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name',50)->nullable();
+            $table->string('description',255)->nullable();
             $table->text('picture')->nullable();
             $table->string('status',10)->default('unbartered')->nullable();
             $table->integer('number_of_flag')->nullable();
