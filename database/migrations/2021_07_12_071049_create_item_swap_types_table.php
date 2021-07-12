@@ -17,7 +17,7 @@ class CreateItemSwapTypesTable extends Migration
             $table->id();
             $table->bigInteger('type_id')->unsigned();
             $table->bigInteger('item_id')->unsigned();             
-            $table->foreign('item_id')->references('id')->on('item');
+            $table->foreign('item_id')->references('id')->on('items');
             $table->foreign('type_id')->references('id')->on('types');
             $table->timestamps();
         });
