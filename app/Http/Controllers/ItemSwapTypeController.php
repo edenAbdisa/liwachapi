@@ -14,7 +14,7 @@ class ItemSwapTypeController extends Controller
      */
     public function index()
     {
-        //
+        return ItemSwapType::all();
     }
 
     /**

@@ -14,7 +14,7 @@ class ServiceSwapTypeController extends Controller
      */
     public function index()
     {
-        //
+        return ServiceSwapType::all();
     }
 
     /**

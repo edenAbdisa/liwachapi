@@ -1790,6 +1790,62 @@
                 }
             }
         },
+        "/serviceswaptype": {
+            "get": {
+                "tags": [
+                    "ServiceSwapType"
+                ],
+                "summary": "Get list of serviceswaptype",
+                "description": "Returns list of serviceswaptype",
+                "operationId": "getserviceswaptypeList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceSwapType"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/itemswaptype": {
+            "get": {
+                "tags": [
+                    "ItemSwapType"
+                ],
+                "summary": "Get list of itemswaptype",
+                "description": "Returns list of itemswaptype",
+                "operationId": "getitemswaptypeList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemSwapType"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
         "/item": {
             "get": {
                 "tags": [
@@ -3324,6 +3380,44 @@
                     "user_id": {
                         "title": "User ID",
                         "description": "The user Id",
+                        "type": "big integer",
+                        "example": 99
+                    }
+                }
+            },
+            "ItemSwapType": {
+                "title": "ItemSwapType",
+                "description": "ItemSwapType model",
+                "properties": {
+                    "type_id": {
+                        "title": "Item ID",
+                        "description": "This is the item that the user wanted to barter with",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    
+                    "item_id": {
+                        "title": "Item ID",
+                        "description": "The service Id",
+                        "type": "big integer",
+                        "example": 99
+                    }
+                }
+            },
+            "ServiceSwapType": {
+                "title": "ServiceSwapType",
+                "description": "ServiceSwapType model",
+                "properties": {
+                    "type_id": {
+                        "title": "Service ID",
+                        "description": "This is the service that the user wanted to barter with",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    
+                    "service_id": {
+                        "title": "Service ID",
+                        "description": "The service Id",
                         "type": "big integer",
                         "example": 99
                     }

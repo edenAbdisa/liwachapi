@@ -26,6 +26,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     Route::delete('/user/{id}','UserController@destroy');
     Route::post('/user/login','UserController@login'); 
 //});
+Route::get('/serviceswaptype','ServiceSwapTypeController@index');
+Route::get('/itemswaptype','ItemSwapTypeController@index');
 
 Route::get('/address','AddressController@index');
 Route::post('/address/search','AddressController@search');
