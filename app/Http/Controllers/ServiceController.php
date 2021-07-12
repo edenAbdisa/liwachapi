@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ServiceSwapType;
 use App\Models\Service;
+use App\Models\Address;
+use App\Models\Type;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\ServiceResource;
@@ -111,9 +113,11 @@ class ServiceController extends Controller
                     if($service->save()){ 
                         $serviceSwapType=json_decode($input["swap_type"]);
                         foreach ($serviceSwapType as $t) {
-                            //check if the sent type id is in there      
-                            if(!ServiceSwapType::create(["type_id" => $t],
-                            ["service_id" => $service->id])->save()){
+                            //check if the sent type id is in there  
+                            $swap=new ServiceSwapType();
+                            $swap->type_id=$t;
+                            $swap->service_id=$service->id;
+                            if(!$swap->save()){
                                 return response()
                                 ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     
                              }
