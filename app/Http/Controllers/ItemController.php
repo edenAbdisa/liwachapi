@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\ItemSwapType;
 use App\Models\Address;
 use App\Models\Type;
 use App\Models\Item;
@@ -67,6 +67,15 @@ class ItemController extends Controller
                     $input['picture']=$filename;
                     $item=Item::create($input);
                     if($item->save()){ 
+                        foreach ($itemSwapType as $t) {
+                            //check if the sent type id is in there
+                            $itemSwap['type_id']=$t;
+                            $itemSwap['item_id']=$item->id;                      
+                            if(!ItemSwapType::create($itemSwap)->save()){
+                                return response()
+                                ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     
+                             }
+                        }
                         $item->bartering_location ;
                         $item->type ;
                         return (new ItemResource($item))

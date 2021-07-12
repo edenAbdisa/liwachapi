@@ -2528,6 +2528,13 @@
                         "type": "string",
                         "format" : "binary"
                     },
+                    "swap_type": {
+                        "title": "Swap Types",
+                        "description": "List containing the id of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": [1,3,2,4]
+                    },
                     "address": {
                         "$ref": "#/components/schemas/AddressRequest"
                     },
@@ -2586,6 +2593,13 @@
                         "type": "big integer",
                         "format": "int64",
                         "example": 1
+                    },
+                    "swap_type": {
+                        "title": "Swap Types",
+                        "description": "List containing the name of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": ["Mobile","Shoes"]
                     },
                     "type_id": {
                         "title": "Type",
@@ -2958,6 +2972,13 @@
                         "format": "int64",
                         "example": 1
                     },
+                    "swap_type": {
+                        "title": "Swap Types",
+                        "description": "List containing the name of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": ["Mobile","Shoe"]
+                    },
                     "timestamp": {
                         "title": "Timestamp",
                         "description": "This is the timestamp that we got when this data is added.",
@@ -3006,6 +3027,13 @@
                         "type": "big integer",
                         "format": "int64",
                         "example": 1
+                    },
+                    "swap_type": {
+                        "title": "Swap Types",
+                        "description": "List containing the id of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": [1,2,3,4]
                     }
                 }
             },

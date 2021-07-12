@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ServiceSwapType;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Gate;
@@ -107,6 +108,16 @@ class ServiceController extends Controller
                     //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
                     //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST                
                     if($service->save()){ 
+                        $serviceSwapType=$input["swap_type"]
+                        foreach ($serviceSwapType as $t) {
+                            //check if the sent type id is in there
+                            $serviceSwap['type_id']=$t;
+                            $serviceSwap['service_id']=$service->id;                      
+                            if(!ServiceSwapType::create($serviceSwap)->save()){
+                                return response()
+                                ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     
+                             }
+                        }
                         $service->bartering_location;
                         $service->type; 
                         return (new ServiceResource($service))

@@ -25,7 +25,8 @@ class CreateItemsTable extends Migration
         $table->bigInteger('type_id')->unsigned()->nullable();
         $table->timestamps();
         $table->foreign('bartering_location_id')->references('id')->on('addresses');
-        $table->foreign('type_id')->references('id')->on('types');});
+        $table->foreign('type_id')->references('id')->on('types');
+        });
     }
 
     /**
