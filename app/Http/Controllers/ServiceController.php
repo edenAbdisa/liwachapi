@@ -112,8 +112,10 @@ class ServiceController extends Controller
                         $serviceSwapType=$input["swap_type"];
                         foreach ($serviceSwapType as $t) {
                             //check if the sent type id is in there
-                            $serviceSwap['type_id']=$t;
-                            $serviceSwap['service_id']=$service->id;                      
+			    $data = array(
+ 				 "type_id" => $t,
+ 				 "service_id" => $service->id
+			    );                     
                             if(!ServiceSwapType::create($serviceSwap)->save()){
                                 return response()
                                 ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     

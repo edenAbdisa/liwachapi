@@ -67,12 +67,15 @@ class ItemController extends Controller
                     $input['type_id']=$type->id;
                     $input['picture']=$filename;
                     $item=Item::create($input);
-                    if($item->save()){ 
+                    if($item->save()){
+			$itemSwapType=$input['swap_type']; 
                         foreach ($itemSwapType as $t) {
                             //check if the sent type id is in there
-                            $itemSwap['type_id']=$t;
-                            $itemSwap['item_id']=$item->id;                      
-                            if(!ItemSwapType::create($itemSwap)->save()){
+			    $data = array(
+ 				 "type_id" => $t,
+ 				 "item_id" => $item->id
+			    );                      
+                            if(!ItemSwapType::create($data)->save()){
                                 return response()
                                 ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     
                              }
