@@ -33,7 +33,18 @@ class ItemController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
-
+    public function itemsByLocation(Request $request){
+        $input = $request->all(); 
+         
+        $items= DB::table('items')
+->select('items.id','items.picture','items.name','items.bartering_location_id','items.status','items.description','items.number_of_flag','items.number_of_request','items.type_id')
+->join('addresses','items.bartering_location_id','=','addresses.id')
+->where(['addresses.city' => $input['city']])
+->get();
+         
+        return response()->json($items, 200); 
+   
+    }
     /**
      * Store a newly created resource in storage.
      *

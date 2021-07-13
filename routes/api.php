@@ -48,6 +48,7 @@ Route::put('/flag/{id}','FlagController@update');
 Route::delete('/flag/{id}','FlagController@destroy');
 
 Route::get('/item','ItemController@index');
+Route::post('/item/byLocation','ItemController@itemsByLocation');
 Route::post('/item/search','ItemController@search');
 Route::post('/item','ItemController@store');
 Route::put('/item/{id}','ItemController@update');
@@ -79,6 +80,7 @@ Route::delete('/request/{id}','RequestController@destroy');
 
 Route::get('/service','ServiceController@index');
 Route::post('/service/search','ServiceController@search');
+Route::post('/service/byLocation','ServiceController@serviceByLocation');
 Route::post('/service','ServiceController@store');
 Route::put('/service/{id}','ServiceController@update');
 Route::delete('/service/{id}','ServiceController@destroy');
