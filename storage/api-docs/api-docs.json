@@ -1596,7 +1596,7 @@
                 ],
                 "summary": "Get list of service",
                 "description": "Returns list of service",
-                "operationId": "searchService",
+                "operationId": "searchByLocationService",
                 "requestBody": {
                     "required": true,
                     "content": {

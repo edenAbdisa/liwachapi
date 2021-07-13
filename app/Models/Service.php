@@ -18,11 +18,7 @@ class Service extends Model
         'bartering_location_id',
         'type_id'
     ];
-    
-    /* public function serviceSwapType()
-    {
-        return $this->belongsToMany(ServiceSwapType::class);
-    } */
+     
 
     public function bartering_location()
     {
@@ -39,5 +35,9 @@ class Service extends Model
     public function flag()
     {
         return $this->hasMany(Flag::class);
+    }
+    public function serviceSwapType()
+    {
+        return $this->hasMany(ServiceSwapType::class);
     }
 }

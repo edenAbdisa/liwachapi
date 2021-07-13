@@ -12,4 +12,8 @@ class ItemSwapType extends Model
         'type_id',
         'item_id'
     ];
+    public function type()
+    {
+        return $this->belongsTo(Type::class);
+    }
 }

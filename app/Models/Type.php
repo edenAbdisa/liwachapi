@@ -16,6 +16,14 @@ class Type extends Model
     {
         return $this->belongsTo(Category::class);
     }
+    public function serviceSwapType()
+    {
+        return $this->hasMany(ServiceSwapType::class);
+    }
+    public function itemSwapType()
+    {
+        return $this->hasMany(ItemSwapType::class);
+    }
     /*
     public function itemSwap()
     {

@@ -233,12 +233,12 @@ class AddressController extends Controller
      *      )
      * )
      */
-   /* public function destroy($id)
+ public function destroy($id)
     {
         $address = Address::findOrFail($id);
         $address->delete();
         return response(null, Response::HTTP_NO_CONTENT);
-    }*/
+    }
     //cant be deletd alone since it violates foreign key no need
     //to delete this data by an end point
 }

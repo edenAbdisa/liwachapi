@@ -136,15 +136,13 @@ class ServiceController extends Controller
         }
     }
     public function serviceByLocation(Request $request){
-        $input = $request->all(); 
-         
-        $services= DB::table('services')
-->select('services.id','services.picture','services.name','services.bartering_location_id','services.status',
-'services.description','services.number_of_flag','services.number_of_request','services.type_id')
-->join('addresses','services.bartering_location_id','=','addresses.id')
-->where(['addresses.city' => $input['city']])
-->get();
-         
+        $input = $request->all();           
+        $services=Address::where('city', $input['city'])->where('type','service')->get();
+        $services->each(function($item, $key) {
+            $item->service->serviceSwapType->each(function($type,$key){
+                $type->type;
+            });  
+        });
         return response()->json($services, 200); 
    
     }

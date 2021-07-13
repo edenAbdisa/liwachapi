@@ -33,7 +33,7 @@ Route::get('/address','AddressController@index');
 Route::post('/address/search','AddressController@search');
 Route::post('/address','AddressController@store');
 Route::put('/address/{id}','AddressController@update');
-//Route::delete('/address/{id}','AddressController@destroy');
+Route::delete('/address/{id}','AddressController@destroy');
 
 Route::get('/category','CategoryController@index');
 Route::post('/category/search','CategoryController@search');

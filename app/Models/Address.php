@@ -27,6 +27,10 @@ class Address extends Model
     }
     public function item()
     {
-        return $this->hasOne(Item::class);
+        return $this->hasOne(Item::class,'bartering_location_id');
+    }
+    public function service()
+    {
+        return $this->hasOne(Service::class,'bartering_location_id');
     }
 }

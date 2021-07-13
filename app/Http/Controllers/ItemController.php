@@ -35,13 +35,14 @@ class ItemController extends Controller
     }
     public function itemsByLocation(Request $request){
         $input = $request->all(); 
-         
-        $items= DB::table('items')
-->select('items.id','items.picture','items.name','items.bartering_location_id','items.status','items.description','items.number_of_flag','items.number_of_request','items.type_id')
-->join('addresses','items.bartering_location_id','=','addresses.id')
-->where(['addresses.city' => $input['city']])
-->get();
-         
+        $items=Address::where('city', $input['city'])->where('type','item')->get();
+        $items->each(function($address, $key) { 
+            $address
+            ->item
+            ->itemSwapType->each(function($type,$key){
+                $type->type;
+            });  
+        });
         return response()->json($items, 200); 
    
     }

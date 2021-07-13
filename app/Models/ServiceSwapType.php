@@ -12,4 +12,10 @@ class ServiceSwapType extends Model
         'type_id',
         'service_id'
     ];
+    public function type()
+    {
+        return $this->belongsTo(Type::class);
+    }
+    
+    
 }
