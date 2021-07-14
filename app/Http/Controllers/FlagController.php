@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\ReportType;
 use App\Models\Flag;
 use Illuminate\Http\Request; 
 use Gate;
@@ -41,9 +41,9 @@ class FlagController extends Controller
         //User::with(['roles'])->get() 
         $flag= Flag::all();
         foreach($flag as $f){
-          $flag['reason_id']= $f->reason;
-          $flag['flagged_by_id']= $f->flagged_by;
-          $flag['flagged_item_id']= $f->flagged_item;
+          $f->reason;
+          $f->flagged_by;
+          $f->flagged_item;
         }
         return (new FlagResource($flag))
             ->response()
@@ -83,14 +83,20 @@ class FlagController extends Controller
      */
     public function store(Request $request)
     {
-        $flag = Flag::create($request->all());
+        $input=$request->all();           
+        $reason= ReportType::where('report_detail',$input['reason'])->first();
+       if(!$reason){
+        return response()
+        ->json("No such kind of report type", Response::HTTP_INTERNAL_SERVER_ERROR);
+
+       }
+        $input['reason_id']=$reason->id;
+        $flag = Flag::create($input);
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
-        if($flag->save()){ 
-            $flag['reason_id']= $flag->reason;
-            $flag['flagged_by_id']= $flag->flagged_by;
-            $flag['flagged_item_id']= $flag->flagged_item;
+        if($flag->save()){
+          
             return (new FlagResource($flag))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);

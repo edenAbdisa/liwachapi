@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str; 
 use App\Models\User;
+use App\Models\Address;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
@@ -112,21 +113,22 @@ class UserController extends Controller
         $input = $request->all(); 
         $user= User::where('email',$request->email)->first();
         if(!$user){
-            $input['password']=Hash::make($input['password']);
+            $input['password']=Hash::make($request->password);
             $input['remember_token'] = Str::random(10);   
             $user=User::create($input);
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $user['remember_token']= $token;
-            $address = Address::create($request->address);
-            if(!$address->save()){
-                $user['address_id']=$address->id;
+            $address=json_decode( $request->address, true);
+            $address = Address::create($address);
+            if(!$address->save()){                
                 return response()
                 ->json("The address resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
             }
+            $user['address_id']=$address->id;
             $saveduser= $user->save();
+            if($saveduser){                
             $saveduser->address;
             $saveduser->membership;
-            if($saveduser){
                 return response(new UserResource($saveduser),Response::HTTP_CREATED);
             }else{ 
                 return response()

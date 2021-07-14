@@ -2737,6 +2737,9 @@
                         "format": "int64",
                         "example": 1
                     },
+                    "address": {
+                        "$ref": "#/components/schemas/AddressRequest"
+                    },
                     "bartering_location_id": {
                         "title": "Bartering location",
                         "description": "After saving the location at address the id will be assocated with this item",
@@ -3003,9 +3006,8 @@
                     "type": {
                         "title": "type",
                         "description": "Type of items that are being exchanged. This will make it easy to decide on which table to query,",
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 9
+                        "type": "string", 
+                        "example": "item or service"
                     },
                     "timestamp": {
                         "title": "Timestamp",
@@ -3059,9 +3061,8 @@
                     "type": {
                         "title": "type",
                         "description": "Type of items that are being exchanged. This will make it easy to decide on which table to query,",
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 9
+                        "type": "string",
+                        "example": "item"
                     }
                 }
             },
@@ -3107,6 +3108,9 @@
                         "type": "integer",
                         "format": "int64",
                         "example": 1
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/AddressRequest"
                     },
                     "bartering_location_id": {
                         "title": "Bartering location",
@@ -3164,12 +3168,8 @@
                         "type": "string",
                         "example": "mybag.jpg"
                     },
-                    "bartering_location_id": {
-                        "title": "Bartering location",
-                        "description": "After saving the location at address the id will be assocated with this service",
-                        "type": "big integer",
-                        "format": "int64",
-                        "example": 1
+                    "address": {
+                        "$ref": "#/components/schemas/AddressRequest"
                     },
                     "type_id": {
                         "title": "Type",
@@ -3260,6 +3260,12 @@
                         "type": "string",
                         "example": "Abdisa "
                     },
+                    "password": {
+                        "title": "Password",
+                        "description": "Password",
+                        "type": "string",
+                        "format": "thisismyPassword"
+                    },
                     "email": {
                         "title": "Email",
                         "description": "Email",
@@ -3303,12 +3309,8 @@
                         "type": "string",
                         "example": "user or admin or company"
                     },
-                    
-                    "address_id": {
-                        "title": "Address ID",
-                        "description": "The ID of the address",
-                        "type": "big integer",
-                        "format": 99
+                    "address": {
+                        "$ref": "#/components/schemas/AddressRequest"
                     },
                     "membership_id": {
                         "title": "Membership ID ",
@@ -3398,12 +3400,8 @@
                         "type": "string",
                         "example": "user or admin or company"
                     },
-                    
-                    "address_id": {
-                        "title": "Address ID",
-                        "description": "The ID of the address",
-                        "type": "big integer",
-                        "format": 99
+                    "address": {
+                        "$ref": "#/components/schemas/AddressRequest"
                     },
                     "membership_id": {
                         "title": "Membership ID ",

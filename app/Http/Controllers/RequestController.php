@@ -83,7 +83,7 @@ class RequestController extends Controller
      */
     public function store(Request $request)
     {
-        $request = Request::create($request->all());
+        $request = RequestOrder::create($request->all());
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
@@ -138,7 +138,7 @@ class RequestController extends Controller
     public function search(Request $request)
     { 
         $input = $request->all();
-        $requests = Request::all();  
+        $requests = RequestOrder::all();  
         $col=DB::getSchemaBuilder()->getColumnListing('requests'); 
         $requestKeys = collect($request->all())->keys();       
         foreach ($requestKeys as $key) { 
@@ -203,7 +203,7 @@ class RequestController extends Controller
     public function update(Request $request, $id)
     {
         $input = $request->all();          
-        $request= Request::where('id',$id)->first();
+        $request= RequestOrder::where('id',$id)->first();
         if($request->fill($input)->save()){
             $request->requester;
             $request->requested_item; 
@@ -251,7 +251,7 @@ class RequestController extends Controller
      */
     public function destroy($id)
     {
-        $request = Request::find($id);
+        $request = RequestOrder::find($id);
         if(!$request){
             return response()
                    ->json("Resource Not Found", Response::HTTP_NOT_FOUND);

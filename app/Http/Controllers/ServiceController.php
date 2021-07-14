@@ -91,8 +91,8 @@ class ServiceController extends Controller
         if($file) {            
             $filename = time().'_'.$file->getClientOriginalName();
             if(!HelperClass::uploadFile($file,$filename, 'files/services')){
-                return response()
-                            ->json("The picture couldn't be uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
+               // return response()
+                //            ->json("The picture couldn't be uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
             }
             $address = $request->address;
             $address=json_decode( $address, true);
