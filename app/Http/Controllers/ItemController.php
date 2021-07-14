@@ -27,7 +27,8 @@ class ItemController extends Controller
     {
         $items= Item::all()->each(function($item, $key) {
             $item->bartering_location ;
-            $item->type ;  
+            $item->type ;
+            $item->picture=public_path().'/files/items/'.$item->picture;
        });
         return (new ItemResource($items))
             ->response()
@@ -37,9 +38,8 @@ class ItemController extends Controller
         $input = $request->all(); 
         $items=Address::where('city', $input['city'])->where('type','item')->get();
         $items->each(function($address, $key) { 
-            $address
-            ->item
-            ->itemSwapType->each(function($type,$key){
+            $address->item->picture=public_path().'/files/items/'.$item->picture;
+            $address->item->itemSwapType->each(function($type,$key){
                 $type->type;
             });  
         });
@@ -90,6 +90,7 @@ class ItemController extends Controller
                                 ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     
                              }
                         }
+                        $item->picture=public_path().'/files/items/'.$item->picture;
                         $item->bartering_location ;
                         $item->type ;
                         return (new ItemResource($item))
@@ -134,6 +135,7 @@ class ItemController extends Controller
             }            
         } 
         $items->each(function($item, $key) {
+            $item->picture=public_path().'/files/items/'.$item->picture;
             $item->bartering_location ;
             $item->type ;
        });
@@ -160,6 +162,7 @@ class ItemController extends Controller
             $input['type_id']=$type->id;
         }
         if($item->fill($input)->save()){
+            $item->picture=public_path().'/files/items/'.$item->picture;
             $item->bartering_location ;
             $item->type ;
             return ($item)

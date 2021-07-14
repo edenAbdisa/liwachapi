@@ -44,6 +44,7 @@ class ServiceController extends Controller
         //User::with(['roles'])->get()
         $service= Service::all()
                          ->each(function($item, $key) {
+                            $item->picture=public_path().'/files/services/'.$item->picture;
                             $item->bartering_location;
                             $item->type;
                             $item->serviceSwapType; 
@@ -122,6 +123,7 @@ class ServiceController extends Controller
                                 ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     
                              }
                         }
+                        $service->picture=public_path().'/files/services/'.$service->picture;                          
                         $service->bartering_location;
                         $service->type; 
                         return (new ServiceResource($service))
@@ -139,6 +141,7 @@ class ServiceController extends Controller
         $input = $request->all();           
         $services=Address::where('city', $input['city'])->where('type','service')->get();
         $services->each(function($item, $key) {
+            $item->picture=public_path().'/files/services/'.$item->picture;                        
             $item->service->serviceSwapType->each(function($type,$key){
                 $type->type;
             });  
@@ -196,6 +199,7 @@ class ServiceController extends Controller
             }            
         } 
         $services->each(function($item, $key) {
+                            $item->picture=public_path().'/files/services/'.$item->picture;
                             $item->bartering_location;
                             $item->type; 
                         });
@@ -251,6 +255,7 @@ class ServiceController extends Controller
         $input = $request->all();          
         $service= Service::where('id',$id)->first();
         if($service->fill($input)->save()){
+            $service->picture=public_path().'/files/services/'.$service->picture;
             $service->bartering_location;
             $service->type;
             return ($service)
