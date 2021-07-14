@@ -111,14 +111,25 @@ class UserController extends Controller
     public function store(Request $request)
     {    
         $input = $request->all(); 
+        /* return $request->all();
+        $input['first_name']=$request->first_name;
+        $input['last_name']=$request->last_name;
+        $input['email']=$request->email;
+        $input['profile_picture']=$request->profile_picture;
+        $input['phone_number']=$request->phone_number;
+        $input['TIN_picture']=$request->TIN_picture;
+        $input['status']=$request->status;
+        $input['birthdate']=$request->birthdate;
+        $input['type']=$request->type;
+        $input['membership_id']=$request->membership_id; */
         $user= User::where('email',$request->email)->first();
         if(!$user){
             $input['password']=Hash::make($request->password);
             $input['remember_token'] = Str::random(10);   
             $user=User::create($input);
-            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+            $token = "user->createToken('Laravel Password Grant')->accessToken";
             $user['remember_token']= $token;
-            $address=json_decode( $request->address, true);
+            $address=$request->address;
             $address = Address::create($address);
             if(!$address->save()){                
                 return response()
@@ -127,9 +138,9 @@ class UserController extends Controller
             $user['address_id']=$address->id;
             $saveduser= $user->save();
             if($saveduser){                
-            $saveduser->address;
-            $saveduser->membership;
-                return response(new UserResource($saveduser),Response::HTTP_CREATED);
+            $user->address;
+            $user->membership;
+                return response(new UserResource($user),Response::HTTP_CREATED);
             }else{ 
                 return response()
                        ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
