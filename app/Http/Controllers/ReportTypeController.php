@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+
 class ReportTypeController extends Controller
 {
     /**
@@ -77,19 +78,19 @@ class ReportTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $input=$request->all();
+        $input = $request->all();
         $reporttype = ReportType::create($input);
-        $input['name']=Str::ucfirst($input['name']);
+        $input['name'] = Str::ucfirst($input['name']);
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
-        if($reporttype->save()){ 
+        if ($reporttype->save()) {
             return (new ReportTypeResource($reporttype))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        }else{ 
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        } else {
             return response()
-                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -129,20 +130,20 @@ class ReportTypeController extends Controller
      * )
      */
     public function search(Request $request)
-    { 
+    {
         $input = $request->all();
-        $reporttypes = ReportType::all();  
-        $col=DB::getSchemaBuilder()->getColumnListing('report_types'); 
-        $requestKeys = collect($request->all())->keys();       
-        foreach ($requestKeys as $key) { 
-            if(empty($reporttypes)){
+        $reporttypes = ReportType::all();
+        $col = DB::getSchemaBuilder()->getColumnListing('report_types');
+        $requestKeys = collect($request->all())->keys();
+        foreach ($requestKeys as $key) {
+            if (empty($reporttypes)) {
                 return response()->json($reporttypes, 200);
             }
-            if(in_array($key,$col)){ 
-                $reporttypes = $reporttypes->where($key,$input[$key]);
-            }            
-        } 
-        return response()->json($reporttypes, 200); 
+            if (in_array($key, $col)) {
+                $reporttypes = $reporttypes->where($key, $input[$key]);
+            }
+        }
+        return response()->json($reporttypes, 200);
     }
 
     /**
@@ -190,21 +191,21 @@ class ReportTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->all();          
-        $reporttype_to_be_edited= ReportType::where('id',$id)->first();
-        if($reporttype_to_be_edited){        
-            if(in_array('report_detail',$input)){
-                $reporttype= ReportType::where('report_detail',Str::ucfirst($request->name))->first();
-                if($reporttype){
-                    return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);      
+        $input = $request->all();
+        $reporttype_to_be_edited = ReportType::where('id', $id)->first();
+        if ($reporttype_to_be_edited) {
+            if (in_array('report_detail', $input)) {
+                $reporttype = ReportType::where('report_detail', Str::ucfirst($request->name))->first();
+                if ($reporttype) {
+                    return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);
                 }
-                $input['report_detail']=Str::ucfirst($input['report_detail']);
-            } 
-            if($reporttype_to_be_edited->fill($input)->save()){
+                $input['report_detail'] = Str::ucfirst($input['report_detail']);
+            }
+            if ($reporttype_to_be_edited->fill($input)->save()) {
                 return (new ReportType($reporttype_to_be_edited))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-            } 
+                    ->response()
+                    ->setStatusCode(Response::HTTP_CREATED);
+            }
         }
     }
 
@@ -246,10 +247,9 @@ class ReportTypeController extends Controller
     public function destroy($id)
     {
         $reporttype = ReportType::find($id);
-        if(!$reporttype){
+        if (!$reporttype) {
             return response()
-                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
-     
+                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
         $reporttype->delete();
         return response(null, Response::HTTP_NO_CONTENT);

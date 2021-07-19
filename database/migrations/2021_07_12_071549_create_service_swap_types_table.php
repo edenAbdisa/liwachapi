@@ -16,7 +16,7 @@ class CreateServiceSwapTypesTable extends Migration
         Schema::create('service_swap_types', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('type_id')->unsigned();
-            $table->bigInteger('service_id')->unsigned();             
+            $table->bigInteger('service_id')->unsigned();
             $table->foreign('service_id')->references('id')->on('services');
             $table->foreign('type_id')->references('id')->on('types');
             $table->timestamps();

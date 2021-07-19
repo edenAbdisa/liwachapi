@@ -9,11 +9,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str; 
+use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Address;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+
 class UserController extends Controller
 {
     /**
@@ -40,45 +41,47 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user= User::all()
-                         ->each(function($item, $key) {
-                            $item->address;
-                            $item->membership; 
-                        });
+        $user = User::all()
+            ->each(function ($item, $key) {
+                $item->address;
+                $item->membership;
+            });
         return (new UserResource($user))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_OK); 
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
-    public function login(Request $request){
-    	$user= User::where('email',$request->email)->first();
-    	$response=['user'=> $user];
-    	if( $user) {
-    		if(Hash::check($request->password,$user->password)){
-    		   $token=$user->createToken('Laravel Password Grant Client')->accessToken;
-    		   $user['remember_token']= $token;
-    		   $response=['user'=> $user];
-               $user->address;
-               $user->membership; 
-    		   return $user->save()? response($response,200):
-    			  "Couldn't provide token for user"; 
-    		}else{
-    		   $response=["message"=>"Password mismatch"];
-          		   return response($response,422);
-    		}
-    	}else{
-    		$response=['message'=>'User doesnt not exist'];
-    		return response($response,422);
-    	}
+    public function login(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        $response = ['user' => $user];
+        if ($user) {
+            if (Hash::check($request->password, $user->password)) {
+                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                $user['remember_token'] = $token;
+                $response = ['user' => $user];
+                $user->address;
+                $user->membership;
+                return $user->save() ? response($response, 200) :
+                    "Couldn't provide token for user";
+            } else {
+                $response = ["message" => "Password mismatch"];
+                return response($response, 422);
+            }
+        } else {
+            $response = ['message' => 'User doesnt not exist'];
+            return response($response, 422);
+        }
     }
-    public function logout(Request $request){ 
-        $token= $request->user()->token();
+    public function logout(Request $request)
+    {
+        $token = $request->user()->token();
         $token->revoke();
-        $user= User::where('id',$token->user_id)->first();
-        $user['remember_token']='';
-        $response['message'] = $user->save()? 'You have been successfully logged out!':'We could not successfully log out your account please try again!';
-        return response($response,200);	
+        $user = User::where('id', $token->user_id)->first();
+        $user['remember_token'] = '';
+        $response['message'] = $user->save() ? 'You have been successfully logged out!' : 'We could not successfully log out your account please try again!';
+        return response($response, 200);
     }
-     /**
+    /**
      * @OA\Post(
      *      path="/user",
      *      operationId="storeUser",
@@ -109,8 +112,8 @@ class UserController extends Controller
      * )
      */
     public function store(Request $request)
-    {    
-        $input = $request->all(); 
+    {
+        $input = $request->all();
         /* return $request->all();
         $input['first_name']=$request->first_name;
         $input['last_name']=$request->last_name;
@@ -122,36 +125,36 @@ class UserController extends Controller
         $input['birthdate']=$request->birthdate;
         $input['type']=$request->type;
         $input['membership_id']=$request->membership_id; */
-        $user= User::where('email',$request->email)->first();
-        if(!$user){
-            $input['password']=Hash::make($request->password);
-            $input['remember_token'] = Str::random(10);   
-            $user=User::create($input);
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            $input['password'] = Hash::make($request->password);
+            $input['remember_token'] = Str::random(10);
+            $user = User::create($input);
             $token = "user->createToken('Laravel Password Grant')->accessToken";
-            $user['remember_token']= $token;
-            $address=$request->address;
+            $user['remember_token'] = $token;
+            $address = $request->address;
             $address = Address::create($address);
-            if(!$address->save()){                
+            if (!$address->save()) {
                 return response()
-                ->json("The address resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                    ->json("The address resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-            $user['address_id']=$address->id;
-            $saveduser= $user->save();
-            if($saveduser){                
-            $user->address;
-            $user->membership;
-                return response(new UserResource($user),Response::HTTP_CREATED);
-            }else{ 
+            $user['address_id'] = $address->id;
+            $saveduser = $user->save();
+            if ($saveduser) {
+                $user->address;
+                $user->membership;
+                return response(new UserResource($user), Response::HTTP_CREATED);
+            } else {
                 return response()
-                       ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-        }else{
+        } else {
             return response()
-                ->json("An account already exist by this email.", Response::HTTP_INTERNAL_SERVER_ERROR);          
+                ->json("An account already exist by this email.", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-        /**
+    /**
      * @OA\Get(
      *      path="/users/{id}",
      *      operationId="getUserById",
@@ -187,27 +190,27 @@ class UserController extends Controller
      * )
      */
     public function search(Request $request)
-    { 
+    {
         $input = $request->all();
-        $users = User::all();  
-        $col=DB::getSchemaBuilder()->getColumnListing('users'); 
-        $requestKeys = collect($request->all())->keys();       
-        foreach ($requestKeys as $key) { 
-            if(empty($users)){
+        $users = User::all();
+        $col = DB::getSchemaBuilder()->getColumnListing('users');
+        $requestKeys = collect($request->all())->keys();
+        foreach ($requestKeys as $key) {
+            if (empty($users)) {
                 return response()->json($users, 200);
             }
-            if(in_array($key,$col)){ 
-                $users = $users->where($key,$input[$key]);
-            }            
-        } 
-        $users->each(function($item, $key) {
-                            $item->address;
-                            $item->membership; 
-                        });
-        return response()->json($users, 200); 
+            if (in_array($key, $col)) {
+                $users = $users->where($key, $input[$key]);
+            }
+        }
+        $users->each(function ($item, $key) {
+            $item->address;
+            $item->membership;
+        });
+        return response()->json($users, 200);
     }
 
-     /**
+    /**
      * @OA\Put(
      *      path="/users/{id}",
      *      operationId="updateUser",
@@ -252,17 +255,17 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->all();          
-        $user= User::where('id',$id)->first();
-        if($user->fill($input)->save()){
+        $input = $request->all();
+        $user = User::where('id', $id)->first();
+        if ($user->fill($input)->save()) {
             $user->address;
-            $user->membership; 
-            return (new UserResponse($user))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        } 
+            $user->membership;
+            return (new UserResource($user))
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        }
     }
-     /**
+    /**
      * @OA\Delete(
      *      path="/users/{id}",
      *      operationId="deleteUser",
@@ -300,10 +303,9 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::find($id);
-        if(!$user){
+        if (!$user) {
             return response()
-                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
-     
+                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
         $user->delete();
         return response(null, Response::HTTP_NO_CONTENT);

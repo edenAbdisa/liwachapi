@@ -24,17 +24,17 @@ class RequestOrder extends Model
     }
     public function requested_item()
     {
-        if($this->type =='service'){
+        if ($this->type == 'service') {
             return $this->belongsTo(Service::class);
-        }else{
+        } else {
             return $this->belongsTo(Item::class);
         }
     }
     public function requester_item()
     {
-        if($this->type =='service'){
+        if ($this->type == 'service') {
             return $this->belongsTo(Service::class);
-        }else{
+        } else {
             return $this->belongsTo(Item::class);
         }
     }

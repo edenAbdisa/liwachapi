@@ -16,6 +16,4 @@ class ServiceSwapType extends Model
     {
         return $this->belongsTo(Type::class);
     }
-    
-    
 }

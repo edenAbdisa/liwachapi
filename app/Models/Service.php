@@ -18,7 +18,7 @@ class Service extends Model
         'bartering_location_id',
         'type_id'
     ];
-     
+
 
     public function bartering_location()
     {

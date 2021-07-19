@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+
 class RequestController extends Controller
 {
     /**
@@ -39,12 +40,12 @@ class RequestController extends Controller
     {
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        $requestOrder= RequestOrder::all()
-                         ->each(function($item, $key) {
-                            $item->requester;
-                            $item->requested_item; 
-                            $item->requester_item;
-                        });
+        $requestOrder = RequestOrder::all()
+            ->each(function ($item, $key) {
+                $item->requester;
+                $item->requested_item;
+                $item->requester_item;
+            });
         return (new RequestResource($requestOrder))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -87,16 +88,16 @@ class RequestController extends Controller
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
-        if($request->save()){ 
+        if ($request->save()) {
             $request->requester;
-            $request->requested_item; 
+            $request->requested_item;
             $request->requester_item;
             return (new RequestResource($request))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        }else{ 
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        } else {
             return response()
-                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -136,25 +137,25 @@ class RequestController extends Controller
      * )
      */
     public function search(Request $request)
-    { 
+    {
         $input = $request->all();
-        $requests = RequestOrder::all();  
-        $col=DB::getSchemaBuilder()->getColumnListing('requests'); 
-        $requestKeys = collect($request->all())->keys();       
-        foreach ($requestKeys as $key) { 
-            if(empty($requests)){
+        $requests = RequestOrder::all();
+        $col = DB::getSchemaBuilder()->getColumnListing('requests');
+        $requestKeys = collect($request->all())->keys();
+        foreach ($requestKeys as $key) {
+            if (empty($requests)) {
                 return response()->json($requests, 200);
             }
-            if(in_array($key,$col)){ 
-                $requests = $requests->where($key,$input[$key]);
-            }            
-        } 
-        $requests->each(function($item, $key) {
+            if (in_array($key, $col)) {
+                $requests = $requests->where($key, $input[$key]);
+            }
+        }
+        $requests->each(function ($item, $key) {
             $item->requester;
-            $item->requested_item; 
+            $item->requested_item;
             $item->requester_item;
         });
-        return response()->json($requests, 200); 
+        return response()->json($requests, 200);
     }
 
     /**
@@ -202,16 +203,16 @@ class RequestController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->all();          
-        $request= RequestOrder::where('id',$id)->first();
-        if($request->fill($input)->save()){
+        $input = $request->all();
+        $request = RequestOrder::where('id', $id)->first();
+        if ($request->fill($input)->save()) {
             $request->requester;
-            $request->requested_item; 
+            $request->requested_item;
             $request->requester_item;
             return ($request)
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        } 
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        }
     }
 
     /**
@@ -252,10 +253,9 @@ class RequestController extends Controller
     public function destroy($id)
     {
         $request = RequestOrder::find($id);
-        if(!$request){
+        if (!$request) {
             return response()
-                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
-     
+                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
         $request->delete();
         return response(null, Response::HTTP_NO_CONTENT);

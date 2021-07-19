@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+
 class AddressController extends Controller
 {
     /**
@@ -81,14 +82,14 @@ class AddressController extends Controller
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
-        if($address->save()){ 
+        if ($address->save()) {
             return (new AddressResource($address))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        }else{ 
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        } else {
             return (new AddressResource($address))
-            ->response()
-            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->response()
+                ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -128,20 +129,20 @@ class AddressController extends Controller
      * )
      */
     public function search(Request $request)
-    { 
+    {
         $input = $request->all();
-        $addresses = Address::all();  
-        $col=DB::getSchemaBuilder()->getColumnListing('addresses'); 
-        $requestKeys = collect($request->all())->keys();       
-        foreach ($requestKeys as $key) { 
-            if(empty($addresses)){
+        $addresses = Address::all();
+        $col = DB::getSchemaBuilder()->getColumnListing('addresses');
+        $requestKeys = collect($request->all())->keys();
+        foreach ($requestKeys as $key) {
+            if (empty($addresses)) {
                 return response()->json($addresses, 200);
             }
-            if(in_array($key,$col)){ 
-                $addresses = $addresses->where($key,$input[$key]);
-            }            
-        } 
-        return response()->json($addresses, 200); 
+            if (in_array($key, $col)) {
+                $addresses = $addresses->where($key, $input[$key]);
+            }
+        }
+        return response()->json($addresses, 200);
     }
 
     /**
@@ -189,13 +190,13 @@ class AddressController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->all();          
-        $address= Address::where('id',$id)->first();
-        if($address->fill($input)->save()){
+        $input = $request->all();
+        $address = Address::where('id', $id)->first();
+        if ($address->fill($input)->save()) {
             return (new AddressResource($address))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        } 
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        }
     }
 
     /**
@@ -233,7 +234,7 @@ class AddressController extends Controller
      *      )
      * )
      */
- public function destroy($id)
+    public function destroy($id)
     {
         $address = Address::findOrFail($id);
         $address->delete();

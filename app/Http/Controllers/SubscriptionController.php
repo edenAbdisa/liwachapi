@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+
 class SubscriptionController extends Controller
 {
     /**
@@ -39,11 +40,11 @@ class SubscriptionController extends Controller
     {
         //abort_if(Gate::denies('subscription_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        $subscription= Subscription::all()
-                         ->each(function($item, $key) {
-                            $item->type;
-                            $item->user; 
-                        }); 
+        $subscription = Subscription::all()
+            ->each(function ($item, $key) {
+                $item->type;
+                $item->user;
+            });
         return (new SubscriptionResource($subscription))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -86,15 +87,15 @@ class SubscriptionController extends Controller
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
-        if($subscription->save()){
+        if ($subscription->save()) {
             $subscription->type;
-            $subscription->user; 
+            $subscription->user;
             return (new SubscriptionResource($subscription))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        }else{ 
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        } else {
             return response()
-                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -134,24 +135,24 @@ class SubscriptionController extends Controller
      * )
      */
     public function search(Request $request)
-    { 
+    {
         $input = $request->all();
-        $subscriptions = Subscription::all();  
-        $col=DB::getSchemaBuilder()->getColumnListing('subscriptions'); 
-        $requestKeys = collect($request->all())->keys();       
-        foreach ($requestKeys as $key) { 
-            if(empty($subscriptions)){
+        $subscriptions = Subscription::all();
+        $col = DB::getSchemaBuilder()->getColumnListing('subscriptions');
+        $requestKeys = collect($request->all())->keys();
+        foreach ($requestKeys as $key) {
+            if (empty($subscriptions)) {
                 return response()->json($subscriptions, 200);
             }
-            if(in_array($key,$col)){ 
-                $subscriptions = $subscriptions->where($key,$input[$key]);
-            }            
-        } 
-        $subscriptions->each(function($item, $key) {
-                            $item->type;
-                            $item->user; 
-                        }); 
-        return response()->json($subscriptions, 200); 
+            if (in_array($key, $col)) {
+                $subscriptions = $subscriptions->where($key, $input[$key]);
+            }
+        }
+        $subscriptions->each(function ($item, $key) {
+            $item->type;
+            $item->user;
+        });
+        return response()->json($subscriptions, 200);
     }
 
     /**
@@ -199,15 +200,15 @@ class SubscriptionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->all();          
-        $subscription= Subscription::where('id',$id)->first();
-        if($subscription->fill($input)->save()){
+        $input = $request->all();
+        $subscription = Subscription::where('id', $id)->first();
+        if ($subscription->fill($input)->save()) {
             $subscription->type;
-            $subscription->user; 
+            $subscription->user;
             return ($subscription)
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        } 
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        }
     }
 
     /**
@@ -248,10 +249,9 @@ class SubscriptionController extends Controller
     public function destroy($id)
     {
         $subscription = Subscription::find($id);
-        if(!$subscription){
+        if (!$subscription) {
             return response()
-                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
-     
+                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
         $subscription->delete();
         return response(null, Response::HTTP_NO_CONTENT);

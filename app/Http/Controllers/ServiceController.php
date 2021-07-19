@@ -14,6 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+
 class ServiceController extends Controller
 {
     /**
@@ -42,13 +43,13 @@ class ServiceController extends Controller
     {
         //abort_if(Gate::denies('service_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get()
-        $service= Service::all()
-                         ->each(function($item, $key) {
-                            $item->picture=public_path().'/files/services/'.$item->picture;
-                            $item->bartering_location;
-                            $item->type;
-                            $item->serviceSwapType; 
-                        }); 
+        $service = Service::all()
+            ->each(function ($item, $key) {
+                $item->picture = public_path() . '/files/services/' . $item->picture;
+                $item->bartering_location;
+                $item->type;
+                $item->serviceSwapType;
+            });
         return (new ServiceResource($service))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -87,49 +88,49 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $file=$request->file('picture');
-        if($file) {            
-            $filename = time().'_'.$file->getClientOriginalName();
-            if(!HelperClass::uploadFile($file,$filename, 'files/services')){
-               // return response()
+        $file = $request->file('picture');
+        if ($file) {
+            $filename = time() . '_' . $file->getClientOriginalName();
+            if (!HelperClass::uploadFile($file, $filename, 'files/services')) {
+                // return response()
                 //            ->json("The picture couldn't be uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
             }
             $address = $request->address;
-            $address=json_decode( $address, true);
-            $address['type'] = 'service'; 
+            $address = json_decode($address, true);
+            $address['type'] = 'service';
             $address = Address::create($address);
-            if($address->save()){ 
-                $type= Type::where('name',$request->type_name)->first();
-                if($type){
-                    $input = $request->all();            
-                    $input['status']='open';
-                    $input['number_of_flag']=0;
-                    $input['number_of_request']=0; 
-                    $input['bartering_location_id']=$address->id;            
-                    $input['type_id']=$type->id;
-                    $input['picture']=$filename;
+            if ($address->save()) {
+                $type = Type::where('name', $request->type_name)->first();
+                if ($type) {
+                    $input = $request->all();
+                    $input['status'] = 'open';
+                    $input['number_of_flag'] = 0;
+                    $input['number_of_request'] = 0;
+                    $input['bartering_location_id'] = $address->id;
+                    $input['type_id'] = $type->id;
+                    $input['picture'] = $filename;
                     $service = Service::create($input);
                     //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
                     //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST                
-                    if($service->save()){ 
-                        $serviceSwapType=json_decode($input["swap_type"]);
+                    if ($service->save()) {
+                        $serviceSwapType = json_decode($input["swap_type"]);
                         foreach ($serviceSwapType as $t) {
                             //check if the sent type id is in there  
-                            $swap=new ServiceSwapType();
-                            $swap->type_id=$t;
-                            $swap->service_id=$service->id;
-                            if(!$swap->save()){
+                            $swap = new ServiceSwapType();
+                            $swap->type_id = $t;
+                            $swap->service_id = $service->id;
+                            if (!$swap->save()) {
                                 return response()
-                                ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);                     
-                             }
+                                    ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                            }
                         }
-                        $service->picture=public_path().'/files/services/'.$service->picture;                          
+                        $service->picture = public_path() . '/files/services/' . $service->picture;
                         $service->bartering_location;
-                        $service->type; 
+                        $service->type;
                         return (new ServiceResource($service))
-                        ->response()
-                        ->setStatusCode(Response::HTTP_CREATED);
-                    }else{ 
+                            ->response()
+                            ->setStatusCode(Response::HTTP_CREATED);
+                    } else {
                         return response()
                             ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
                     }
@@ -137,17 +138,17 @@ class ServiceController extends Controller
             }
         }
     }
-    public function serviceByLocation(Request $request){
-        $input = $request->all();           
-        $services=Address::where('city', $input['city'])->where('type','service')->get();
-        $services->each(function($item, $key) {
-            $item->picture=public_path().'/files/services/'.$item->picture;                        
-            $item->service->serviceSwapType->each(function($type,$key){
+    public function serviceByLocation(Request $request)
+    {
+        $input = $request->all();
+        $services = Address::where('city', $input['city'])->where('type', 'service')->get();
+        $services->each(function ($item, $key) {
+            $item->picture = public_path() . '/files/services/' . $item->picture;
+            $item->service->serviceSwapType->each(function ($type, $key) {
                 $type->type;
-            });  
+            });
         });
-        return response()->json($services, 200); 
-   
+        return response()->json($services, 200);
     }
     /**
      * @OA\Get(
@@ -185,26 +186,26 @@ class ServiceController extends Controller
      * )
      */
     public function search(Request $request)
-    { 
+    {
         $input = $request->all();
-        $services = Service::all();  
-        $col=DB::getSchemaBuilder()->getColumnListing('services'); 
-        $requestKeys = collect($request->all())->keys();       
-        foreach ($requestKeys as $key) { 
-            if(empty($services)){
+        $services = Service::all();
+        $col = DB::getSchemaBuilder()->getColumnListing('services');
+        $requestKeys = collect($request->all())->keys();
+        foreach ($requestKeys as $key) {
+            if (empty($services)) {
                 return response()->json($services, 200);
             }
-            if(in_array($key,$col)){ 
-                $services = $services->where($key,$input[$key]);
-            }            
-        } 
-        $services->each(function($item, $key) {
-                            $item->picture=public_path().'/files/services/'.$item->picture;
-                            $item->bartering_location;
-                            $item->type; 
-                        });
-         
-        return response()->json($services, 200); 
+            if (in_array($key, $col)) {
+                $services = $services->where($key, $input[$key]);
+            }
+        }
+        $services->each(function ($item, $key) {
+            $item->picture = public_path() . '/files/services/' . $item->picture;
+            $item->bartering_location;
+            $item->type;
+        });
+
+        return response()->json($services, 200);
     }
 
     /**
@@ -252,16 +253,16 @@ class ServiceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->all();          
-        $service= Service::where('id',$id)->first();
-        if($service->fill($input)->save()){
-            $service->picture=public_path().'/files/services/'.$service->picture;
+        $input = $request->all();
+        $service = Service::where('id', $id)->first();
+        if ($service->fill($input)->save()) {
+            $service->picture = public_path() . '/files/services/' . $service->picture;
             $service->bartering_location;
             $service->type;
             return ($service)
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        } 
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        }
     }
 
     /**
@@ -302,12 +303,11 @@ class ServiceController extends Controller
     public function destroy($id)
     {
         $service = Service::find($id);
-        if(!$service){
+        if (!$service) {
             return response()
-                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
-     
+                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
         $service->delete();
         return response(null, Response::HTTP_NO_CONTENT);
-    } 
+    }
 }

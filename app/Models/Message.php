@@ -20,6 +20,6 @@ class Message extends Model
     }
     public function chat()
     {
-        return $this->belongsTo(RequestOrder::class,'token');
+        return $this->belongsTo(RequestOrder::class, 'token');
     }
 }

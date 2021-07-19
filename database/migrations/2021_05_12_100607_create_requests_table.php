@@ -13,18 +13,18 @@ class CreateRequestsTable extends Migration
      */
     public function up()
     {
-        Schema::create('requests', function (Blueprint $table) {            
+        Schema::create('requests', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('status',10)->nullable(); 
-		$table->bigInteger('requester_id')->unsigned()->nullable();
-		$table->bigInteger('requested_item_id')->unsigned()->nullable();
-		$table->bigInteger('requester_item_id')->unsigned()->nullable();
-		$table->integer('rating')->nullable();
-		$table->text('token')->unique()->nullable(); 
-        $table->text('type')->default('item')->nullable();
-		$table->foreign('requester_id')->references('id')->on('users');
-        //$table->foreign('requester_id')->references('id')->on('users');
-        //$table->foreign('requester_id')->references('id')->on('users');
+            $table->string('status', 10)->nullable();
+            $table->bigInteger('requester_id')->unsigned()->nullable();
+            $table->bigInteger('requested_item_id')->unsigned()->nullable();
+            $table->bigInteger('requester_item_id')->unsigned()->nullable();
+            $table->integer('rating')->nullable();
+            $table->text('token')->unique()->nullable();
+            $table->text('type')->default('item')->nullable();
+            $table->foreign('requester_id')->references('id')->on('users');
+            //$table->foreign('requester_id')->references('id')->on('users');
+            //$table->foreign('requester_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

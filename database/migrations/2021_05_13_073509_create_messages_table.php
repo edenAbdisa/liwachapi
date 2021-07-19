@@ -16,7 +16,7 @@ class CreateMessagesTable extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->text('content')->nullable();
-            $table->string('type',10)->default('text')->nullable();
+            $table->string('type', 10)->default('text')->nullable();
             $table->text('chat_id')->unique()->nullable();
             $table->bigInteger('sender_id')->unsigned()->nullable();
             $table->foreign('sender_id')->references('id')->on('users');

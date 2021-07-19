@@ -16,7 +16,7 @@ class CreateItemSwapTypesTable extends Migration
         Schema::create('item_swap_types', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('type_id')->unsigned();
-            $table->bigInteger('item_id')->unsigned();             
+            $table->bigInteger('item_id')->unsigned();
             $table->foreign('item_id')->references('id')->on('items');
             $table->foreign('type_id')->references('id')->on('types');
             $table->timestamps();

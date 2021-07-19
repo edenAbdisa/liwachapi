@@ -15,10 +15,10 @@ class CreateFlagsTable extends Migration
     {
         Schema::create('flags', function (Blueprint $table) {
             $table->bigIncrements('id');
-		    $table->bigInteger('reason_id')->nullable();
-		    $table->bigInteger('flagged_item_id')->unsigned()->nullable();
+            $table->bigInteger('reason_id')->nullable();
+            $table->bigInteger('flagged_item_id')->unsigned()->nullable();
             $table->bigInteger('flagged_by_id')->unsigned()->nullable();
-		    $table->string('type',30)->default('item')->nullable(); 
+            $table->string('type', 30)->default('item')->nullable();
             $table->timestamps();
             $table->foreign('reason_id')->references('id')->on('report_types');
             $table->foreign('flagged_by_id')->references('id')->on('users');

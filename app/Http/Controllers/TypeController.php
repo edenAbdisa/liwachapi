@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+
 class TypeController extends Controller
 {
     /**
@@ -39,10 +40,10 @@ class TypeController extends Controller
     {
         //abort_if(Gate::denies('type_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        $type= Type::all()
-                    ->each(function($item, $key) {
-                         $item->category ;
-                    });
+        $type = Type::all()
+            ->each(function ($item, $key) {
+                $item->category;
+            });
         return (new TypeResource($type))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -81,22 +82,22 @@ class TypeController extends Controller
      */
     public function store(Request $request)
     {
-        $type= Type::where('name',$request->name)->first();
-        if(!$type){
-        $type = Type::create($request->all());
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-         
-        if($type->save()){
-            $type->category; 
-            return (new TypeResource($type))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        }else{ 
-            return response()
-                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+        $type = Type::where('name', $request->name)->first();
+        if (!$type) {
+            $type = Type::create($request->all());
+            //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+            //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
+
+            if ($type->save()) {
+                $type->category;
+                return (new TypeResource($type))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_CREATED);
+            } else {
+                return response()
+                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
-     }
     }
 
     /**
@@ -135,23 +136,23 @@ class TypeController extends Controller
      * )
      */
     public function search(Request $request)
-    { 
+    {
         $input = $request->all();
-        $types = Type::all();         
-        $col=DB::getSchemaBuilder()->getColumnListing('types'); 
-        $requestKeys = collect($request->all())->keys();       
-        foreach ($requestKeys as $key) { 
-            if(empty($types)){
+        $types = Type::all();
+        $col = DB::getSchemaBuilder()->getColumnListing('types');
+        $requestKeys = collect($request->all())->keys();
+        foreach ($requestKeys as $key) {
+            if (empty($types)) {
                 return response()->json($types, 200);
             }
-            if(in_array($key,$col)){ 
-                $types = $types->where($key,$input[$key]);
-            }            
-        } 
-        $types->each(function($item, $key) {
-            $item->category ;
+            if (in_array($key, $col)) {
+                $types = $types->where($key, $input[$key]);
+            }
+        }
+        $types->each(function ($item, $key) {
+            $item->category;
         });
-        return response()->json($types, 200); 
+        return response()->json($types, 200);
     }
 
     /**
@@ -199,18 +200,18 @@ class TypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->all();          
-        $type_to_be_updated= Type::where('id',$id)->first();
-        if(in_array('name',$input)){
-            $type= Type::where('name',Str::ucfirst($request->name))->first();
-            if($type){
-                return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);      
+        $input = $request->all();
+        $type_to_be_updated = Type::where('id', $id)->first();
+        if (in_array('name', $input)) {
+            $type = Type::where('name', Str::ucfirst($request->name))->first();
+            if ($type) {
+                return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);
             }
-            $input['name']=Str::ucfirst($input['name']);
-        } 
-        if($type_to_be_updated->fill($input)->save()){
+            $input['name'] = Str::ucfirst($input['name']);
+        }
+        if ($type_to_be_updated->fill($input)->save()) {
             return (new TypeResource($type_to_be_updated))
-                 ->response()
+                ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         }
     }
@@ -253,12 +254,11 @@ class TypeController extends Controller
     public function destroy($id)
     {
         $type = Type::find($id);
-        if(!$type){
+        if (!$type) {
             return response()
-                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
-     
+                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
         $type->delete();
         return response(null, Response::HTTP_NO_CONTENT);
-    }    
+    }
 }

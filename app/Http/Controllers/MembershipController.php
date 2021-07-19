@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+
 class MembershipController extends Controller
 {
     /**
@@ -77,19 +78,19 @@ class MembershipController extends Controller
      */
     public function store(Request $request)
     {
-        $input=$request->all();
-        $input['name']=Str::ucfirst($input['name']);
+        $input = $request->all();
+        $input['name'] = Str::ucfirst($input['name']);
         $membership = Membership::create($input);
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
-        if($membership->save()){ 
+        if ($membership->save()) {
             return (new MembershipResource($membership))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-        }else{ 
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        } else {
             return response()
-                   ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -129,23 +130,23 @@ class MembershipController extends Controller
      * )
      */
     public function search(Request $request)
-    { 
+    {
         $input = $request->all();
-        $memberships = Membership::all();  
-        $col=DB::getSchemaBuilder()->getColumnListing('memberships'); 
-        $requestKeys = collect($request->all())->keys();       
-        foreach ($requestKeys as $key) { 
-            if(empty($memberships)){
+        $memberships = Membership::all();
+        $col = DB::getSchemaBuilder()->getColumnListing('memberships');
+        $requestKeys = collect($request->all())->keys();
+        foreach ($requestKeys as $key) {
+            if (empty($memberships)) {
                 return response()->json($memberships, 200);
             }
-            if(in_array($key,$col)){ 
-                if($key=='name'){
-                    $input[$key]= Str::ucfirst($input[$key]);
+            if (in_array($key, $col)) {
+                if ($key == 'name') {
+                    $input[$key] = Str::ucfirst($input[$key]);
                 }
-                $memberships = $memberships->where($key,$input[$key]);
-            }            
-        } 
-        return response()->json($memberships, 200); 
+                $memberships = $memberships->where($key, $input[$key]);
+            }
+        }
+        return response()->json($memberships, 200);
     }
 
     /**
@@ -193,21 +194,21 @@ class MembershipController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->all();          
-        $membership_to_be_updated= Membership::where('id',$id)->first();
-        if(in_array('name',$input)){
-            $membership= Membership::where('name',Str::ucfirst($request->name))->first();
-            if($membership){
-                return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);      
+        $input = $request->all();
+        $membership_to_be_updated = Membership::where('id', $id)->first();
+        if (in_array('name', $input)) {
+            $membership = Membership::where('name', Str::ucfirst($request->name))->first();
+            if ($membership) {
+                return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);
             }
-            $input['name']=Str::ucfirst($input['name']);
+            $input['name'] = Str::ucfirst($input['name']);
         }
-        
-        if($membership_to_be_updated->fill($input)->save()){
+
+        if ($membership_to_be_updated->fill($input)->save()) {
             return (new MembershipResource($membership_to_be_updated))
-                 ->response()
+                ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
-        } 
+        }
     }
 
     /**
@@ -248,10 +249,9 @@ class MembershipController extends Controller
     public function destroy($id)
     {
         $membership = Membership::find($id);
-        if(!$membership){
+        if (!$membership) {
             return response()
-                   ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
-     
+                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
         $membership->delete();
         return response(null, Response::HTTP_NO_CONTENT);

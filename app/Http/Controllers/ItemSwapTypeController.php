@@ -44,7 +44,7 @@ class ItemSwapTypeController extends Controller
      * @param  \App\Models\SwapType  $swapType
      * @return \Illuminate\Http\Response
      */
-    public function show(SwapType $swapType)
+    public function show(ItemSwapType $swapType)
     {
         //
     }
@@ -55,7 +55,7 @@ class ItemSwapTypeController extends Controller
      * @param  \App\Models\SwapType  $swapType
      * @return \Illuminate\Http\Response
      */
-    public function edit(SwapType $swapType)
+    public function edit(ItemSwapType $swapType)
     {
         //
     }
@@ -67,7 +67,7 @@ class ItemSwapTypeController extends Controller
      * @param  \App\Models\SwapType  $swapType
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, SwapType $swapType)
+    public function update(Request $request, ItemSwapType $swapType)
     {
         //
     }
@@ -78,7 +78,7 @@ class ItemSwapTypeController extends Controller
      * @param  \App\Models\SwapType  $swapType
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SwapType $swapType)
+    public function destroy(ItemSwapType $swapType)
     {
         //
     }
