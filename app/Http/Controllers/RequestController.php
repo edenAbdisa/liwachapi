@@ -55,7 +55,7 @@ class RequestController extends Controller
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
         //$wordCount = Wordlist::where('id', '<=', $correctedComparisons)->count();
-        $requestOrder = RequestOrder::where('status', '<=', $status)->count();
+        $requestOrder = RequestOrder::where('status', '=', $status)->count();
         return response()
         ->json($requestOrder,Response::HTTP_OK);
     } 
