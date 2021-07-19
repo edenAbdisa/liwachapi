@@ -72,8 +72,7 @@ Route::post('/reporttype', 'ReportTypeController@store');
 Route::put('/reporttype/{id}', 'ReportTypeController@update');
 Route::delete('/reporttype/{id}', 'ReportTypeController@destroy');
 
-Route::get('/request/bartered', 'RequestController@barteredRequest');
-Route::get('/request/open', 'RequestController@openRequest');
+Route::get('/request/{status}', 'RequestController@statusCountRequest'); 
 Route::get('/request', 'RequestController@index');
 Route::post('/request/search', 'RequestController@search');
 Route::post('/request', 'RequestController@store');
