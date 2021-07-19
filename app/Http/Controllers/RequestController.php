@@ -50,7 +50,23 @@ class RequestController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
-
+    public function barteredRequest()
+    {
+        //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //User::with(['roles'])->get() 
+        //$wordCount = Wordlist::where('id', '<=', $correctedComparisons)->count();
+        $requestOrder = RequestOrder::where('status', '<=', 'bartered')->count();
+        return response()
+        ->json($requestOrder,Response::HTTP_OK);
+    }
+    public function openRequest()
+    {
+        //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //User::with(['roles'])->get() 
+        $requestOrder = RequestOrder::where('status', '<=', 'open')->count();
+        return response()
+        ->json($requestOrder,Response::HTTP_OK);
+    }
 
     /**
      * @OA\Post(
