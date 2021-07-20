@@ -1425,7 +1425,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/ServiceRequest"
                             }
@@ -1924,7 +1924,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/ItemRequest"
                             }
@@ -2384,7 +2384,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UserRequest"
+                                "$ref": "#/components/schemas/UserLogin"
                             }
                         }
                     }
@@ -2438,29 +2438,23 @@
                         "type": "string",
                         "example": "Addis Ababa"
                     },
-                    "subcity": {
-                        "title": "Subcity",
-                        "description": "Subcity",
-                        "type": "string",
-                        "example": "Yeka"
+                    "latitude": {
+                        "title": "Latitude",
+                        "description": "Latitude",
+                        "type": "double",
+                        "example": "3.444"
                     },
-                    "district": {
-                        "title": "District",
-                        "description": "This the area name",
-                        "type": "string",
-                        "example": "Summit, 4kilo"
+                    "longitude": {
+                        "title": "Longitude",
+                        "description": "Longitude",
+                        "type": "double",
+                        "example": "3.444"
                     },
-                    "landmark": {
-                        "title": "Landmark",
-                        "description": "This is a famous lanmark name around the area",
+                    "type": {
+                        "title": "Type",
+                        "description": "What the address stands for",
                         "type": "string",
-                        "example": "Firdebet, Next to the parlament, Adwa adebaby"
-                    },
-                    "api": {
-                        "title": "Api",
-                        "description": "This is the exact location api link",
-                        "type": "text",
-                        "example": "https://google.maps/dhjsdbshf"
+                        "example": "user, item, service"
                     },
                     "timestamp": {
                         "title": "Timestamp",
@@ -2486,30 +2480,24 @@
                         "description": "City name",
                         "type": "string",
                         "example": "Addis Ababa"
+                    },                    
+                    "latitude": {
+                        "title": "Latitude",
+                        "description": "Latitude",
+                        "type": "double",
+                        "example": "3.444"
                     },
-                    "subcity": {
-                        "title": "Subcity",
-                        "description": "Subcity",
+                    "longitude": {
+                        "title": "Longitude",
+                        "description": "Longitude",
+                        "type": "double",
+                        "example": "3.444"
+                    },
+                    "type": {
+                        "title": "Type",
+                        "description": "What the address stands for",
                         "type": "string",
-                        "example": "Yeka"
-                    },
-                    "district": {
-                        "title": "District",
-                        "description": "This the area name",
-                        "type": "string",
-                        "example": "Summit, 4kilo"
-                    },
-                    "landmark": {
-                        "title": "Landmark",
-                        "description": "This is a famous lanmark name around the area",
-                        "type": "string",
-                        "example": "Firdebet, Next to the parlament, Adwa adebaby"
-                    },
-                    "api": {
-                        "title": "Api",
-                        "description": "This is the exact location api link",
-                        "type": "text",
-                        "example": "https://google.maps/dhjsdbshf"
+                        "example": "user, item, service"
                     }
                 }
             },
@@ -2541,6 +2529,12 @@
                         "description": "Category name",
                         "type": "string",
                         "example": "Garments, Mens"
+                    },                    
+                    "status": {
+                        "title": "Status",
+                        "description": "The status of the category data",
+                        "type": "string",
+                        "example": "deleted ot active"
                     },
                     "timestamp": {
                         "title": "Timestamp",
@@ -2564,6 +2558,12 @@
                         "description": "Category name",
                         "type": "string",
                         "example": "Garments"
+                    },                  
+                    "status": {
+                        "title": "Status",
+                        "description": "The status of the category data",
+                        "type": "string",
+                        "example": "deleted ot active"
                     }
                 },
                 "type": "object",
@@ -2693,12 +2693,25 @@
                     "address": {
                         "$ref": "#/components/schemas/AddressRequest"
                     },
-                    "type_name": {
+                    "type_id": {
                         "title": "Type",
                         "description": "Categorize the item into a type and from this type we can decide the category",
                         "type": "big integer",
                         "format": "string",
-                        "example": "Mobile"
+                        "example": 4
+                    },
+                    "user_id": {
+                        "title": "User",
+                        "description": "The id of the owner",
+                        "type": "big integer",
+                        "format": "string",
+                        "example": 4
+                    },
+                    "status": {
+                        "title": "status",
+                        "description": "Status of the item whether it is bartered,unbartered,blocked. Automatically all user item are set to unbartered but company is set to blocked",
+                        "type": "string",
+                        "example": "bartered,unbartered,blocked"
                     }
                 }
             },
@@ -2769,6 +2782,13 @@
                         "format": "int64",
                         "example": 1
                     },
+                    "user_id": {
+                        "title": "User",
+                        "description": "The id of the owner",
+                        "type": "big integer",
+                        "format": "string",
+                        "example": 4
+                    },
                     "timestamp": {
                         "title": "Timestamp",
                         "description": "This is the timestamp that we got when this data is added.",
@@ -2800,6 +2820,12 @@
                         "description": "Limit of post that this memebrship is allowed",
                         "type": "integer",
                         "example": 100
+                    },                  
+                    "status": {
+                        "title": "Status",
+                        "description": "The status of the membership data",
+                        "type": "string",
+                        "example": "deleted or active"
                     },
                     "transaction_limit": {
                         "title": "Transation Limit",
@@ -2825,6 +2851,12 @@
                         "description": "Name of the membership",
                         "type": "string",
                         "example": "normal,premium,gold"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "The status of the membership data",
+                        "type": "string",
+                        "example": "deleted or active"
                     },
                     "limit_of_post": {
                         "title": "Limit of post",
@@ -2931,6 +2963,12 @@
                         "type": "string",
                         "example": "Spam, Fake Item, Violence, Child Abuse, Other, "
                     },
+                    "status": {
+                        "title": "Status",
+                        "description": "The status of the Report type data",
+                        "type": "string",
+                        "example": "deleted or active"
+                    },
                     "type_for": {
                         "title": "Type for",
                         "description": "The item that this report can be associated with",
@@ -2955,6 +2993,12 @@
                         "description": "Small text that will be displayed to user so that they can choose from the list",
                         "type": "string",
                         "example": "Spam, Fake Item, Violence, Child Abuse, Other, "
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "The status of the Report type data",
+                        "type": "string",
+                        "example": "deleted or active"
                     },
                     "type_for": {
                         "title": "Type for",
@@ -3099,9 +3143,15 @@
                     },
                     "status": {
                         "title": "Status",
-                        "description": "Describes if the bartering offer is bartred and open. For case where user select to reopen this the status can be changed to open unlike item",
+                        "description": "Describes if the service is bartred and open",
                         "type": "string",
                         "example": "bartered or bartered or blocked"
+                    },
+                    "description": {
+                        "title": "Description",
+                        "description": "Description of the service",
+                        "type": "string",
+                        "example": "Plumbering is a work"
                     },
                     "number_of_flag": {
                         "title": "Number of Flag",
@@ -3130,6 +3180,13 @@
                     "type_id": {
                         "title": "Type",
                         "description": "Categorize the service into a type and from this type we can decide the category",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "title": "User",
+                        "description": "The user that uploaded the service.",
                         "type": "big integer",
                         "format": "int64",
                         "example": 1
@@ -3189,6 +3246,13 @@
                         "format": "int64",
                         "example": 1
                     },
+                    "user_id": {
+                        "title": "User",
+                        "description": "The user that uploaded the service.",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
                     "swap_type": {
                         "title": "Swap Types",
                         "description": "List containing the id of the types",
@@ -3200,6 +3264,12 @@
                             3,
                             4
                         ]
+                    },
+                    "status": {
+                        "title": "status",
+                        "description": "Status of the service whether it is bartered,unbartered,blocked. Automatically all user item are set to unbartered but company is set to blocked",
+                        "type": "string",
+                        "example": "bartered,unbartered,blocked"
                     }
                 }
             },
@@ -3219,6 +3289,12 @@
                         "description": "Name of the new project",
                         "type": "string",
                         "example": "A nice project"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Describes if the type data is deleted ,active",
+                        "type": "string",
+                        "example": "deleted ,active"
                     },
                     "category_id": {
                         "title": "Category ID",
@@ -3250,6 +3326,12 @@
                         "description": "This type is under a certain category.",
                         "type": "big integer",
                         "example": 123
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Describes if the type data is deleted ,active",
+                        "type": "string",
+                        "example": "deleted ,active"
                     }
                 }
             },
@@ -3276,12 +3358,6 @@
                         "type": "string",
                         "example": "Abdisa "
                     },
-                    "password": {
-                        "title": "Password",
-                        "description": "Password",
-                        "type": "string",
-                        "format": "thisismyPassword"
-                    },
                     "email": {
                         "title": "Email",
                         "description": "Email",
@@ -3341,19 +3417,30 @@
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
                     },
-                    "rememberToken": {
-                        "title": "Login Token",
-                        "description": "The token optained when user logged in",
-                        "type": "string",
-                        "format": "datetime",
-                        "example": "2020-01-27 17:50:45"
-                    },
                     "timestamp": {
                         "title": "Timestamp",
                         "description": "This is the timestamp that we got when this data is added.",
                         "type": "string",
                         "format": "datetime",
                         "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "UserLogin": {
+                "title": "User",
+                "description": "User model",
+                "properties": {
+                    "email": {
+                        "title": "Email",
+                        "description": "Email",
+                        "type": "string",
+                        "format": "eden@yahoo.com"
+                    },
+                    "password": {
+                        "title": "Signup password",
+                        "description": "The user password",
+                        "type": "string",
+                        "example": "passs"
                     }
                 }
             },
@@ -3379,6 +3466,12 @@
                         "type": "string",
                         "format": "eden@yahoo.com"
                     },
+                    "password": {
+                        "title": "Signup password",
+                        "description": "The user password",
+                        "type": "string",
+                        "example": "passs"
+                    },
                     "profile_picture": {
                         "title": "Picture file name",
                         "description": "This name will be concated with the image collection folder",
@@ -3424,20 +3517,6 @@
                         "description": "This is the ID of the membership that the user or organization choose",
                         "type": "big integer",
                         "example": 8
-                    },
-                    "email_verified_at": {
-                        "title": "Email verified at",
-                        "description": "Email verified at",
-                        "type": "string",
-                        "format": "datetime",
-                        "example": "2020-01-27 17:50:45"
-                    },
-                    "rememberToken": {
-                        "title": "Login Token",
-                        "description": "The token optained when user logged in",
-                        "type": "string",
-                        "format": "datetime",
-                        "example": "2020-01-27 17:50:45"
                     }
                 }
             },

@@ -62,30 +62,30 @@ class ItemController extends Controller
     {
         //if organization or user do smt on status. Check if 
         //the memebrship of this user enables the user to enter a new product
-        $file = $request->file('picture');
-        if ($file) {
-            $filename = time() . '_' . $file->getClientOriginalName();
-            if (!HelperClass::uploadFile($file, $filename, 'files/items')) {
+        //$file = $request->file('picture');
+       // if ($file) {
+           // $filename = time() . '_' . $file->getClientOriginalName();
+            //if (!HelperClass::uploadFile($file, $filename, 'files/items')) {
                 // return response()
                 // ->json("The picture couldn't be uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-            $address = $request->address;
-            $address = json_decode($address, true);
-            $address['type'] = 'item';
-            $address = Address::create($address);
+            //}            
+            $input = $request->all();
+            $address = $request->address;         
+           // $address = json_decode($address, true,512,JSON_BIGINT_AS_STRING);
+            $address = Address::create($address);   
+            $address->type='item';
             if ($address->save()) {
-                $type = Type::where('name', $request->type_name)->first();
-                if ($type) {
-                    $input = $request->all();
+                //$type = Type::where('id', $request->type_name)->first();
+                //if ($type) {
                     $input['status'] = 'open';
                     $input['number_of_flag'] = 0;
                     $input['number_of_request'] = 0;
                     $input['bartering_location_id'] = $address->id;
-                    $input['type_id'] = $type->id;
-                    $input['picture'] = $filename;
+                   // $input['type_id'] = $type->id;
+                   // $input['picture'] = $filename;
                     $item = Item::create($input);
                     if ($item->save()) {
-                        $itemSwapType = json_decode($input['swap_type']);
+                        $itemSwapType = $request->swap_type;
                         foreach ($itemSwapType as $t) {
                             //check if the sent type id is in there 
                             $swap = new ItemSwapType();
@@ -108,18 +108,18 @@ class ItemController extends Controller
                         return response()
                             ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
                     }
-                } else {
+                /* } else {
                     return response()
                         ->json("No such type",Response::HTTP_INTERNAL_SERVER_ERROR);
-                }
+                } */
             } else {
                 return response()
                     ->json("The address couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-        } else {
+        /* } else {
             return response()
                 ->json("The image files isnt uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        } */
         //$item = Item::create($request->all());
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
