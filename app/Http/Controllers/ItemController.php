@@ -27,8 +27,10 @@ class ItemController extends Controller
     public function index()
     {
         $items = Item::all()->each(function ($item, $key) {
+            $item->itemSwapType;
             $item->bartering_location;
             $item->type;
+            $item->user;
             $item->picture = public_path() . '/files/items/' . $item->picture;
         });
         return (new ItemResource($items))
@@ -38,14 +40,17 @@ class ItemController extends Controller
     public function itemsByLocation(Request $request)
     {
         $input = $request->all();
-        $items = Address::where('city', $input['city'])->where('type', 'item')->get();
-        $items->each(function ($address, $key) {
+        $addresses = Address::where('city', $input['city'])->where('type', 'item')->get();
+        $addresses->each(function ($address, $key) {            
+            $address->item->itemSwapType;
+            $address->item->user;
+            $address->item->bartering_location;
             $address->item->picture = public_path() . '/files/items/' . $address->item->picture;
             $address->item->itemSwapType->each(function ($type, $key) {
                 $type->type;
             });
         });
-        return response()->json($items, 200);
+        return response()->json($addresses, 200);
     }
     /**
      * Store a newly created resource in storage.
@@ -94,6 +99,8 @@ class ItemController extends Controller
                         $item->picture = public_path() . '/files/items/' . $item->picture;
                         $item->bartering_location;
                         $item->type;
+                        $item->itemSwapType;
+                        $item->user;
                         return (new ItemResource($item))
                             ->response()
                             ->setStatusCode(Response::HTTP_CREATED);
@@ -137,6 +144,9 @@ class ItemController extends Controller
             $item->picture = public_path() . '/files/items/' . $item->picture;
             $item->bartering_location;
             $item->type;
+            $item->user;
+            $item->itemSwapType;
+            $item->request;
         });
         return response()->json($items, 200);
     }
@@ -161,10 +171,13 @@ class ItemController extends Controller
             $type = Type::where('name', $request->type_name)->first();
             $input['type_id'] = $type->id;
         }
+        //swap edition isnt done
         if ($item->fill($input)->save()) {
             $item->picture = public_path() . '/files/items/' . $item->picture;
             $item->bartering_location;
             $item->type;
+            $item->user;
+            $item->itemSwapType;
             return ($item)
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);

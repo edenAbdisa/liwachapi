@@ -151,6 +151,8 @@ class TypeController extends Controller
         }
         $types->each(function ($item, $key) {
             $item->category;
+            $item->service;
+            $item->item;
         });
         return response()->json($types, 200);
     }
@@ -210,6 +212,7 @@ class TypeController extends Controller
             $input['name'] = Str::ucfirst($input['name']);
         }
         if ($type_to_be_updated->fill($input)->save()) {
+            $type_to_be_updated->type;
             return (new TypeResource($type_to_be_updated))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);

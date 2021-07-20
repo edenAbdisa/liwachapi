@@ -48,6 +48,7 @@ class ServiceController extends Controller
                 $item->picture = public_path() . '/files/services/' . $item->picture;
                 $item->bartering_location;
                 $item->type;
+                $item->user;
                 $item->serviceSwapType;
             });
         return (new ServiceResource($service))
@@ -127,6 +128,8 @@ class ServiceController extends Controller
                         $service->picture = public_path() . '/files/services/' . $service->picture;
                         $service->bartering_location;
                         $service->type;
+                        $service->user;
+                        $service->serviceSwapType;
                         return (new ServiceResource($service))
                             ->response()
                             ->setStatusCode(Response::HTTP_CREATED);
@@ -141,14 +144,17 @@ class ServiceController extends Controller
     public function serviceByLocation(Request $request)
     {
         $input = $request->all();
-        $services = Address::where('city', $input['city'])->where('type', 'service')->get();
-        $services->each(function ($item, $key) {
-            $item->picture = public_path() . '/files/services/' . $item->picture;
-            $item->service->serviceSwapType->each(function ($type, $key) {
+        $addresses = Address::where('city', $input['city'])->where('type', 'service')->get();
+        $addresses->each(function ($address, $key) {
+            $address->service->serviceSwapType;
+            $address->service->user;
+            $address->service->bartering_location;
+            $address->service->picture = public_path() . '/files/services/' . $address->service->picture;
+            $address->service->serviceSwapType->each(function ($type, $key) {
                 $type->type;
             });
         });
-        return response()->json($services, 200);
+        return response()->json($addresses, 200);
     }
     /**
      * @OA\Get(
@@ -203,6 +209,8 @@ class ServiceController extends Controller
             $item->picture = public_path() . '/files/services/' . $item->picture;
             $item->bartering_location;
             $item->type;
+            $item->user;
+            $item->serviceSwapType;
         });
 
         return response()->json($services, 200);
@@ -255,10 +263,22 @@ class ServiceController extends Controller
     {
         $input = $request->all();
         $service = Service::where('id', $id)->first();
+        if (in_array('address', $input)) {
+            $address = Address::where('id', $service->bartering_location_id)->first();
+            $address_to_be_updated=$input['address'];
+            $address->fill($address_to_be_updated)->save();
+        }
+        if (in_array('type_name', $input)) {
+            $type = Type::where('name', $request->type_name)->first();
+            $input['type_id'] = $type->id;
+        }
+        //swap edition isnt done
         if ($service->fill($input)->save()) {
             $service->picture = public_path() . '/files/services/' . $service->picture;
             $service->bartering_location;
             $service->type;
+            $service->user;
+            $service->itemSwapType;
             return ($service)
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);

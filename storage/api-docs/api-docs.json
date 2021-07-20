@@ -14,7 +14,7 @@
     },
     "servers": [
         {
-            "url": "http://liwachapi.herokuapp.com/api",
+            "url": "http://liwachapi.herokuapp.com/api/documentation/api",
             "description": "Demo API Server"
         }
     ],

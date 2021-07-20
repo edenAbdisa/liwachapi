@@ -40,7 +40,10 @@ class CategoryController extends Controller
     {
         //abort_if(Gate::denies('category_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new CategoryResource(Category::all()))
+        $categories = Category::all()->each(function ($item, $key) {
+            $item->type;
+       });
+        return (new CategoryResource($categories))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
@@ -151,6 +154,9 @@ class CategoryController extends Controller
                 $categories = $categories->where($key, $input[$key]);
             }
         }
+        $categories->each(function ($item, $key) {
+            $item->type;
+        });
         return response()->json($categories, Response::HTTP_OK);
     }
 
@@ -204,11 +210,13 @@ class CategoryController extends Controller
         if (in_array('name', $input)) {
             $category = Category::where('name', Str::ucfirst($request->name))->first();
             if ($category) {
+                $category->type;
                 return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);
             }
             $input['name'] = Str::ucfirst($input['name']);
         }
         if ($category_to_be_updated->fill($input)->save()) {
+            $category_to_be_updated->type;
             return (new CategoryResource($category_to_be_updated))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);

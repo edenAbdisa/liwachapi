@@ -16,11 +16,16 @@ class Item extends Model
         'number_of_flag',
         'number_of_request',
         'bartering_location_id',
-        'type_id'
+        'type_id',
+        'user_id'
     ];
     public function bartering_location()
     {
         return $this->belongsTo(Address::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
     public function type()
     {
@@ -28,7 +33,7 @@ class Item extends Model
     }
     public function request()
     {
-        return $this->hasMany(RequestOrder::class);
+        return $this->hasMany(RequestOrder::class, 'requested_item_id');
     }
     public function flag()
     {
