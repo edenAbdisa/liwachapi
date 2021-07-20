@@ -267,8 +267,9 @@ class CategoryController extends Controller
         if (!$category) {
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
-        }
-        $category->delete();
+        }        
+        $category->status='deleted';
+        $category->save();
         return response(null, Response::HTTP_NO_CONTENT);
     }
 }

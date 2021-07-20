@@ -167,18 +167,18 @@ class ItemController extends Controller
             $address_to_be_updated=$input['address'];
             $address->fill($address_to_be_updated)->save();
         }
-        if (in_array('type_name', $input)) {
-            $type = Type::where('name', $request->type_name)->first();
-            $input['type_id'] = $type->id;
-        }
-        //swap edition isnt done
+        // if (in_array('type_name', $input)) {
+        //     $type = Type::where('name', $request->type_id)->first();
+        //     $input['type_id'] = $type->id;
+        // }
+        //swap update isnt done
         if ($item->fill($input)->save()) {
             $item->picture = public_path() . '/files/items/' . $item->picture;
             $item->bartering_location;
             $item->type;
             $item->user;
             $item->itemSwapType;
-            return ($item)
+            return (new ItemResource($item))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         }
@@ -198,7 +198,8 @@ class ItemController extends Controller
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
-        $item->delete();
+        $item->status='deleted';
+        $item->save(); 
         return response(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -251,7 +251,8 @@ class ReportTypeController extends Controller
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
-        $reporttype->delete();
+        $reporttype->status='deleted';
+        $reporttype->save();
         return response(null, Response::HTTP_NO_CONTENT);
     }
 }

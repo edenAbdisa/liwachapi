@@ -10,7 +10,8 @@ class Type extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'category_id'
+        'category_id',
+        'status'
     ];
     public function category()
     {

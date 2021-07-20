@@ -18,7 +18,8 @@ class CreateServicesTable extends Migration
             $table->string('name', 50)->nullable();
             $table->string('description', 255)->nullable();
             $table->text('picture')->nullable();
-            $table->string('status', 10)->default('unbartered')->nullable();
+            $table->string('status', 10)->default('unbartered')->nullable();  
+            $table->bigInteger('user_id')->unsigned()->nullable();
             $table->integer('number_of_flag')->nullable();
             $table->integer('number_of_request')->nullable();
             $table->bigInteger('bartering_location_id')->unsigned()->nullable();

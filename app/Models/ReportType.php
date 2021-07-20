@@ -10,7 +10,8 @@ class ReportType extends Model
     use HasFactory;
     protected $fillable = [
         'report_detail',
-        'type_for'
+        'type_for',
+        'status'
     ];
     public function flag()
     {

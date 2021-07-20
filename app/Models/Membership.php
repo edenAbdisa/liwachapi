@@ -11,7 +11,8 @@ class Membership extends Model
     protected $fillable = [
         'name',
         'limit_of_post',
-        'transaction_limit'
+        'transaction_limit',
+        'status'
     ];
     public function user()
     {

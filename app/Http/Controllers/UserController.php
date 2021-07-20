@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Address;
+use App\Models\Membership;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -257,6 +258,16 @@ class UserController extends Controller
     {
         $input = $request->all();
         $user = User::where('id', $id)->first();
+        if (in_array('address', $input)) {
+            $address = Address::where('id', $user->address_id)->first();
+            if(!$address->fill($input["address"])->save()){
+                return response()
+                ->json($address, Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } 
+        if (in_array('password', $input)) {
+            $input['password'] = Hash::make($request->password);
+        }
         if ($user->fill($input)->save()) {
             $user->address;
             $user->membership;
@@ -307,7 +318,8 @@ class UserController extends Controller
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
-        $user->delete();
+        $user->status='deleted';
+        $user->save();
         return response(null, Response::HTTP_NO_CONTENT);
     }
 }

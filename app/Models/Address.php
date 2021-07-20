@@ -16,9 +16,8 @@ class Address extends Model
     protected $fillable = [
         'country',
         'city',
-        'subcity',
-        'district',
-        'landmark',
+        'latitude',
+        'longitude',
         'type'
     ];
     public function user()

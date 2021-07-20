@@ -268,18 +268,18 @@ class ServiceController extends Controller
             $address_to_be_updated=$input['address'];
             $address->fill($address_to_be_updated)->save();
         }
-        if (in_array('type_name', $input)) {
+        /* if (in_array('type_name', $input)) {
             $type = Type::where('name', $request->type_name)->first();
             $input['type_id'] = $type->id;
-        }
-        //swap edition isnt done
+        } */
+        //swap update isnt done
         if ($service->fill($input)->save()) {
             $service->picture = public_path() . '/files/services/' . $service->picture;
             $service->bartering_location;
             $service->type;
             $service->user;
             $service->itemSwapType;
-            return ($service)
+            return (new ServiceResource($service))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         }
@@ -327,7 +327,8 @@ class ServiceController extends Controller
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
-        $service->delete();
+        $service->status='deleted';
+        $service->save();
         return response(null, Response::HTTP_NO_CONTENT);
     }
 }

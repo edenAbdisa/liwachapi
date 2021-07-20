@@ -253,7 +253,8 @@ class MembershipController extends Controller
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
-        $membership->delete();
+        $membership->status='deleted';
+        $membership->save(); 
         return response(null, Response::HTTP_NO_CONTENT);
     }
 }

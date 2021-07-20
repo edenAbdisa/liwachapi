@@ -217,7 +217,7 @@ class RequestController extends Controller
             $request->requester;
             $request->requested_item;
             $request->requester_item;
-            return ($request)
+            return (new RequestResource($request))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         }

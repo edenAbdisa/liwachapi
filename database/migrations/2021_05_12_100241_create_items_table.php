@@ -18,7 +18,8 @@ class CreateItemsTable extends Migration
             $table->text('picture')->nullable();
             $table->string('name', 50)->nullable();
             $table->string('description', 255)->nullable();
-            $table->string('status', 30)->nullable();
+            $table->string('status', 30)->nullable();            
+            $table->bigInteger('user_id')->unsigned()->nullable();
             $table->integer('number_of_flag')->nullable();
             $table->integer('number_of_request')->nullable();
             $table->bigInteger('bartering_location_id')->unsigned()->nullable();

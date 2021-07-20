@@ -17,11 +17,9 @@ class CreateAddressesTable extends Migration
             $table->bigIncrements('id')->unsigned();
             $table->string('country', 50)->nullable();
             $table->string('city', 50)->nullable();
-            $table->string('subcity', 50)->nullable();
-            $table->string('district', 50)->nullable();
-            $table->string('landmark', 50)->nullable();
-            $table->string('type', 10)->nullable();
-            $table->text('api')->nullable();
+            $table->double('latitude')->nullable();
+            $table->double('longitude')->nullable(); 
+            $table->string('type', 10)->nullable(); 
             $table->timestamps();
         });
     }

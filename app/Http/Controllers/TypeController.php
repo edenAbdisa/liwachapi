@@ -261,7 +261,8 @@ class TypeController extends Controller
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
-        $type->delete();
+        $type->status='deleted';
+        $type->save();
         return response(null, Response::HTTP_NO_CONTENT);
     }
 }
