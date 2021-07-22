@@ -51,7 +51,7 @@ class RequestController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
-    public function statusCountRequest($status,$type)
+   /*  public function statusCountRequest($status,$type)
     {
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
@@ -60,7 +60,7 @@ class RequestController extends Controller
                         ->where('type', '=', $type)->count();
         return response()
         ->json($requestOrder,Response::HTTP_OK);
-    } 
+    }  */
     public function requestCount($type)
     {
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
