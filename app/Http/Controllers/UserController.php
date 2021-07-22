@@ -54,9 +54,9 @@ class UserController extends Controller
     }
     public function internalUsers()
     {
-        $user = User::where('status', '!=', 'active')->
+        $user = User::where('status', '!=', 'active')->orWhereNull('status')->
         where('type','!=','user')->
-        where('type','!=','organization')->get();
+        where('type','!=','organization')->orWhereNull('type')->get();
         return (new UserResource($user))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
