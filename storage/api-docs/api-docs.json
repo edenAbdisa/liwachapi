@@ -543,6 +543,51 @@
                 }
             }
         },
+        "/flag/countByDate/{attribute}": {
+            "get": {
+                "tags": [
+                    "Flag"
+                ],
+                "summary": "Update existing project",
+                "description": "Returns updated project data",
+                "operationId": "updateProject",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type":[]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            }
+        },
         "/flag/search": {
             "post": {
                 "tags": [
@@ -1254,6 +1299,34 @@
                 }
             }
         },
+        "/request/countByDate/{attribute}": {
+            "get": {
+                "tags": [
+                    "Request"
+                ],
+                "summary": "Get list of request",
+                "description": "Returns list of request",
+                "operationId": "getProjectsList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": []
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
         "/request/{id}": {
             "put": {
                 "tags": [
@@ -1347,6 +1420,7 @@
                 }
             }
         },
+        
         "/request/search": {
             "post": {
                 "tags": [
@@ -1445,6 +1519,34 @@
                     },
                     "400": {
                         "description": "Bad Service"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/service/countByDate/{attribute}": {
+            "get": {
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Get list of service",
+                "description": "Returns list of service",
+                "operationId": "getProjectsList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": []
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -1954,6 +2056,34 @@
                 }
             }
         },
+        "/item/countByDate/{attribute}": {
+            "get": {
+                "tags": [
+                    "Item"
+                ],
+                "summary": "Get list of Item",
+                "description": "Returns list of Item",
+                "operationId": "getItemList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": []
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
         "/item/{id}": {
             "put": {
                 "tags": [
@@ -2186,6 +2316,34 @@
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/user/countByDate/{attribute}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get list of user",
+                "description": "Returns list of user",
+                "operationId": "getUsersList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type":[]
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthenticated"

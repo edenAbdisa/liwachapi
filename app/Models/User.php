@@ -26,6 +26,11 @@ class User extends Authenticatable
         'membership_id',
         'remember_token'
     ];
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+        'email_verified_at' => 'datetime:Y-m-d',
+    ];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -37,14 +42,6 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
     public function address()
     {
         return $this->belongsTo(Address::class);

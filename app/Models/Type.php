@@ -13,6 +13,10 @@ class Type extends Model
         'category_id',
         'status'
     ];
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+    ];
     public function category()
     {
         return $this->belongsTo(Category::class);

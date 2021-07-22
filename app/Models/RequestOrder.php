@@ -18,6 +18,10 @@ class RequestOrder extends Model
         'token',
         'type'
     ];
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+    ];
     public function requester()
     {
         return $this->belongsTo(User::class);

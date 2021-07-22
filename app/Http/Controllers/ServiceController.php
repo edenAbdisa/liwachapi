@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\ServiceSwapType;
 use App\Models\Service;
 use App\Models\Address;
@@ -139,6 +140,24 @@ class ServiceController extends Controller
                 //}
             }
         //}
+    }
+    public function serviceCountByDate($attribute)
+    {
+        try{
+        $items = Service::orderBy($attribute)->get()->groupBy(function($item) {
+             return $item->created_at->format('Y-m-d');
+       });
+       }catch(Exception $e){
+        return response()
+        ->json("There is no such attribute.",Response::HTTP_OK);
+       }
+       foreach($items as $key => $item){
+        $day = $key;
+        $totalCount = $item->count();
+        $items[$key]=$totalCount;
+       }
+        return response()
+            ->json($items,Response::HTTP_OK);
     }
     public function serviceByLocation(Request $request)
     {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\UserResource;
@@ -50,6 +51,24 @@ class UserController extends Controller
         return (new UserResource($user))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
+    }
+    public function userCountByDate($attribute)
+    {
+        try{
+        $items = User::orderBy($attribute)->get()->groupBy(function($item) {
+             return $item->created_at->format('Y-m-d');
+       });
+       }catch(Exception $e){
+        return response()
+        ->json("There is no such attribute.",Response::HTTP_OK);
+       }
+       foreach($items as $key => $item){
+        $day = $key;
+        $totalCount = $item->count();
+        $items[$key]=$totalCount;
+       }
+        return response()
+            ->json($items,Response::HTTP_OK);
     }
     public function login(Request $request)
     {

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Exception;
 use App\Models\ItemSwapType;
 use App\Models\Address;
 use App\Models\Type;
@@ -36,6 +36,29 @@ class ItemController extends Controller
         return (new ItemResource($items))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
+    }
+        /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function itemCountByDate($attribute)
+    {
+        try{
+        $items = Item::orderBy($attribute)->get()->groupBy(function($item) {
+             return $item->created_at->format('Y-m-d');
+       });
+       }catch(Exception $e){
+        return response()
+        ->json("There is no such attribute.",Response::HTTP_OK);
+       }
+       foreach($items as $key => $item){
+        $day = $key;
+        $totalCount = $item->count();
+        $items[$key]=$totalCount;
+       }
+        return response()
+            ->json($items,Response::HTTP_OK);
     }
     public function itemsByLocation(Request $request)
     {

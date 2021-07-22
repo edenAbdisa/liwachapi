@@ -13,6 +13,10 @@ class ReportType extends Model
         'type_for',
         'status'
     ];
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+    ];
     public function flag()
     {
         return $this->hasMany(Flag::class);

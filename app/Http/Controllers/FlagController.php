@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\ReportType;
 use App\Models\Flag;
 use Illuminate\Http\Request;
@@ -106,7 +107,24 @@ class FlagController extends Controller
                 ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
+    public function flaggedProductCountByDate($attribute)
+    {
+        try{
+        $items = Flag::orderBy($attribute)->get()->groupBy(function($item) {
+             return $item->created_at->format('Y-m-d');
+       });
+       }catch(Exception $e){
+        return response()
+        ->json("There is no such attribute.",Response::HTTP_OK);
+       }
+       foreach($items as $key => $item){
+        $day = $key;
+        $totalCount = $item->count();
+        $items[$key]=$totalCount;
+       }
+        return response()
+            ->json($items,Response::HTTP_OK);
+    }
     /**
      * @OA\Get(
      *      path="/flag/{id}",

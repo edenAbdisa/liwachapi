@@ -25,6 +25,7 @@ Route::get('/user/search', 'UserController@search');
 Route::put('/user/{id}', 'UserController@update');
 Route::delete('/user/{id}', 'UserController@destroy');
 Route::post('/user/login', 'UserController@login');
+Route::get('/user/countByDate/{attribute}', 'UserController@userCountByDate');
 //});
 Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
 Route::get('/itemswaptype', 'ItemSwapTypeController@index');
@@ -41,12 +42,14 @@ Route::post('/category', 'CategoryController@store');
 Route::put('/category/{id}', 'CategoryController@update');
 Route::delete('/category/{id}', 'CategoryController@destroy');
 
+Route::get('/flag/countByDate/{attribute}', 'FlagController@flaggedProductCountByDate');
 Route::get('/flag', 'FlagController@index');
 Route::post('/flag/search', 'FlagController@search');
 Route::post('/flag', 'FlagController@store');
 Route::put('/flag/{id}', 'FlagController@update');
 Route::delete('/flag/{id}', 'FlagController@destroy');
 
+Route::get('/item/countByDate/{attribute}', 'ItemController@itemCountByDate');
 Route::get('/item', 'ItemController@index');
 Route::post('/item/byLocation', 'ItemController@itemsByLocation');
 Route::post('/item/search', 'ItemController@search');
@@ -72,6 +75,7 @@ Route::post('/reporttype', 'ReportTypeController@store');
 Route::put('/reporttype/{id}', 'ReportTypeController@update');
 Route::delete('/reporttype/{id}', 'ReportTypeController@destroy');
 
+Route::get('/request/countByDate/{attribute}', 'RequestController@requestCountByDate');
 Route::get('/request/{status}', 'RequestController@statusCountRequest'); 
 Route::get('/request', 'RequestController@index');
 Route::post('/request/search', 'RequestController@search');
@@ -79,6 +83,7 @@ Route::post('/request', 'RequestController@store');
 Route::put('/request/{id}', 'RequestController@update');
 Route::delete('/request/{id}', 'RequestController@destroy');
 
+Route::get('/service/countByDate/{attribute}', 'ServiceController@serviceCountByDate');
 Route::get('/service', 'ServiceController@index');
 Route::post('/service/search', 'ServiceController@search');
 Route::post('/service/byLocation', 'ServiceController@serviceByLocation');

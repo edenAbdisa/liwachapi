@@ -14,6 +14,10 @@ class Flag extends Model
         'flagged_by_id',
         'type'
     ];
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+    ];
     public function reason()
     {
         return $this->belongsTo(ReportType::class);

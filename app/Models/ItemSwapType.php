@@ -12,6 +12,10 @@ class ItemSwapType extends Model
         'type_id',
         'item_id'
     ];
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+    ];
     public function type()
     {
         return $this->belongsTo(Type::class);
