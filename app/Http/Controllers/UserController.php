@@ -54,9 +54,9 @@ class UserController extends Controller
     }
     public function internalUsers()
     {
-        $user = User::where('status', '!=', 'active')->orWhereNull('status')->
+        $user = User::where('status', '!=', 'active')->
         where('type','!=','user')->
-        where('type','!=','organization')->orWhereNull('type')->get();
+        where('type','!=','org')->get();
         return (new UserResource($user))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -64,7 +64,7 @@ class UserController extends Controller
     public function organizationByStatus($status)
     {
         $user = User::where('status', '=', $status)->
-        where('type','=','organization')->get()->each(
+        where('type','=','org')->get()->each(
             function ($item, $key) {
             $item->address;
             $item->membership;
@@ -80,7 +80,7 @@ class UserController extends Controller
         //$wordCount = Wordlist::where('id', '<=', $correctedComparisons)->count();
         $userGrouped = User::where('status', '=', 'active')->where(function($q) {
             $q->where('type', 'user')
-              ->orWhere('type', 'organization');
+              ->orWhere('type', 'org');
         })->get()->groupBy(function($item) {
             return $item->type;
         });
