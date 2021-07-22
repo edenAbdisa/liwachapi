@@ -52,6 +52,27 @@ class UserController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
+    public function internalUsers()
+    {
+        $user = User::where('status', '=', 'active')->
+        where('type','!=','user')->
+        where('type','!=','organization')->get();
+        return (new UserResource($user))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
+    }
+    public function organizationByStatus($status)
+    {
+        $user = User::where('status', '=', $status)->
+        where('type','=','organization')->get()->each(
+            function ($item, $key) {
+            $item->address;
+            $item->membership;
+        });
+        return (new UserResource($user))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
+    }
     public function userCount()
     {
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
