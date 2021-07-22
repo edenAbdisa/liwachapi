@@ -54,7 +54,7 @@ class UserController extends Controller
     }
     public function internalUsers()
     {
-        $user = User::where('status', '!=', 'active')->->orWhereNull('status')
+        $user = User::where('status', '!=', 'active')->orWhereNull('status')->
         where('type','!=','user')->
         where('type','!=','org')->orWhereNull('type')->get();
         return (new UserResource($user))
