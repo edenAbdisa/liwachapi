@@ -25,6 +25,7 @@ Route::get('/user/search', 'UserController@search');
 Route::put('/user/{id}', 'UserController@update');
 Route::delete('/user/{id}', 'UserController@destroy');
 Route::post('/user/login', 'UserController@login');
+Route::get('/user/count', 'UserController@userCount');
 Route::get('/user/countByDate/{attribute}', 'UserController@userCountByDate');
 //});
 Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
@@ -82,6 +83,7 @@ Route::post('/request/search', 'RequestController@search');
 Route::post('/request', 'RequestController@store');
 Route::put('/request/{id}', 'RequestController@update');
 Route::delete('/request/{id}', 'RequestController@destroy');
+Route::get('/request/count/{type}', 'RequestController@requestCount');
 
 Route::get('/service/countByDate/{attribute}', 'ServiceController@serviceCountByDate');
 Route::get('/service', 'ServiceController@index');

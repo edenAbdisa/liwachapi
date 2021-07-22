@@ -61,7 +61,22 @@ class RequestController extends Controller
         return response()
         ->json($requestOrder,Response::HTTP_OK);
     } 
-
+    public function requestCount($type)
+    {
+        //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //User::with(['roles'])->get() 
+        //$wordCount = Wordlist::where('id', '<=', $correctedComparisons)->count();
+        $userGrouped = RequestOrder::where('type', '=', $type)->get()->groupBy(function($item) {
+            return $item->status;
+        });
+        foreach($userGrouped as $key => $user){
+            $day = $key;
+            $totalCount = $user->count();
+            $userGrouped[$key]=$totalCount;
+           }          
+        return response()
+        ->json($userGrouped,Response::HTTP_OK);
+    }
     /**
      * @OA\Post(
      *      path="/request",

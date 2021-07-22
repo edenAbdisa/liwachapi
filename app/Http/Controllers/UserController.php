@@ -52,6 +52,25 @@ class UserController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
+    public function userCount()
+    {
+        //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //User::with(['roles'])->get() 
+        //$wordCount = Wordlist::where('id', '<=', $correctedComparisons)->count();
+        $userGrouped = User::where('status', '=', 'active')->where(function($q) {
+            $q->where('type', 'user')
+              ->orWhere('type', 'organization');
+        })->get()->groupBy(function($item) {
+            return $item->type;
+        });
+        foreach($userGrouped as $key => $user){
+            $day = $key;
+            $totalCount = $user->count();
+            $userGrouped[$key]=$totalCount;
+           }          
+        return response()
+        ->json($userGrouped,Response::HTTP_OK);
+    }
     public function userCountByDate($attribute)
     {
         try{

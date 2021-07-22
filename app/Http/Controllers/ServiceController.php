@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
+    
     /**
      * @OA\Get(
      *      path="/service",
