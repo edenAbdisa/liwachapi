@@ -76,7 +76,7 @@ Route::put('/reporttype/{id}', 'ReportTypeController@update');
 Route::delete('/reporttype/{id}', 'ReportTypeController@destroy');
 
 Route::get('/request/countByDate/{attribute}', 'RequestController@requestCountByDate');
-Route::get('/request/{status}', 'RequestController@statusCountRequest'); 
+Route::get('/request/{status}/{type}', 'RequestController@statusCountRequest'); 
 Route::get('/request', 'RequestController@index');
 Route::post('/request/search', 'RequestController@search');
 Route::post('/request', 'RequestController@store');
