@@ -40,7 +40,7 @@ class CategoryController extends Controller
     {
         //abort_if(Gate::denies('category_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        $categories = Category::where('status', '!=', 'deleted')->get()
+        $categories = Category::where('status', '!=', 'deleted')->orWhereNull('status')->get()
         ->each(function ($item, $key) {
             $item->type;
        });

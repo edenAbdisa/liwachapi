@@ -40,7 +40,7 @@ class TypeController extends Controller
     {
         //abort_if(Gate::denies('type_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        $type = Type::where('status', '!=', 'deleted')->get()
+        $type = Type::where('status', '=', 'active')->orWhereNull('status')->get()
             ->each(function ($item, $key) {
                 $item->category;
             });

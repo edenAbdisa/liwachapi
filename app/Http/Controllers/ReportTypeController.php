@@ -40,7 +40,7 @@ class ReportTypeController extends Controller
     {
         //abort_if(Gate::denies('reporttype_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new ReportTypeResource(ReportType::where('status', '!=', 'deleted')->get()))
+        return (new ReportTypeResource(ReportType::where('status', '!=', 'deleted')->orWhereNull('status')->get()))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
