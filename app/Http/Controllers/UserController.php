@@ -54,7 +54,7 @@ class UserController extends Controller
     }
     public function internalUsers()
     {
-        $user = User::where('status', '=', 'active')->
+        $user = User::where('status', '!=', 'active')->
         where('type','!=','user')->
         where('type','!=','organization')->get();
         return (new UserResource($user))
