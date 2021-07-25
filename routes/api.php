@@ -21,7 +21,7 @@ use Illuminate\Http\Controllers;
 Route::post('/user', 'UserController@store');
 Route::post('/user/logout', 'UserController@logout');
 Route::get('/user', 'UserController@index');
-Route::get('/user/internal', 'UserController@internalUsers');
+Route::get('/user/internal/{status}', 'UserController@internalUsers');
 Route::get('/user/organization/{status}', 'UserController@organizationByStatus');
 Route::get('/user/search', 'UserController@search');
 Route::put('/user/{id}', 'UserController@update');

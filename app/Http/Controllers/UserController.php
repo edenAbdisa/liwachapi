@@ -52,9 +52,9 @@ class UserController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
-    public function internalUsers()
+    public function internalUsers($status)
     {
-        $user = User::where('status', '!=', 'active')->orWhereNull('status')->
+        $user = User::where('status', '=', $status)->orWhereNull('status')->
         where('type','!=','user')->
         where('type','!=','org')->orWhereNull('type')->get();
         return (new UserResource($user))
