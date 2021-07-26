@@ -112,18 +112,18 @@ class UserController extends Controller
     }
     public function login(Request $request)
     {
-        $user = User::where('email', $request->email)->first();
-        $response = ['user' => $user];
+        $user = User::where('email', $request->email)->first(); 
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
+                if( $user->remember_token===''){
                 $token = $user->createToken('Laravel Password Grant')->accessToken;
-                $user['remember_token'] = $token;
-                $response = ['user' => $user];
+                $user['remember_token'] = $token; 
                 if($user->save()){
                     $user->address;
                     $user->membership;
-                    return response(new UserResource($user), Response::HTTP_CREATED);
+                 }
                 }
+                return response(new UserResource($user), Response::HTTP_CREATED);            
             } else {
                return response()
                     ->json("Password mismatch", 422); 
