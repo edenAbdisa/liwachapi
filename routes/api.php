@@ -17,7 +17,9 @@ use Illuminate\Http\Controllers;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
  return $request->user();
 });
-//Route::middleware('auth:api')->group(function (){
+Route::middleware('auth:api')->group(function (){
+Route::get('/address', 'AddressController@index');});
+
 Route::post('/user', 'UserController@store');
 Route::post('/user/logout', 'UserController@logout');
 //Route::get('/user', 'UserController@index');
@@ -33,7 +35,7 @@ Route::get('/user/countByDate/{attribute}', 'UserController@userCountByDate');
 Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
 Route::get('/itemswaptype', 'ItemSwapTypeController@index');
 
-Route::get('/address', 'AddressController@index');
+
 Route::post('/address/search', 'AddressController@search');
 Route::post('/address', 'AddressController@store');
 Route::put('/address/{id}', 'AddressController@update');
