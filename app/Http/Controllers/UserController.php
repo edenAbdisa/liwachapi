@@ -117,11 +117,10 @@ class UserController extends Controller
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant')->accessToken;
-                $user['remember_token'] = $token;
-                $response = ['user' => $user];
+                $user['remember_token'] = $token; 
                 $user->address;
                 $user->membership;
-                return $user->save() ? response($response, 200) :
+                return $user->save() ? response($user, 200) :
                     "Couldn't provide token for user";
             } else {
                 $response = ["message" => "Password mismatch"];
@@ -134,7 +133,8 @@ class UserController extends Controller
     }
     public function logout(Request $request)
     {
-        $token = $request->user()->token(); 
+        $token = $request->user()->token();
+        //$token = User::where('email', $request->email)->first()->token();
         $token->revoke();
         $user = User::where('id', $token->user_id)->first();
         $user['remember_token'] = '';
