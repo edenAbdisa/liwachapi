@@ -117,18 +117,20 @@ class UserController extends Controller
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant')->accessToken;
-                $user['remember_token'] = $token; 
-                $user->address;
-                $user->membership;
-                return $user->save() ? response($user, 200) :
-                    "Couldn't provide token for user";
+                $user['remember_token'] = $token;
+                $response = ['user' => $user];
+                if($user->save()){
+                    $user->address;
+                    $user->membership;
+                    return response(new UserResource($user), Response::HTTP_CREATED);
+                }
             } else {
-                $response = ["message" => "Password mismatch"];
-                return response($response, 422);
+               return response()
+                    ->json("Password mismatch", 422); 
             }
         } else {
-            $response = ['message' => 'User doesnt not exist'];
-            return response($response, 422);
+            return response()
+                    ->json("User doesnt not exist", 422); 
         }
     }
     public function logout(Request $request)
