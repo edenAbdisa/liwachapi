@@ -3773,5 +3773,6 @@
                 }
             }
         }
-    }
+    },
+    "security":  {"bearerAuth": []} 
 }
