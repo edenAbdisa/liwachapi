@@ -2574,7 +2574,7 @@
     "components": {
 "securitySchemes": {
 			"bearerAuth": {
-				"type": "http",
+				"type": "Bearer Token",
 				"description": "Passport security.",
 				"scheme": "bearer",
 				"bearerFormat": "JWT"
