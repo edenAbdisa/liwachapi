@@ -2572,6 +2572,14 @@
         }
     },
     "components": {
+"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"description": "Passport security.",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		},
         "schemas": {
             "Address": {
                 "title": "Address",
