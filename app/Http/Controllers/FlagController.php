@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\ReportType;
 use App\Models\Flag;
+use App\Models\Item;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\FlagResource;
@@ -98,7 +100,15 @@ class FlagController extends Controller
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
         if ($flag->save()) {
-
+            if ($flag->type==='item') {
+                $flagged_item=Item::where('id',$flag->flagged_item_id);
+                $flagged_item->number_of_flag=$flagged_item->number_of_flag+1;
+                $flagged_item->save();
+            }else{
+                $flagged_service=Service::where('id',$flag->flagged_item_id);
+                $flagged_service->number_of_flag=$flagged_service->number_of_flag+1;
+                $flagged_service->save();
+            }  
             return (new FlagResource($flag))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
@@ -230,9 +240,11 @@ class FlagController extends Controller
         $input = $request->all();
         $flag = Flag::where('id', $id)->first();
         if ($flag->fill($input)->save()) {
-            $flag['reason_id'] = $flag->reason;
-            $flag['flagged_by_id'] = $flag->flagged_by;
-            $flag['flagged_item_id'] = $flag->flagged_item;
+            
+            $flag->reason;
+            $flag->flagged_by;
+            $flag->flagged_item;
+            
             return ($flag)
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\RequestOrder;
+use App\Models\Item;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\RequestResource;
@@ -117,6 +119,21 @@ class RequestController extends Controller
             $request->requester;
             $request->requested_item;
             $request->requester_item;
+            if ($request->type==='item') {
+                $requested_item=Item::where('id',$request->requested_item_id);
+                $requested_item->number_of_request=$requested_item->number_of_request+1;
+                $requested_item->save();
+                $requester_item=Item::where('id',$request->requester_item_id);
+                $requester_item->number_of_request=$requester_item->number_of_request+1;
+                $requester_item->save();
+            }else{
+                $requested_service=Service::where('id',$request->requested_item_id);
+                $requested_service->number_of_request=$requested_service->number_of_request+1;
+                $requested_service->save();
+                $requester_service=Service::where('id',$request->requester_item_id);
+                $requester_service->number_of_request=$requester_service->number_of_request+1;
+                $requester_service->save();
+            }
             return (new RequestResource($request))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
@@ -247,6 +264,25 @@ class RequestController extends Controller
     {
         $input = $request->all();
         $request = RequestOrder::where('id', $id)->first();
+        if (in_array('status', $input)) {
+            if($input['status']==='bartered'){
+                if ($request->type==='item') {
+                    $requested_item=Item::where('id',$request->requested_item_id);
+                    $requested_item->status='bartered';
+                    $requested_item->save();
+                    $requester_item=Item::where('id',$request->requester_item_id);
+                    $requester_item->status='bartered';
+                    $requester_item->save();
+                }else{
+                    $requested_service=Service::where('id',$request->requested_item_id);
+                    $requested_service->status='bartered';
+                    $requested_service->save();
+                    $requester_service=Service::where('id',$request->requester_item_id);
+                    $requester_service->status='bartered';
+                    $requester_service->save();
+                }
+            }
+        }
         if ($request->fill($input)->save()) {
             $request->requester;
             $request->requested_item;

@@ -59,6 +59,7 @@ Route::post('/item/search', 'ItemController@search');
 Route::post('/item', 'ItemController@store');
 Route::put('/item/{id}', 'ItemController@update');
 Route::delete('/item/{id}', 'ItemController@destroy');
+Route::get('/item/countByStatus', 'ItemController@countByStatus');
 
 Route::get('/membership', 'MembershipController@index');
 Route::post('/membership/search', 'MembershipController@search');
@@ -95,6 +96,7 @@ Route::post('/service', 'ServiceController@store');
 Route::put('/service/{id}', 'ServiceController@update');
 Route::delete('/service/{id}', 'ServiceController@destroy');
 Route::post('/service/uploadPicture', 'FileController@uploadFile');
+Route::get('/service/countByStatus', 'ServiceController@countByStatus');
 
 Route::get('/type', 'TypeController@index');
 Route::post('/type/search', 'TypeController@search');

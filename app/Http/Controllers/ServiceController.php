@@ -58,7 +58,20 @@ class ServiceController extends Controller
             ->setStatusCode(Response::HTTP_OK);
     }
 
-
+    public function countByStatus()
+    {
+        //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //User::with(['roles'])->get() 
+        //$wordCount = Wordlist::where('id', '<=', $correctedComparisons)->count();
+        $serviceGrouped = Service::all()->groupBy(function($item) {
+            return $item->status;
+        });
+        foreach($serviceGrouped as $key => $service){
+            $serviceGrouped[$key]=$service->count();
+           }          
+        return response()
+        ->json($serviceGrouped,Response::HTTP_OK);
+    }
     /**
      * @OA\Post(
      *      path="/service",

@@ -60,6 +60,20 @@ class ItemController extends Controller
         return response()
             ->json($items,Response::HTTP_OK);
     }
+    public function countByStatus()
+    {
+        //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //User::with(['roles'])->get() 
+        //$wordCount = Wordlist::where('id', '<=', $correctedComparisons)->count();
+        $itemGrouped = Item::all()->groupBy(function($item) {
+            return $item->status;
+        });
+        foreach($itemGrouped as $key => $item){
+            $itemGrouped[$key]=$item->count();
+           }          
+        return response()
+        ->json($itemGrouped,Response::HTTP_OK);
+    }
     public function itemsByLocation(Request $request)
     {
         $input = $request->all();
