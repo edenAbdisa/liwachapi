@@ -21,6 +21,8 @@
     "paths": {
         "/address": {
             "get": {
+                "security":
+        {"bearerAuth": []},
                 "tags": [
                     "Address"
                 ],
@@ -2574,7 +2576,7 @@
     "components": {
 "securitySchemes": {
 			"bearerAuth": {
-				"type": "Bearer Token",
+				"type": "http",
 				"description": "Passport security.",
 				"scheme": "bearer",
 				"bearerFormat": "JWT"
@@ -3773,6 +3775,5 @@
                 }
             }
         }
-    },
-    "security":  {"bearerAuth": []} 
+    }
 }
