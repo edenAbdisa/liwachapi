@@ -2577,7 +2577,7 @@
 "securitySchemes": {
 			"bearerAuth": {
 				"type": "http",
-				"description": "Passport security.",
+				"description": "JWT security.",
 				"scheme": "bearer",
 				"bearerFormat": "JWT"
 			}
