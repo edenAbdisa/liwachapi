@@ -116,7 +116,7 @@ class UserController extends Controller
         $response = ['user' => $user];
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                $token = $user->createToken('Laravel Password Grant')->accessToken;
                 $user['remember_token'] = $token;
                 $response = ['user' => $user];
                 $user->address;
@@ -134,7 +134,7 @@ class UserController extends Controller
     }
     public function logout(Request $request)
     {
-        $token = $request->user()->token();
+        $token = $request->user()->token(); 
         $token->revoke();
         $user = User::where('id', $token->user_id)->first();
         $user['remember_token'] = '';
@@ -190,7 +190,7 @@ class UserController extends Controller
             $input['password'] = Hash::make($request->password);
             $input['remember_token'] = Str::random(10);
             $user = User::create($input);
-            $token = "user->createToken('Laravel Password Grant')->accessToken";
+            $token = $user->createToken('Laravel Password Grant')->accessToken;
             $user['remember_token'] = $token;
             $address = $request->address;
             $address = Address::create($address);
