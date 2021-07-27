@@ -117,7 +117,7 @@ class UserController extends Controller
             if (Hash::check($request->password, $user->password)) {
                 if( $user->remember_token==='' || $user->remember_token===null){
                 $token = $user->createToken('Laravel Password Grant')->accessToken;
-                $user['remember_token'] = $token; 
+                $user['token'] = $token; 
                 if($user->save()){
                     $user->address;
                     $user->membership;

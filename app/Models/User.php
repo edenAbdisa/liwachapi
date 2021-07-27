@@ -26,6 +26,7 @@ class User extends Authenticatable
         'membership_id',
         'remember_token'
     ];
+    protected $token='';
     protected $casts = [
         'created_at' => 'datetime:Y-m-d',
         'updated_at' => 'datetime:Y-m-d',
