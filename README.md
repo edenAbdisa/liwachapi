@@ -5,6 +5,7 @@ php artisan make:model Todo -mcr
 php artisan serve
 heroku run php artisan migrate --app=liwachapi
 heroku run php artisan storage:link --app=liwachapi
+heroku run php artisan vendor:publish --tag=passport-config
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

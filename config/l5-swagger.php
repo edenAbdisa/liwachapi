@@ -62,8 +62,7 @@ return [
                     \Illuminate\Session\Middleware\StartSession::class,
                     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
                     \App\Http\Middleware\VerifyCsrfToken::class,
-                    \Illuminate\Routing\Middleware\SubstituteBindings::class, 
-                    \Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,
+                    \Illuminate\Routing\Middleware\SubstituteBindings::class  
                 ],
                 'asset' => [],
                 'docs' => [],
