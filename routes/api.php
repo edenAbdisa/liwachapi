@@ -27,7 +27,7 @@ Route::post('/user/logout', 'UserController@logout');
 //
 Route::get('/user/internal/{status}', 'UserController@internalUsers');
 Route::get('/user/organization/{status}', 'UserController@organizationByStatus');
-Route::get('/user/search', 'UserController@search');
+Route::post('/user/search', 'UserController@search');
 Route::put('/user/{id}', 'UserController@update');
 Route::delete('/user/{id}', 'UserController@destroy');
 Route::post('/user/login', 'UserController@login');

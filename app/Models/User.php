@@ -23,7 +23,8 @@ class User extends Authenticatable
         'birthdate',
         'type',
         'address_id',
-        'membership_id'
+        'membership_id',
+        'remember_token'
     ];
     protected $token='';
     protected $casts = [
