@@ -23,8 +23,7 @@ class User extends Authenticatable
         'birthdate',
         'type',
         'address_id',
-        'membership_id',
-        'remember_token'
+        'membership_id'
     ];
     protected $token='';
     protected $casts = [
@@ -39,8 +38,7 @@ class User extends Authenticatable
      * @var array
     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password'
     ]; 
 
     public function address()
