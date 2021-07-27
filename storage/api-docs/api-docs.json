@@ -14,7 +14,7 @@
     },
     "servers": [
         {
-            "url": "http://liwachapi.herokuapp.com/api",
+            "url": "https://liwachapi.herokuapp.com/api/",
             "description": "Demo API Server"
         }
     ],
@@ -22,7 +22,7 @@
         "/address": {
             "get": {
                 "security":
-        {"bearerAuth": []},
+                  {"access_token": []},
                 "tags": [
                     "Address"
                 ],
@@ -2575,11 +2575,12 @@
     },
     "components": {
 "securitySchemes": {
-			"bearerAuth": {
+			"access_token": {
 				"type": "http",
 				"description": "JWT security.",
 				"scheme": "bearer",
 				"bearerFormat": "JWT"
+                ,"in":"header"
 			}
 		},
         "schemas": {
