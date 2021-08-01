@@ -44,6 +44,6 @@ class RequestOrder extends Model
     }
     public function message()
     {
-        return $this->hasMany(Message::class,'chat_id');
+        return $this->hasMany(Message::class,'token','chat_id');
     }
 }
