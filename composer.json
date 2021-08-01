@@ -9,10 +9,12 @@
         "darkaonline/l5-swagger": "^8.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
+        "google/apiclient": "^2.10",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.40",
         "laravel/passport": "^10.1",
         "laravel/tinker": "^2.5",
+        "nao-pon/flysystem-google-drive": "~1.1",
         "symfony/console": "v5.2.7"
     },
     "require-dev": {
@@ -65,4 +67,3 @@
     "minimum-stability": "dev",
     "prefer-stable": true
 }
-   

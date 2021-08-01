@@ -28,6 +28,10 @@ class Service extends Model
     {
         return $this->belongsTo(Address::class);
     }
+    public function media()
+    {
+        return $this->hasMany(Media::class, 'item_id');
+    }
     public function type()
     {
         return $this->belongsTo(Type::class);

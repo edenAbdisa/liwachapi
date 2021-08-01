@@ -74,4 +74,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Service::class);
     } 
+    public function media()
+    {
+        return $this->hasMany(Media::class, 'item_id');
+    }
 }

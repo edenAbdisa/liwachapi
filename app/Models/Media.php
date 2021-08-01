@@ -5,26 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Message extends Model
+class Media extends Model  
 {
     use HasFactory;
     protected $fillable = [
-        'content',
-        'type',
-        'chat_id',
-        'sender_id'
+        'item_id',
+        'type'
     ];
     protected $casts = [
         'created_at' => 'datetime:Y-m-d',
         'updated_at' => 'datetime:Y-m-d',
     ];
-    public function sender()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
-    public function chat()
+    public function service()
     {
-        return $this->belongsTo(RequestOrder::class);
+        return $this->belongsTo(Service::class);
     }
-    
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
 }

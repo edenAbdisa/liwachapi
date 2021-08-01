@@ -22,7 +22,7 @@ Route::get('/address', 'AddressController@index');
 Route::get('/users', 'UserController@index');
 Route::post('/user/logout', 'UserController@logout');
 });
-
+Route::post('/put', 'MediaController@store');
 Route::post('/user', 'UserController@store');
 
 Route::get('/user/internal/{status}', 'UserController@internalUsers');

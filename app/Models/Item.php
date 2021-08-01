@@ -39,6 +39,10 @@ class Item extends Model
     {
         return $this->hasMany(RequestOrder::class, 'requested_item_id');
     }
+    public function media()
+    {
+        return $this->hasMany(Media::class, 'item_id');
+    }
     public function flag()
     {
         return $this->hasMany(Flag::class);
