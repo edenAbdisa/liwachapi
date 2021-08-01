@@ -13,7 +13,7 @@ class CreateMediaTable extends Migration
      */
     public function up()
     {
-        Schema::create('media', function (Blueprint $table) {
+        Schema::create('medias', function (Blueprint $table) {
             $table->bigIncrements('id');            
             $table->bigInteger('item_id')->unsigned()->nullable();            
             $table->string('type', 10)->default('user')->nullable();
@@ -28,6 +28,6 @@ class CreateMediaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('media');
+        Schema::dropIfExists('medias');
     }
 }
