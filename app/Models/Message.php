@@ -22,7 +22,7 @@ class Message extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function chat()
+    public function request()
     {
         return $this->belongsTo(RequestOrder::class,'chat_id','token');
     }

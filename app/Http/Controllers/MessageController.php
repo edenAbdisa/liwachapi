@@ -43,7 +43,7 @@ class MessageController extends Controller
         $message = Message::all()
             ->each(function ($item, $key) {
                 $item->sender;
-                $item->chat;
+                $item->request;
             });
         return (new MessageResource($message))
             ->response()
