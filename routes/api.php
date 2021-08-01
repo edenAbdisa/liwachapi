@@ -18,13 +18,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 return $request->user();
 });
 Route::middleware('auth:api')->group(function (){
-Route::get('/address', 'AddressController@index');
 Route::get('/users', 'UserController@index');
 Route::post('/user/logout', 'UserController@logout');
 });
 Route::post('/put', 'MediaController@store');
 Route::post('/user', 'UserController@store');
 
+Route::get('/address', 'AddressController@index');
 Route::get('/user/internal/{status}', 'UserController@internalUsers');
 Route::get('/user/organization/{status}', 'UserController@organizationByStatus');
 Route::post('/user/search', 'UserController@search');
