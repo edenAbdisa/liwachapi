@@ -47,6 +47,7 @@ class UserController extends Controller
             ->each(function ($item, $key) {
                 $item->address;
                 $item->membership;
+                $item->remember_token="";
             });
         return (new UserResource($user))
             ->response()
