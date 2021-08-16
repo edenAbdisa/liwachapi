@@ -40,7 +40,9 @@ class MembershipController extends Controller
     {
         //abort_if(Gate::denies('membership_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new MembershipResource(Membership::all()))
+        $membership = Membership::where('status', '=', 'active')->orWhereNull('status')->get();
+
+        return (new MembershipResource($membership))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
