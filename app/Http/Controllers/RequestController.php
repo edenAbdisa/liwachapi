@@ -145,7 +145,7 @@ class RequestController extends Controller
     public function requestCountByDate($attribute,$start,$end)
     {
         try{
-        $items = Request::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
+        $items = RequestOrder::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
              return $item->created_at->format('Y-m-d');
        });
        }catch(Exception $e){
