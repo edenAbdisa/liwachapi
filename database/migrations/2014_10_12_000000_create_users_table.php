@@ -15,8 +15,8 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('first_name', 10)->nullable();
-            $table->string('last_name', 10)->nullable();
+            $table->string('first_name', 20)->nullable();
+            $table->string('last_name', 20)->nullable();
             $table->string('email')->unique()->nullable();
             $table->text('password')->nullable();
             $table->text('profile_picture')->nullable();
@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->text('TIN_picture')->nullable();
             $table->string('status', 10)->nullable();
             $table->date('birthdate')->nullable();
-            $table->string('type', 10)->default('user')->nullable();
+            $table->string('type', 20)->default('user')->nullable();
             $table->bigInteger('address_id')->unsigned()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->bigInteger('membership_id')->unsigned()->nullable();

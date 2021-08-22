@@ -56,7 +56,7 @@ Route::post('/flag', 'FlagController@store');
 Route::put('/flag/{id}', 'FlagController@update');
 Route::delete('/flag/{id}', 'FlagController@destroy');
 
-Route::get('/item/countByDate/{attribute}', 'ItemController@itemCountByDate');
+Route::get('/item/countByDate/{attribute}/{start}/{end}', 'ItemController@itemCountByDate');
 Route::get('/item', 'ItemController@index');
 Route::post('/item/byLocation', 'ItemController@itemsByLocation');
 Route::post('/item/search', 'ItemController@search');
