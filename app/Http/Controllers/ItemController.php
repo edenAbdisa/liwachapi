@@ -47,7 +47,7 @@ class ItemController extends Controller
         //whereBetween('created_at', [$dateS->format('Y-m-d').
         //" 00:00:00", $dateE->format('Y-m-d')." 23:59:59"])->get();
         try{
-        $items = Item::orderBy($attribute)->whereBetween($attribute,$start,$end)->get()->groupBy(function($item) {
+        $items = Item::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
              return $item->created_at->format('Y-m-d');
        });
        }catch(Exception $e){
