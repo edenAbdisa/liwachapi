@@ -93,10 +93,10 @@ class UserController extends Controller
         return response()
         ->json($userGrouped,Response::HTTP_OK);
     }
-    public function userCountByDate($attribute)
+    public function userCountByDate($attribute,$start,$end)
     {
         try{
-        $items = User::orderBy($attribute)->get()->groupBy(function($item) {
+        $items = User::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
              return $item->created_at->format('Y-m-d');
        });
        }catch(Exception $e){

@@ -117,10 +117,10 @@ class FlagController extends Controller
                 ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function flaggedProductCountByDate($attribute)
+    public function flaggedProductCountByDate($attribute,$start,$end)
     {
         try{
-        $items = Flag::orderBy($attribute)->get()->groupBy(function($item) {
+        $items = Flag::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
              return $item->created_at->format('Y-m-d');
        });
        }catch(Exception $e){

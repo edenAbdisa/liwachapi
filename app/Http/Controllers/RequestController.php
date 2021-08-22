@@ -142,10 +142,10 @@ class RequestController extends Controller
                 ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function requestCountByDate($attribute)
+    public function requestCountByDate($attribute,$start,$end)
     {
         try{
-        $items = Request::orderBy($attribute)->get()->groupBy(function($item) {
+        $items = Request::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
              return $item->created_at->format('Y-m-d');
        });
        }catch(Exception $e){

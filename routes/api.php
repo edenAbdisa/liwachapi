@@ -32,7 +32,7 @@ Route::put('/user/{id}', 'UserController@update');
 Route::delete('/user/{id}', 'UserController@destroy');
 Route::post('/user/login', 'UserController@login');
 Route::get('/user/count', 'UserController@userCount');
-Route::get('/user/countByDate/{attribute}', 'UserController@userCountByDate');
+Route::get('/user/countByDate/{attribute}/{start}/{end}', 'UserController@userCountByDate');
 //});
 Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
 Route::get('/itemswaptype', 'ItemSwapTypeController@index');
@@ -49,7 +49,7 @@ Route::post('/category', 'CategoryController@store');
 Route::put('/category/{id}', 'CategoryController@update');
 Route::delete('/category/{id}', 'CategoryController@destroy');
 
-Route::get('/flag/countByDate/{attribute}', 'FlagController@flaggedProductCountByDate');
+Route::get('/flag/countByDate/{attribute}/{start}/{end}', 'FlagController@flaggedProductCountByDate');
 Route::get('/flag', 'FlagController@index');
 Route::post('/flag/search', 'FlagController@search');
 Route::post('/flag', 'FlagController@store');
@@ -83,7 +83,7 @@ Route::post('/reporttype', 'ReportTypeController@store');
 Route::put('/reporttype/{id}', 'ReportTypeController@update');
 Route::delete('/reporttype/{id}', 'ReportTypeController@destroy');
 
-Route::get('/request/countByDate/{attribute}', 'RequestController@requestCountByDate');
+Route::get('/request/countByDate/{attribute}/{start}/{end}', 'RequestController@requestCountByDate');
 //Route::get('/request/{status}/{type}', 'RequestController@statusCountRequest'); 
 Route::get('/request', 'RequestController@index');
 Route::post('/request/search', 'RequestController@search');
@@ -92,7 +92,7 @@ Route::put('/request/{id}', 'RequestController@update');
 Route::delete('/request/{id}', 'RequestController@destroy');
 Route::get('/request/count/{type}', 'RequestController@requestCount');
 
-Route::get('/service/countByDate/{attribute}', 'ServiceController@serviceCountByDate');
+Route::get('/service/countByDate/{attribute}/{start}/{end}', 'ServiceController@serviceCountByDate');
 Route::get('/service', 'ServiceController@index');
 Route::post('/service/search', 'ServiceController@search');
 Route::post('/service/byLocation', 'ServiceController@serviceByLocation');

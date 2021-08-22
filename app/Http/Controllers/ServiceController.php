@@ -155,10 +155,10 @@ class ServiceController extends Controller
             }
         //}
     }
-    public function serviceCountByDate($attribute)
+    public function serviceCountByDate($attribute,$start,$end)
     {
         try{
-        $items = Service::orderBy($attribute)->get()->groupBy(function($item) {
+        $items = Service::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
              return $item->created_at->format('Y-m-d');
        });
        }catch(Exception $e){
