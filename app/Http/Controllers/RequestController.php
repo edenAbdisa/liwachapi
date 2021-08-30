@@ -117,7 +117,7 @@ class RequestController extends Controller
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
         if ($request->save()) {
-            $request->token=Hash::make($request->id);
+            $request->token=Hash::make(Str::random());
             $request->save();
             $request->requester;
             $request->requested_item;
