@@ -116,7 +116,13 @@ class RequestController extends Controller
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
-        //Request::where
+        $request_already_exist=RequestOrder::where('requester_id',$request->requester_id)
+                               ->where('requested_item_id',$request->requested_item_id)->get();
+        if($request_already_exist){
+            return (new RequestResource($request_already_exist))
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        }
         if ($request->save()) {
             $request->token=Hash::make(Str::random());
             $request->save();
