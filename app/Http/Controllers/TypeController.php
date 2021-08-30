@@ -146,7 +146,7 @@ class TypeController extends Controller
                 return response()->json($types, 200);
             }
             if (in_array($key, $col)) {
-                $types = $types->where($key, $input[$key]);
+                $types = $types->where($key, $input[$key])->values();
             }
         }
         $types->each(function ($item, $key) {

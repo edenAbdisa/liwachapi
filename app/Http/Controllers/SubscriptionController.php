@@ -145,7 +145,7 @@ class SubscriptionController extends Controller
                 return response()->json($subscriptions, 200);
             }
             if (in_array($key, $col)) {
-                $subscriptions = $subscriptions->where($key, $input[$key]);
+                $subscriptions = $subscriptions->where($key, $input[$key])->values();
             }
         }
         $subscriptions->each(function ($item, $key) {

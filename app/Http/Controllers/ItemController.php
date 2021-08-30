@@ -176,7 +176,7 @@ class ItemController extends Controller
                 return response()->json($items, 200);
             }
             if (in_array($key, $col)) {
-                $items = $items->where($key, $input[$key]);
+                $items = $items->where($key, $input[$key])->values();
             }
         }
         $items->each(function ($item, $key) {

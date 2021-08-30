@@ -234,7 +234,7 @@ class ServiceController extends Controller
                 return response()->json($services, 200);
             }
             if (in_array($key, $col)) {
-                $services = $services->where($key, $input[$key]);
+                $services = $services->where($key, $input[$key])->values();
             }
         }
         $services->each(function ($item, $key) {

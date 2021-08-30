@@ -152,7 +152,7 @@ class CategoryController extends Controller
                 if ($key == 'name') {
                     $input[$key] = Str::ucfirst($input[$key]);
                 }
-                $categories = $categories->where($key, $input[$key]);
+                $categories = $categories->where($key, $input[$key])->values();
             }
         }
         $categories->each(function ($item, $key) {

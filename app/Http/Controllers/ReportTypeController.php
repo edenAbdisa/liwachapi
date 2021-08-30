@@ -140,7 +140,7 @@ class ReportTypeController extends Controller
                 return response()->json($reporttypes, 200);
             }
             if (in_array($key, $col)) {
-                $reporttypes = $reporttypes->where($key, $input[$key]);
+                $reporttypes = $reporttypes->where($key, $input[$key])->values();
             }
         }
         return response()->json($reporttypes, 200);

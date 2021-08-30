@@ -145,7 +145,7 @@ class MessageController extends Controller
                 return response()->json($messages, 200);
             }
             if (in_array($key, $col)) {
-                $messages = $messages->where($key, $input[$key]);
+                $messages = $messages->where($key, $input[$key])->values();
             }
         }
         $messages->each(function ($item, $key) {

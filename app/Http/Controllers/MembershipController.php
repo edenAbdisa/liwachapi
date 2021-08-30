@@ -145,7 +145,7 @@ class MembershipController extends Controller
                 if ($key == 'name') {
                     $input[$key] = Str::ucfirst($input[$key]);
                 }
-                $memberships = $memberships->where($key, $input[$key]);
+                $memberships = $memberships->where($key, $input[$key])->values();
             }
         }
         return response()->json($memberships, 200);

@@ -262,7 +262,7 @@ class UserController extends Controller
                 return response()->json($users, 200);
             }
             if (in_array($key, $col)) {
-                $users = $users->where($key, $input[$key]);
+                $users = $users->where($key, $input[$key])->values();
             }
         }
         $users->each(function ($item, $key) {

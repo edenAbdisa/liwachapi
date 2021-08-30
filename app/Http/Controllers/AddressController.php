@@ -139,7 +139,7 @@ class AddressController extends Controller
                 return response()->json($addresses, 200);
             }
             if (in_array($key, $col)) {
-                $addresses = $addresses->where($key, $input[$key]);
+                $addresses = $addresses->where($key, $input[$key])->values();
             }
         }
         return response()->json($addresses, 200);

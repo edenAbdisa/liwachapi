@@ -181,7 +181,7 @@ class FlagController extends Controller
                 return response()->json($flags, 200);
             }
             if (in_array($key, $col)) {
-                $flags = $flags->where($key, $input[$key]); 
+                $flags = $flags->where($key, $input[$key])->values(); 
             }
         }
         $flags->each(function ($flag, $key) { 
