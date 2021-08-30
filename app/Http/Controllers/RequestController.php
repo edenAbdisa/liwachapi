@@ -125,17 +125,23 @@ class RequestController extends Controller
             if ($request->type==='item') {
                 $requested_item=Item::where('id',$request->requested_item_id);
                 $requested_item->number_of_request=$requested_item->number_of_request+1;
-                $requested_item->save();
-                $requester_item=Item::where('id',$request->requester_item_id);
-                $requester_item->number_of_request=$requester_item->number_of_request+1;
-                $requester_item->save();
+                if(!$requested_item->save()){
+                    return response()
+                    ->json("This resource couldn't be updated due to internal error ", Response::HTTP_INTERNAL_SERVER_ERROR);       
+                }
+                // $requester_item=Item::where('id',$request->requester_item_id);
+                // $requester_item->number_of_request=$requester_item->number_of_request+1;
+                // $requester_item->save();
             }else{
                 $requested_service=Service::where('id',$request->requested_item_id);
                 $requested_service->number_of_request=$requested_service->number_of_request+1;
-                $requested_service->save();
-                $requester_service=Service::where('id',$request->requester_item_id);
-                $requester_service->number_of_request=$requester_service->number_of_request+1;
-                $requester_service->save();
+                if(!$requested_service->save()){
+                    return response()
+                    ->json("This resource couldn't be updated due to internal error ", Response::HTTP_INTERNAL_SERVER_ERROR);       
+                }
+                // $requester_service=Service::where('id',$request->requester_item_id);
+                // $requester_service->number_of_request=$requester_service->number_of_request+1;
+                // $requester_service->save();
             }
             return (new RequestResource($request))
                 ->response()
