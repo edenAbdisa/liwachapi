@@ -205,7 +205,7 @@ class UserController extends Controller
             if ($saveduser) {
                 $user->address;
                 $user->membership;
-                return response(new UserResource($user), Response::HTTP_CREATED);
+                return response(new UserResource($saveduser), Response::HTTP_CREATED);
             } else {
                 return response()
                     ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
