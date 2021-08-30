@@ -14,6 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class RequestController extends Controller
 {
@@ -112,6 +113,8 @@ class RequestController extends Controller
     public function store(Request $request)
     {
         $request = RequestOrder::create($request->all());
+        $for_token= `$request->requester`+ `$request->requested_item`;
+        $request->token=Hash::make($for_token);
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
