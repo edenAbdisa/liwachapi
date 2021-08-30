@@ -222,7 +222,7 @@ class RequestController extends Controller
                 return response()->json($requests, 200);
             }
             if (in_array($key, $col)) {
-                $requests = $requests->where($key, $input[$key]);
+                $requests = $requests->where($key, $input[$key])->values();
             }
         }
         $requests->each(function ($item, $key) {
