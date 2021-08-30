@@ -116,6 +116,7 @@ class RequestController extends Controller
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
+        //Request::where
         if ($request->save()) {
             $request->token=Hash::make(Str::random());
             $request->save();
