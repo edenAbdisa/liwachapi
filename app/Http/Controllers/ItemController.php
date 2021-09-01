@@ -215,10 +215,15 @@ class ItemController extends Controller
         $input = $request->all();
         $item = Item::where('id', $id)->first();
         if (in_array('address', $input)) {
-            $address = Address::where('id', $item->bartering_location_id)->first();
             $address_to_be_updated=$input['address'];
+            $address = Address::where('id', $input['id'])->first();           
             $address->fill($address_to_be_updated)->save();
         }
+        /* if (in_array('media', $input)) {
+            $address = Media::where('id', $item->bartering_location_id)->first();
+            $address_to_be_updated=$input['address'];
+            $address->fill($address_to_be_updated)->save();
+        } */
         // if (in_array('type_name', $input)) {
         //     $type = Type::where('name', $request->type_id)->first();
         //     $input['type_id'] = $type->id;

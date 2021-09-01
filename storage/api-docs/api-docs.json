@@ -1784,7 +1784,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ServiceRequest"
+                                "$ref": "#/components/schemas/ServiceRequestUpdate"
                             }
                         }
                     }
@@ -2311,7 +2311,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ItemRequest"
+                                "$ref": "#/components/schemas/ItemRequestUpdate"
                             }
                         }
                     }
@@ -3089,6 +3089,72 @@
                     }
                 }
             },
+            "ItemRequestUpdate": {
+                "title": "Item",
+                "description": "Item model ",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the item",
+                        "type": "string",
+                        "example": "car"
+                    },
+                    "description": {
+                        "title": "Description",
+                        "description": "Description of the item",
+                        "type": "string",
+                        "example": "Car is machine used to...."
+                    },
+                    "media": {
+                        "title": "Media",
+                        "description": "List containing the name of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": [
+                            "url link",
+                            "url link"
+                        ]
+                    },
+                    "swap_type": {
+                        "title": "Swap Types",
+                        "description": "List containing the id of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": [
+                            1,
+                            3,
+                            2,
+                            4
+                        ]
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/Address"
+                    },
+                    "type_id": {
+                        "title": "Type",
+                        "description": "Categorize the item into a type and from this type we can decide the category",
+                        "type": "big integer",
+                        "format": "string",
+                        "example": 4
+                    },
+                    "user_id": {
+                        "title": "User",
+                        "description": "The id of the owner",
+                        "type": "big integer",
+                        "format": "string",
+                        "example": 4
+                    },
+                    "status": {
+                        "title": "status",
+                        "description": "Status of the item whether it is bartered,unbartered,blocked. Automatically all user item are set to unbartered but company is set to blocked",
+                        "type": "string",
+                        "example": "bartered,unbartered,blocked"
+                    }
+                }
+            },
             "Item": {
                 "title": "Item",
                 "description": "Item model ",
@@ -3631,6 +3697,69 @@
                         "format": "int64",
                         "example": 1
                     },
+                    "user_id": {
+                        "title": "User",
+                        "description": "The user that uploaded the service.",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "swap_type": {
+                        "title": "Swap Types",
+                        "description": "List containing the id of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": [
+                            1,
+                            2,
+                            3,
+                            4
+                        ]
+                    },
+                    "status": {
+                        "title": "status",
+                        "description": "Status of the service whether it is bartered,unbartered,blocked. Automatically all user item are set to unbartered but company is set to blocked",
+                        "type": "string",
+                        "example": "bartered,unbartered,blocked"
+                    }
+                }
+            },
+            "ServiceRequestUpdate": {
+                "title": "Service",
+                "description": "Service model",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the service",
+                        "type": "string",
+                        "example": "Plumbering"
+                    },
+                    "description": {
+                        "title": "Description",
+                        "description": "Description of the service",
+                        "type": "string",
+                        "example": "Plumbering is type of service that...."
+                    },
+                    "media": {
+                        "title": "Media",
+                        "description": "List containing the name of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": [
+                            "url link",
+                            "url link"
+                        ]
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/Address"
+                    },
+                    "type_id": {
+                        "title": "Type",
+                        "description": "Categorize the service into a type and from this type we can decide the category",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },                    
                     "user_id": {
                         "title": "User",
                         "description": "The user that uploaded the service.",

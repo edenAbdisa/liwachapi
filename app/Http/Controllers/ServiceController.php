@@ -309,8 +309,8 @@ class ServiceController extends Controller
         $input = $request->all();
         $service = Service::where('id', $id)->first();
         if (in_array('address', $input)) {
-            $address = Address::where('id', $service->bartering_location_id)->first();
             $address_to_be_updated=$input['address'];
+            $address = Address::where('id', $input['id'])->first();           
             $address->fill($address_to_be_updated)->save();
         }
         /* if (in_array('type_name', $input)) {
