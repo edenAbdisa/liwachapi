@@ -336,6 +336,23 @@ class ServiceController extends Controller
             $input['type_id'] = $type->id;
         } */
         //swap update isnt done
+        if ($request->swap_type) {            
+            $toBeRemoved=$request->swap_type["removed"];
+            $newToBeSaved=$request->swap_type["added"];
+            $oldSwap = ServiceSwapType::where('service_id', $service->id)
+                                     ->where('type_id', $toBeRemoved)->get();
+            ServiceSwapType::destroy($oldSwap);
+            foreach ($newToBeSaved as $t) {
+                 //check if the sent type id is in there 
+                 $swap = new ServiceSwapType();
+                 $swap->type_id = $t;
+                 $swap->service_id = $service->id;
+                 if (!$swap->save()) {
+                     return response()
+                         ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                 }
+             }
+         }
         if ($service->fill($input)->save()) {
             $service->media;
             $service->bartering_location;

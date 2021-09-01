@@ -3123,12 +3123,10 @@
                         "description": "List containing the id of the types",
                         "type": "List",
                         "format": "List",
-                        "example": [
-                            1,
-                            3,
-                            2,
-                            4
-                        ]
+                        "example": {
+                            "removed":[2,6],
+                            "added":[6,7]
+                        }
                     },
                     "address": {
                         "$ref": "#/components/schemas/Address"
@@ -3772,12 +3770,10 @@
                         "description": "List containing the id of the types",
                         "type": "List",
                         "format": "List",
-                        "example": [
-                            1,
-                            2,
-                            3,
-                            4
-                        ]
+                        "example": {
+                            "removed":[2,6],
+                            "added":[6,7]
+                        }
                     },
                     "status": {
                         "title": "status",

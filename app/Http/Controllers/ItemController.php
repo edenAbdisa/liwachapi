@@ -238,8 +238,24 @@ class ItemController extends Controller
                 $mediaOld->save();
             }             
         } 
-        // if (in_array('type_name', $input)) {
-        //     $type = Type::where('name', $request->type_id)->first();
+        //->select('users.*', 'contacts.phone', 'orders.price')
+        if ($request->swap_type) {            
+           $toBeRemoved=$request->swap_type["removed"];
+           $newToBeSaved=$request->swap_type["added"];
+           $oldSwap = ItemSwapType::where('item_id', $item->id)
+                                    ->where('type_id', $toBeRemoved)->get();
+           ItemSwapType::destroy($oldSwap);
+           foreach ($newToBeSaved as $t) {
+                //check if the sent type id is in there 
+                $swap = new ItemSwapType();
+                $swap->type_id = $t;
+                $swap->item_id = $item->id;
+                if (!$swap->save()) {
+                    return response()
+                        ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            }
+        }
         //     $input['type_id'] = $type->id;
         // }
         //swap update isnt done
