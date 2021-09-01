@@ -319,15 +319,17 @@ class UserController extends Controller
     {
         $input = $request->all();
         $user = User::where('id', $id)->first();
-        if (in_array('address', $input)) {
-            $address = Address::where('id', $user->address_id)->first();
-            if(!$address->fill($input["address"])->save()){
-                return response()
-                ->json($address, Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-        } 
-        if (in_array('password', $input)) {
-            $input['password'] = Hash::make($request->password);
+        if ($request->address) {
+            $address_to_be_updated=$request->address;
+            $address = Address::where('id', $user->bartering_location_id)->first(); 
+            $address->city=$address_to_be_updated['city'];  
+            $address->country=$address_to_be_updated['country']; 
+            $address->latitude=(float)$address_to_be_updated['latitude'];  
+            $address->longitude=(float)$address_to_be_updated['longitude'];        
+            $address->save(); 
+       } 
+        if ($request->password) {
+            $user->password = Hash::make($request->password);
         }
         if ($user->fill($input)->save()) {
             $user->address;

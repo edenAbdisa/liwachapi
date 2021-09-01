@@ -3114,8 +3114,8 @@
                         "type": "List",
                         "format": "List",
                         "example": [
-                            "url link",
-                            "url link"
+                            {"id":8,"url":"url link"},
+                            {"id":4,"url":"url link"}
                         ]
                     },
                     "swap_type": {
@@ -3746,8 +3746,8 @@
                         "type": "List",
                         "format": "List",
                         "example": [
-                            "url link",
-                            "url link"
+                            {"id":8,"url":"url link"},
+                            {"id":4,"url":"url link"}
                         ]
                     },
                     "address": {

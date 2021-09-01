@@ -10,6 +10,7 @@ use App\Models\Media;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\ItemResource;
+use App\Http\Resources\AddressResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +29,9 @@ class ItemController extends Controller
     public function index()
     {
         $items = Item::all()->each(function ($item, $key) {
-            $item->itemSwapType;
+            $item->itemSwapType->each(function ($type, $key) {
+                $type->type;
+            });
             $item->bartering_location;
             $item->type;
             $item->user;
@@ -150,7 +153,9 @@ class ItemController extends Controller
                         }
                         $item->bartering_location;
                         $item->type;
-                        $item->itemSwapType;
+                        $item->itemSwapType->each(function ($type, $key) {
+                            $type->type;
+                        });
                         $item->user; 
                         $item->media;
                         return (new ItemResource($item))
@@ -197,7 +202,9 @@ class ItemController extends Controller
             $item->bartering_location;
             $item->type;
             $item->user;
-            $item->itemSwapType;
+            $item->itemSwapType->each(function ($type, $key) {
+                $type->type;
+            });
             $item->request;
         });
         return response()->json($items, 200);
@@ -214,16 +221,23 @@ class ItemController extends Controller
     {
         $input = $request->all();
         $item = Item::where('id', $id)->first();
-        if (in_array('address', $input)) {
-            $address_to_be_updated=$input['address'];
-            $address = Address::where('id', $input['id'])->first();           
-            $address->fill($address_to_be_updated)->save();
-        }
-        /* if (in_array('media', $input)) {
-            $address = Media::where('id', $item->bartering_location_id)->first();
-            $address_to_be_updated=$input['address'];
-            $address->fill($address_to_be_updated)->save();
-        } */
+       if ($request->address) {
+            $address_to_be_updated=$request->address;
+            $address = Address::where('id', $item->bartering_location_id)->first(); 
+            $address->city=$address_to_be_updated['city'];  
+            $address->country=$address_to_be_updated['country']; 
+            $address->latitude=(float)$address_to_be_updated['latitude'];  
+            $address->longitude=(float)$address_to_be_updated['longitude'];        
+            $address->save(); 
+       }
+        if ($request->media) {
+            $itemMedia = $request->media;
+            foreach ($itemMedia as $m) {
+                $mediaOld = Media::where('id', $m['id'])->first();
+                $mediaOld->url=$m['url'];
+                $mediaOld->save();
+            }             
+        } 
         // if (in_array('type_name', $input)) {
         //     $type = Type::where('name', $request->type_id)->first();
         //     $input['type_id'] = $type->id;
@@ -234,7 +248,9 @@ class ItemController extends Controller
             $item->bartering_location;
             $item->type;
             $item->user;
-            $item->itemSwapType;
+            $item->itemSwapType->each(function ($type, $key) {
+                $type->type;
+            });
             return (new ItemResource($item))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);

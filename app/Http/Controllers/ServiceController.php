@@ -52,7 +52,9 @@ class ServiceController extends Controller
                 $item->bartering_location;
                 $item->type;
                 $item->user;
-                $item->serviceSwapType;
+                $item->serviceSwapType->each(function ($type, $key) {
+                    $type->type;
+                });
             });
         return (new ServiceResource($service))
             ->response()
@@ -156,7 +158,9 @@ class ServiceController extends Controller
                         $service->bartering_location;
                         $service->type;
                         $service->user;
-                        $service->serviceSwapType;
+                        $service->serviceSwapType->each(function ($type, $key) {
+                            $type->type;
+                        });
                         return (new ServiceResource($service))
                             ->response()
                             ->setStatusCode(Response::HTTP_CREATED);
@@ -255,7 +259,9 @@ class ServiceController extends Controller
             $item->bartering_location;
             $item->type;
             $item->user;
-            $item->serviceSwapType;
+            $item->serviceSwapType->each(function ($type, $key) {
+                $type->type;
+            });
         });
 
         return response()->json($services, 200);
@@ -308,10 +314,22 @@ class ServiceController extends Controller
     {
         $input = $request->all();
         $service = Service::where('id', $id)->first();
-        if (in_array('address', $input)) {
-            $address_to_be_updated=$input['address'];
-            $address = Address::where('id', $input['id'])->first();           
-            $address->fill($address_to_be_updated)->save();
+        if ($request->address) {
+            $address_to_be_updated=$request->address;
+            $address = Address::where('id', $service->bartering_location_id)->first(); 
+            $address->city=$address_to_be_updated['city'];  
+            $address->country=$address_to_be_updated['country']; 
+            $address->latitude=(float)$address_to_be_updated['latitude'];  
+            $address->longitude=(float)$address_to_be_updated['longitude'];        
+            $address->save(); 
+       }
+        if ($request->media) {
+            $itemMedia = $request->media;
+            foreach ($itemMedia as $m) {
+                $mediaOld = Media::where('id', $m['id'])->first();
+                $mediaOld->url=$m['url'];
+                $mediaOld->save();
+            }             
         }
         /* if (in_array('type_name', $input)) {
             $type = Type::where('name', $request->type_name)->first();
@@ -323,7 +341,9 @@ class ServiceController extends Controller
             $service->bartering_location;
             $service->type;
             $service->user;
-            $service->itemSwapType;
+            $service->serviceSwapType->each(function ($type, $key) {
+                $type->type;
+            });
             return (new ServiceResource($service))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
