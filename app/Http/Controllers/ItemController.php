@@ -32,7 +32,7 @@ class ItemController extends Controller
             $item->bartering_location;
             $item->type;
             $item->user;
-            $item->picture = public_path() . '/files/items/' . $item->picture;
+            $item->media;
         });
         return (new ItemResource($items))
             ->response()
@@ -85,7 +85,7 @@ class ItemController extends Controller
             $address->item->itemSwapType;
             $address->item->user;
             $address->item->bartering_location;
-            $address->item->picture = public_path() . '/files/items/' . $address->item->picture;
+            $address->item->media;
             $address->item->itemSwapType->each(function ($type, $key) {
                 $type->type;
             });
@@ -193,7 +193,7 @@ class ItemController extends Controller
             }
         }
         $items->each(function ($item, $key) {
-            $item->picture = public_path() . '/files/items/' . $item->picture;
+            $item->media;
             $item->bartering_location;
             $item->type;
             $item->user;
@@ -225,7 +225,7 @@ class ItemController extends Controller
         // }
         //swap update isnt done
         if ($item->fill($input)->save()) {
-            $item->picture = public_path() . '/files/items/' . $item->picture;
+            $item->media;
             $item->bartering_location;
             $item->type;
             $item->user;

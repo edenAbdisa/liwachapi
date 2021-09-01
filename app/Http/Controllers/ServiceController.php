@@ -48,7 +48,7 @@ class ServiceController extends Controller
         //User::with(['roles'])->get()
         $service = Service::all()
             ->each(function ($item, $key) {
-                $item->picture = public_path() . '/files/services/' . $item->picture;
+                $item->media;
                 $item->bartering_location;
                 $item->type;
                 $item->user;
@@ -194,7 +194,7 @@ class ServiceController extends Controller
             $address->service->serviceSwapType;
             $address->service->user;
             $address->service->bartering_location;
-            $address->service->picture = public_path() . '/files/services/' . $address->service->picture;
+            $address->service->media;
             $address->service->serviceSwapType->each(function ($type, $key) {
                 $type->type;
             });
@@ -251,7 +251,7 @@ class ServiceController extends Controller
             }
         }
         $services->each(function ($item, $key) {
-            $item->picture = public_path() . '/files/services/' . $item->picture;
+            $item->media;
             $item->bartering_location;
             $item->type;
             $item->user;
@@ -319,7 +319,7 @@ class ServiceController extends Controller
         } */
         //swap update isnt done
         if ($service->fill($input)->save()) {
-            $service->picture = public_path() . '/files/services/' . $service->picture;
+            $service->media;
             $service->bartering_location;
             $service->type;
             $service->user;
