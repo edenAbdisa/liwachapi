@@ -10,8 +10,10 @@ class Media extends Model
     use HasFactory;
     protected $fillable = [
         'item_id',
-        'type'
+        'type',
+        'url'
     ];
+    protected $table = 'medias';
     protected $casts = [
         'created_at' => 'datetime:Y-m-d',
         'updated_at' => 'datetime:Y-m-d',

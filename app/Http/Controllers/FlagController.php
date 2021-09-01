@@ -245,7 +245,7 @@ class FlagController extends Controller
             $flag->flagged_by;
             $flag->flagged_item;
             
-            return ($flag)
+            return (new FlagResource($flag))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         } else {

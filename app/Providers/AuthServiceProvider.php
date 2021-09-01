@@ -32,9 +32,13 @@ class AuthServiceProvider extends ServiceProvider
             \Laravel\Passport\Console\KeysCommand::class,
         ]);
         Passport::enableImplicitGrant();
-        Passport::tokensExpireIn(\Carbon\Carbon::now()->addMinutes(10));
-        Passport::refreshTokensExpireIn(\Carbon\Carbon::now()->addDays(1));
-        Passport::personalAccessTokensExpireIn(\Carbon\Carbon::now()->addDays(1));
+        $expireAt = \Carbon\Carbon::now()->addDays(7);
+        Passport::tokensExpireIn($expireAt);
+        Passport::refreshTokensExpireIn($expireAt);
+        Passport::personalAccessTokensExpireIn($expireAt);
+        // Passport::tokensExpireIn(\Carbon\Carbon::now()->addMinutes(10));
+        // Passport::refreshTokensExpireIn(\Carbon\Carbon::now()->addDays(1));
+        // Passport::personalAccessTokensExpireIn(\Carbon\Carbon::now()->addDays(1));
 
         //
     }

@@ -14,11 +14,212 @@
     },
     "servers": [
         {
-            "url": "https://liwachapi.herokuapp.com/api/",
+            "url": "http://liwachapi.herokuapp.com/api/",
             "description": "Demo API Server"
         }
     ],
     "paths": {
+        "/media": {
+            "get": {
+                "tags": [
+                    "Media"
+                ],
+                "summary": "Get list of media",
+                "description": "Returns list of media",
+                "operationId": "getProjectsList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Media"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Media"
+                ],
+                "summary": "Store new Media",
+                "description": "Returns Media data",
+                "operationId": "storeMedia",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MediaRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Media"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/media/{id}": {
+            "put": {
+                "tags": [
+                    "Media"
+                ],
+                "summary": "Update existing project",
+                "description": "Returns updated media data",
+                "operationId": "updateProject",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MediaRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Media"
+                ],
+                "summary": "Delete existing Media",
+                "description": "Deletes a record and returns no content",
+                "operationId": "deleteMedia",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Media id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            }
+        },
+        "/media/search": {
+            "post": {
+                "tags": [
+                    "Media"
+                ],
+                "summary": "Get list of media",
+                "description": "Returns list of media",
+                "operationId": "searchMedia",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MediaRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Media"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
         "/address": {
             "get": {
                 "security":
@@ -2841,11 +3042,15 @@
                         "type": "string",
                         "example": "Car is machine used to...."
                     },
-                    "picture": {
-                        "title": "Picture file using multipart",
-                        "description": "This name will be concated with the current time and saved on database.The file wll be uploaded",
-                        "type": "string",
-                        "format": "binary"
+                    "media": {
+                        "title": "Media",
+                        "description": "List containing the name of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": [
+                            "url link",
+                            "url link"
+                        ]
                     },
                     "swap_type": {
                         "title": "Swap Types",
@@ -2898,11 +3103,15 @@
                         "format": "int64",
                         "example": 1
                     },
-                    "picture": {
-                        "title": "Picture file name",
-                        "description": "This name will be concated with the image collection folder",
-                        "type": "string",
-                        "example": "mybag.jpg"
+                    "media": {
+                        "title": "Media",
+                        "description": "List containing the name of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": [
+                            "url link",
+                            "url link"
+                        ]
                     },
                     "status": {
                         "title": "status",
@@ -2940,8 +3149,8 @@
                         "type": "List",
                         "format": "List",
                         "example": [
-                            "Mobile",
-                            "Shoes"
+                            "food",
+                            "mobile"
                         ]
                     },
                     "type_id": {
@@ -3304,11 +3513,15 @@
                         "type": "string",
                         "example": "Plumbering"
                     },
-                    "picture": {
-                        "title": "Picture file name",
-                        "description": "This name will be concated with the image collection folder",
-                        "type": "string",
-                        "example": "mybag.jpg"
+                    "media": {
+                        "title": "Media",
+                        "description": "List containing the url",
+                        "type": "List",
+                        "format": "List",
+                        "example": [
+                            "url link",
+                            "url link"
+                        ]
                     },
                     "status": {
                         "title": "Status",
@@ -3366,8 +3579,7 @@
                         "type": "List",
                         "format": "List",
                         "example": [
-                            "Mobile",
-                            "Shoe"
+                            "driver"
                         ]
                     },
                     "timestamp": {
@@ -3399,11 +3611,15 @@
                         "type": "string",
                         "example": "Plumbering is type of service that...."
                     },
-                    "picture": {
-                        "title": "Picture file name",
-                        "description": "This name will be concated with the image collection folder",
-                        "type": "string",
-                        "example": "mybag.jpg"
+                    "media": {
+                        "title": "Media",
+                        "description": "List containing the name of the types",
+                        "type": "List",
+                        "format": "List",
+                        "example": [
+                            "url link",
+                            "url link"
+                        ]
                     },
                     "address": {
                         "$ref": "#/components/schemas/AddressRequest"
@@ -3501,6 +3717,69 @@
                         "description": "Describes if the type data is deleted ,active",
                         "type": "string",
                         "example": "deleted ,active"
+                    }
+                }
+            },
+            "Media": {
+                "title": "Media",
+                "description": "Media model",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "description": "ID",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "item_id": {
+                        "title": "item_id",
+                        "description": "Name of the new project",
+                        "type": "big integer",
+                        "format": "int64",
+                        "example": 9
+                    },
+                    "type": {
+                        "title": "Type",
+                        "description": "This is the type.",
+                        "type": "big integer",
+                        "example": "item,service,user"
+                    },
+                    "url": {
+                        "title": "Url",
+                        "description": "Describes if the type data is deleted ,active",
+                        "type": "string",
+                        "example": "link.com"
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "description": "This is the timestamp that we got when this data is added.",
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2020-01-27 17:50:45"
+                    }
+                }
+            },
+            "MediaRequest": {
+                "title": "Media",
+                "description": "Media model",
+                "properties": {
+                    "item_id": {
+                        "title": "item_id",
+                        "description": "Name of the new project",
+                        "type": "big integer",
+                        "example": 9
+                    },
+                    "type": {
+                        "title": "Type",
+                        "description": "This is the type.",
+                        "type": "big integer",
+                        "example": "item,service,user"
+                    },
+                    "url": {
+                        "title": "Url",
+                        "description": "Describes if the type data is deleted ,active",
+                        "type": "string",
+                        "example": "link.com"
                     }
                 }
             },

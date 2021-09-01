@@ -109,3 +109,9 @@ Route::post('/type', 'TypeController@store');
 Route::put('/type/{id}', 'TypeController@update');
 Route::delete('/type/{id}', 'TypeController@destroy');
 
+
+Route::get('/media', 'MediaController@index');
+Route::post('/media/search', 'MediaController@search');
+Route::post('/media', 'MediaController@store');
+Route::put('/media/{id}', 'MediaController@update');
+Route::delete('/media/{id}', 'MediaController@destroy');

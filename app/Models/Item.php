@@ -51,4 +51,5 @@ class Item extends Model
     {
         return $this->hasMany(ItemSwapType::class);
     }
+    
 }

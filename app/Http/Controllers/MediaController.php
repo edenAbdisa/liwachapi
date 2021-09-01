@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Media;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Resources\MediaResource;
+use Symfony\Component\HttpFoundation\Response;
 
 class MediaController extends Controller
 {
@@ -14,7 +17,10 @@ class MediaController extends Controller
      */
     public function index()
     {
-        //$mainDisk = Storage::disk('main_google');
+        $items = Media::all();
+        return (new MediaResource($items))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -25,13 +31,44 @@ class MediaController extends Controller
      */
     public function store(Request $request)
     {
-        $file = $request->file('file');
-
-        $filename = time() . '_' . $file->getClientOriginalName();
-        \Storage::disk('google')->put($filename, $file);
-        return 'File was saved to Google Drive';
+        $serviceMedia = $request->url;
+        foreach ($serviceMedia as $m) {
+            //check if the sent type id is in there 
+            $media = new Media();
+            $media->type = $request->type;
+            $media->url = $m;
+            $media->item_id =$request->item_id;
+            if (!$media->save()) {
+                return response()
+                    ->json("The media $media resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+        return (new MediaResource(Media::where('item_id',$request->item_id)->get()))
+                            ->response()
+                            ->setStatusCode(Response::HTTP_CREATED);
+              
     }
-
+    public function search(Request $request)
+    {
+        $input = $request->all();
+        $medias = Media::all();
+        $col = DB::getSchemaBuilder()->getColumnListing('medias');
+        $requestKeys = collect($request->all())->keys();
+        foreach ($requestKeys as $key) {
+            if (empty($medias)) {
+                return response()->json($medias, 200);
+            }
+            if (in_array($key, $col)) {
+                $medias = $medias->where($key, $input[$key])->values(); 
+            }
+        }
+        $medias->each(function ($flag, $key) { 
+            $flag->reason;
+            $flag->flagged_by;
+            $flag->flagged_item;
+        });
+        return response()->json($medias, 200);
+    }
     /**
      * Update the specified resource in storage.
      *
@@ -39,9 +76,19 @@ class MediaController extends Controller
      * @param  \App\Models\Media  $media
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Media $media)
+    public function update(Request $request, $id)
     {
-        //
+        $input = $request->all();
+        $media = Media::where('id', $id)->first();
+        if ($media->fill($input)->save()) {
+            
+            return (new MediaResource($media))
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        } else {
+            return response()
+                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -50,8 +97,14 @@ class MediaController extends Controller
      * @param  \App\Models\Media  $media
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Media $media)
+    public function destroy($id)
     {
-        //
+        $media = Media::find($id);
+        if (!$media) {
+            return response()
+                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+        }
+        $media->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

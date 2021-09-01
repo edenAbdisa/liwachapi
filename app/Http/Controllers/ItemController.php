@@ -6,6 +6,7 @@ use App\Models\ItemSwapType;
 use App\Models\Address;
 use App\Models\Type;
 use App\Models\Item;
+use App\Models\Media;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\ItemResource;
@@ -135,11 +136,23 @@ class ItemController extends Controller
                                     ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
                             }
                         }
-                        $item->picture = public_path() . '/files/items/' . $item->picture;
+                        $itemMedia = $request->media;
+                        foreach ($itemMedia as $m) {
+                            //check if the sent type id is in there 
+                            $media = new Media();
+                            $media->type = 'item';
+                            $media->url = $m;
+                            $media->item_id = $item->id;
+                            if (!$media->save()) {
+                                return response()
+                                    ->json("The media $media resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                            }
+                        }
                         $item->bartering_location;
                         $item->type;
                         $item->itemSwapType;
-                        $item->user;
+                        $item->user; 
+                        $item->media;
                         return (new ItemResource($item))
                             ->response()
                             ->setStatusCode(Response::HTTP_CREATED);

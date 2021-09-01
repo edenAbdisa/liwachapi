@@ -7,6 +7,7 @@ use App\Models\ServiceSwapType;
 use App\Models\Service;
 use App\Models\Address;
 use App\Models\Type;
+use App\Models\Media;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\ServiceResource;
@@ -139,7 +140,19 @@ class ServiceController extends Controller
                                     ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
                             }
                         }
-                        $service->picture = public_path() . '/files/services/' . $service->picture;
+                        $serviceMedia = $request->media;
+                        foreach ($serviceMedia as $m) {
+                            //check if the sent type id is in there 
+                            $media = new Media();
+                            $media->type = 'service';
+                            $media->url = $m;
+                            $media->item_id = $service->id;
+                            if (!$media->save()) {
+                                return response()
+                                    ->json("The media $media resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                            }
+                        }
+                        $service->media;
                         $service->bartering_location;
                         $service->type;
                         $service->user;
