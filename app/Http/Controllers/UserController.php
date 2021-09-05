@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AddressResource;
 use Exception;
 use Illuminate\Http\Request;
 use Gate;
@@ -194,12 +195,14 @@ class UserController extends Controller
             $input['remember_token'] = Str::random(10);
             $user = User::create($input);
             $token = $user->createToken('Laravel Password Grant')->accessToken;
-            $user['remember_token'] = $token;
+            $user['remember_token'] = $token; 
             $address = $request->address;
             $address = Address::create($address);
-            if (!$address->save()) {
+            try{
+                $address->save();
+            }catch(Exception $e){
                 return response()
-                    ->json("The address resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                    ->json(new AddressResource($address), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
             $user['address_id'] = $address->id;
             $saveduser = $user->save();
