@@ -191,11 +191,6 @@ class UserController extends Controller
         $input['membership_id']=$request->membership_id; */
         $user = User::where('email', $request->email)->first();
         if (!$user) {
-            $input['password'] = Hash::make($request->password);
-            $input['remember_token'] = Str::random(10);
-            $user = User::create($input);
-            $token = $user->createToken('Laravel Password Grant')->accessToken;
-            $user['remember_token'] = $token; 
             $address = $request->address;
             $address = Address::create($address);
             try{
@@ -204,6 +199,13 @@ class UserController extends Controller
                 return response()
                     ->json(new AddressResource($address), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
+            
+            $input['password'] = Hash::make($request->password);
+            $input['remember_token'] = Str::random(10);
+            $user = User::create($input);
+            $token = $user->createToken('Laravel Password Grant')->accessToken;
+            $user['remember_token'] = $token; 
+            
             $user['address_id'] = $address->id;
             $saveduser = $user->save();
             if ($saveduser) {
