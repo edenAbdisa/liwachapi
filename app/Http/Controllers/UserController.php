@@ -198,19 +198,19 @@ class UserController extends Controller
             $address = Address::create($address); 
             try{
                 $address->save();
-            }catch(Exception $e){
+            }catch(\Illuminate\Database\QueryException $ex){
                 return response()
-                    ->json(new AddressResource($address), Response::HTTP_INTERNAL_SERVER_ERROR);
+                    ->json($ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-            $user->address_id = $address->id;
-            $saveduser = $user->save();
-            if ($saveduser) {
+            try{
+                $user->address_id = $address->id;
+                $saveduser = $user->save();
                 $user->address;
                 $user->membership;
                 return response(new UserResource($saveduser), Response::HTTP_CREATED);
-            } else {
+            }catch(\Illuminate\Database\QueryException $ex){
                 return response()
-                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                    ->json($ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         } else {
             return response()
