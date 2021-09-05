@@ -191,7 +191,7 @@ class UserController extends Controller
         $input['membership_id']=$request->membership_id; */
         $user = User::where('email', $request->email)->first();
         if (!$user) {
-            $user = User::create($input);
+            $user = new User($input);
             $user->password = Hash::make($request->password);        
             $user->remember_token  = $user->createToken('Laravel Password Grant')->accessToken;
             $address = $request->address;
