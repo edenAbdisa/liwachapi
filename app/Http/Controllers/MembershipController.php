@@ -80,6 +80,8 @@ class MembershipController extends Controller
      */
     public function store(Request $request)
     {
+        $membership = Membership::where('name', Str::ucfirst($request->name))->first();
+        if(!$membership){
         $input = $request->all();
         $input['name'] = Str::ucfirst($input['name']);
         $membership = new Membership($input);
@@ -95,6 +97,9 @@ class MembershipController extends Controller
             return response()
                 ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    } else {
+        return response()->json("This resource already exist.", Response::HTTP_CONFLICT);
+    }
     }
 
     /**
