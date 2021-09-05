@@ -207,7 +207,7 @@ class UserController extends Controller
                 $saveduser = $user->save();
                 $user->address;
                 $user->membership;
-                return response(new UserResource($saveduser), Response::HTTP_CREATED);
+                return response(new UserResource($user), Response::HTTP_CREATED);
             }catch(\Illuminate\Database\QueryException $ex){
                 return response()
                     ->json($ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
