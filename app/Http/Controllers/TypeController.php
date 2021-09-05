@@ -82,7 +82,9 @@ class TypeController extends Controller
      */
     public function store(Request $request)
     {
-        $type = Type::where('name', $request->name)->first();
+        $type = Type::where('name', Str::ucfirst($request->name))
+                    ->where('category_id',$request->category_id)
+                    ->first();
         if (!$type) {
             $type = new Type($request->all());
             $type->status="active"; 

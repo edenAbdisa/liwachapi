@@ -78,20 +78,28 @@ class ReportTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request->all();
-        $input['name'] = Str::ucfirst($input['name']);
-        $reporttype = new ReportType($input);
-        $reporttype->status="active"; 
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        //dd("line 81"); 
-        if ($reporttype->save()) {
-            return (new ReportTypeResource($reporttype))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        } else {
-            return response()
-                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+        $reportType = ReportType::where('report_detail', Str::ucfirst($request->report_detail))
+                               ->where('type_for',$request->type_for)
+                                ->first();       
+        if(!$reportType){
+            $input = $request->all();
+            $input['report_detail'] = Str::ucfirst($input['report_detail']);
+            $reporttype = new ReportType($input);
+            $reporttype->status="active"; 
+            //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+            //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
+            //dd("line 81"); 
+            if ($reporttype->save()) {
+                return (new ReportTypeResource($reporttype))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_CREATED);
+            } else {
+                return response()
+                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+        else{
+            return response()->json("This resource already exist.", Response::HTTP_CONFLICT);
         }
     }
 

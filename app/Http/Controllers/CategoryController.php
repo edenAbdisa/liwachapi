@@ -83,7 +83,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         //Str::upper(str)
-        $category = Category::where('name', $request->name)->first();
+        $category = Category::where('name', Str::ucfirst($request->name))->first();
         if (!$category) {
             $input = $request->all();
             $input['name'] = Str::ucfirst($input['name']);
