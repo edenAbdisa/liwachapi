@@ -1974,7 +1974,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ItemRequest"
+                                "$ref": "#/components/schemas/TypeRequest"
                             }
                         }
                     }
