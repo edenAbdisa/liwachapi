@@ -117,7 +117,7 @@ class ServiceController extends Controller
             //}
             $input = $request->all();
             $address = $request->address; 
-            $address = Address::create($address);            
+            $address = new Address($address);             
             $address->type = 'service';
             if ($address->save()) {
                 //$type = Type::where('name', $request->type_name)->first();

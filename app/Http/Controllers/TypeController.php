@@ -84,7 +84,8 @@ class TypeController extends Controller
     {
         $type = Type::where('name', $request->name)->first();
         if (!$type) {
-            $type = Type::create($request->all());
+            $type = new Type($request->all());
+            $type->status="active"; 
             //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
             //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
 

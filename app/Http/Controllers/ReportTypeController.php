@@ -79,8 +79,9 @@ class ReportTypeController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
-        $reporttype = ReportType::create($input);
         $input['name'] = Str::ucfirst($input['name']);
+        $reporttype = new ReportType($input);
+        $reporttype->status="active"; 
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 

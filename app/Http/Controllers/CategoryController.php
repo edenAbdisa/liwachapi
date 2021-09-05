@@ -87,7 +87,8 @@ class CategoryController extends Controller
         if (!$category) {
             $input = $request->all();
             $input['name'] = Str::ucfirst($input['name']);
-            $category = Category::create($input);
+            $category = new Category($input);
+            $category->status="active";
             //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
             //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST            
             if ($category->save()) {

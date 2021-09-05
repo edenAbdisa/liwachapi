@@ -82,7 +82,8 @@ class MembershipController extends Controller
     {
         $input = $request->all();
         $input['name'] = Str::ucfirst($input['name']);
-        $membership = Membership::create($input);
+        $membership = new Membership($input);
+        $membership->status="active"; 
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 

@@ -116,8 +116,8 @@ class ItemController extends Controller
             //}            
             $input = $request->all();
             $address = $request->address;         
-           // $address = json_decode($address, true,512,JSON_BIGINT_AS_STRING);
-            $address = Address::create($address);   
+            // $address = json_decode($address, true,512,JSON_BIGINT_AS_STRING);
+            $address = new Address($address);   
             $address->type='item';
             if ($address->save()) {
                 //$type = Type::where('id', $request->type_name)->first();
@@ -127,7 +127,7 @@ class ItemController extends Controller
                     $input['number_of_request'] = 0;
                     $input['bartering_location_id'] = $address->id;
                    // $input['type_id'] = $type->id;
-                   // $input['picture'] = $filename;
+                   // $input['picture'] = $filename;                    
                     $item = Item::create($input);
                     if ($item->save()) {
                         $itemSwapType = $request->swap_type;

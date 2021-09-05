@@ -195,7 +195,11 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);        
             $user->remember_token  = $user->createToken('Laravel Password Grant')->accessToken;
             $address = $request->address;
-            $address = Address::create($address); 
+            $address = Address::create($address);
+            if($user->type==="organization"){
+                $user->status="pending";
+            } 
+            $user->status="active";
             try{
                 $address->save();
             }catch(\Illuminate\Database\QueryException $ex){
