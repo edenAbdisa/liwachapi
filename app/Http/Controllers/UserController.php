@@ -333,11 +333,12 @@ class UserController extends Controller
             $address->latitude=(float)$address_to_be_updated['latitude'];  
             $address->longitude=(float)$address_to_be_updated['longitude'];        
             $address->save(); 
-       } 
+        } 
+        $user=$user->fill($input);
         if ($request->password) {
             $user->password = Hash::make($request->password);
         }
-        if ($user->fill($input)->save()) {
+        if ($user->save()) {
             $user->address;
             $user->membership;
             return (new UserResource($user))
