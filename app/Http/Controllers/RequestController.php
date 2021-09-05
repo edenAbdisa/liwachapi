@@ -49,7 +49,9 @@ class RequestController extends Controller
             ->each(function ($item, $key) {
                 $item->requester;
                 $item->requested_item;
-                $item->requester_item;
+                $item->requester_item;                
+                $item->requested_item->type;
+                $item->requester_item->type;
             });
         return (new RequestResource($requestOrder))
             ->response()
