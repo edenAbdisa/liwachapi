@@ -28,7 +28,9 @@ class ItemController extends Controller
      */
     public function index()
     {
-        $items = Item::all()->each(function ($item, $key) {
+        $items = Item::where('status','!=','deleted')
+                 ->orWhereNull('status')->get()
+                 ->each(function ($item, $key) {
             $item->itemSwapType->each(function ($type, $key) {
                 $type->type;
             });

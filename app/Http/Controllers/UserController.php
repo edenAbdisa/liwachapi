@@ -43,7 +43,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::all()
+        $user = User::where('status','!=','deleted')
+        ->orWhereNull('status')->get()
             ->each(function ($item, $key) {
                 $item->address;
                 $item->membership;

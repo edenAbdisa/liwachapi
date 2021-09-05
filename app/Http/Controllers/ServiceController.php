@@ -46,7 +46,8 @@ class ServiceController extends Controller
     {
         //abort_if(Gate::denies('service_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get()
-        $service = Service::all()
+        $service = Service::where('status','!=','deleted')
+            ->orWhereNull('status')->get()
             ->each(function ($item, $key) {
                 $item->media;
                 $item->bartering_location;

@@ -44,7 +44,8 @@ class RequestController extends Controller
     {
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        $requestOrder = RequestOrder::all()
+        $requestOrder = RequestOrder::where('status','!=','deleted')
+        ->orWhereNull('status')->get()
             ->each(function ($item, $key) {
                 $item->requester;
                 $item->requested_item;
@@ -229,6 +230,8 @@ class RequestController extends Controller
             $item->requester;
             $item->requested_item;
             $item->requester_item;
+            $item->requested_item->type;
+            $item->requester_item->type;
         });
         return response()->json($requests, 200);
     }

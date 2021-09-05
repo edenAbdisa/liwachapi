@@ -38,7 +38,6 @@ Route::get('/user/countByDate/{attribute}/{start}/{end}', 'UserController@userCo
 Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
 Route::get('/itemswaptype', 'ItemSwapTypeController@index');
 
-
 Route::post('/address/search', 'AddressController@search');
 Route::post('/address', 'AddressController@store');
 Route::put('/address/{id}', 'AddressController@update');
