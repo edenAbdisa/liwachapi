@@ -195,9 +195,7 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);        
             $user->remember_token  = $user->createToken('Laravel Password Grant')->accessToken;
             $address = $request->address;
-            $address = Address::create($address);
-            return response()
-                    ->json(new AddressResource($address), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $address = Address::create($address); 
             try{
                 $address->save();
             }catch(Exception $e){
