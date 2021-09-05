@@ -38,6 +38,7 @@ class ItemController extends Controller
             $item->type;
             $item->user;
             $item->media;
+            $item->request;
         });
         return (new ItemResource($items))
             ->response()
@@ -160,6 +161,7 @@ class ItemController extends Controller
                         });
                         $item->user; 
                         $item->media;
+                        $item->request;
                         return (new ItemResource($item))
                             ->response()
                             ->setStatusCode(Response::HTTP_CREATED);
@@ -203,7 +205,7 @@ class ItemController extends Controller
             $item->media;
             $item->bartering_location;
             $item->type;
-            $item->user;
+            $item->user; 
             $item->itemSwapType->each(function ($type, $key) {
                 $type->type;
             });
@@ -266,6 +268,7 @@ class ItemController extends Controller
             $item->bartering_location;
             $item->type;
             $item->user;
+            $item->request;
             $item->itemSwapType->each(function ($type, $key) {
                 $type->type;
             });

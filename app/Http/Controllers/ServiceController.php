@@ -53,6 +53,7 @@ class ServiceController extends Controller
                 $item->bartering_location;
                 $item->type;
                 $item->user;
+                $item->request;
                 $item->serviceSwapType->each(function ($type, $key) {
                     $type->type;
                 });
@@ -159,6 +160,7 @@ class ServiceController extends Controller
                         $service->bartering_location;
                         $service->type;
                         $service->user;
+                        $service->request;
                         $service->serviceSwapType->each(function ($type, $key) {
                             $type->type;
                         });
@@ -260,6 +262,7 @@ class ServiceController extends Controller
             $item->bartering_location;
             $item->type;
             $item->user;
+            $item->request;
             $item->serviceSwapType->each(function ($type, $key) {
                 $type->type;
             });
@@ -359,6 +362,7 @@ class ServiceController extends Controller
             $service->bartering_location;
             $service->type;
             $service->user;
+            $service->request;
             $service->serviceSwapType->each(function ($type, $key) {
                 $type->type;
             });
