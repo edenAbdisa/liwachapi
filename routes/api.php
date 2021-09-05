@@ -109,6 +109,12 @@ Route::put('/type/{id}', 'TypeController@update');
 Route::delete('/type/{id}', 'TypeController@destroy');
 
 
+Route::get('/subscription', 'SubscriptionController@index');
+Route::post('/subscription/search', 'SubscriptionController@search');
+Route::post('/subscription', 'SubscriptionController@store');
+Route::put('/subscription/{id}', 'SubscriptionController@update');
+Route::delete('/subscription/{id}', 'SubscriptionController@destroy');
+
 Route::get('/media', 'MediaController@index');
 Route::post('/media/search', 'MediaController@search');
 Route::post('/media', 'MediaController@store');
