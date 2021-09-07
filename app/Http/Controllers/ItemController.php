@@ -140,8 +140,8 @@ class ItemController extends Controller
                     'errors' => [
                         [
                             'status' => Response::HTTP_OK,
-                            'title' => 'Address doesnt exist',
-                            'message' => "An address by the given inputs doesnt exist."
+                            'title' => 'List of address with their item.',
+                            'message' => "These are the list of items near the address you choose."
                         ],
                     ]
                 ], Response::HTTP_NO_CONTENT); 
