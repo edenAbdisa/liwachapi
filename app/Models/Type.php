@@ -11,7 +11,8 @@ class Type extends Model
     protected $fillable = [
         'name',
         'category_id',
-        'status'
+        'status',
+        'used_for'
     ];
     protected $casts = [
         'created_at' => 'datetime:Y-m-d',

@@ -18,6 +18,7 @@ class CreateTypesTable extends Migration
             $table->string('name', 50)->nullable();            
             $table->string('status', 50)->nullable();
             $table->bigInteger('category_id')->unsigned()->nullable();
+            $table->string('used_for', 50);
             $table->timestamps();
             $table->foreign('category_id')->references('id')->on('categories');
         });

@@ -3042,6 +3042,12 @@
                         "type": "string",
                         "example": "Car is machine used to...."
                     },
+                    "picture": {
+                        "title": "Main picture",
+                        "description": "Main picture of the item",
+                        "type": "string",
+                        "example": "Link"
+                    },
                     "media": {
                         "title": "Media",
                         "description": "List containing the name of the types",
@@ -3101,6 +3107,12 @@
                         "description": "Name of the item",
                         "type": "string",
                         "example": "car"
+                    },
+                    "picture": {
+                        "title": "Main picture",
+                        "description": "Main picture of the item",
+                        "type": "string",
+                        "example": "Link"
                     },
                     "description": {
                         "title": "Description",
@@ -3176,6 +3188,12 @@
                             "url link",
                             "url link"
                         ]
+                    },
+                    "picture": {
+                        "title": "Main picture",
+                        "description": "Main picture of the item",
+                        "type": "string",
+                        "example": "Link"
                     },
                     "status": {
                         "title": "status",
@@ -3577,6 +3595,12 @@
                         "type": "string",
                         "example": "Plumbering"
                     },
+                    "picture": {
+                        "title": "Main picture",
+                        "description": "Main picture of the item",
+                        "type": "string",
+                        "example": "Link"
+                    },
                     "media": {
                         "title": "Media",
                         "description": "List containing the url",
@@ -3669,6 +3693,12 @@
                         "type": "string",
                         "example": "Plumbering"
                     },
+                    "picture": {
+                        "title": "Main picture",
+                        "description": "Main picture of the item",
+                        "type": "string",
+                        "example": "Link"
+                    },
                     "description": {
                         "title": "Description",
                         "description": "Description of the service",
@@ -3731,6 +3761,12 @@
                         "description": "Name of the service",
                         "type": "string",
                         "example": "Plumbering"
+                    },
+                    "picture": {
+                        "title": "Main picture",
+                        "description": "Main picture of the item",
+                        "type": "string",
+                        "example": "Link"
                     },
                     "description": {
                         "title": "Description",

@@ -10,7 +10,8 @@ class Category extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'status'
+        'status',
+        'used_for'
     ];
     protected $casts = [
         'created_at' => 'datetime:Y-m-d',
