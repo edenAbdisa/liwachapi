@@ -119,7 +119,7 @@ class ItemController extends Controller
                             [
                                 'status' => 500,
                                 'title' => 'Internal server error',
-                                'message' => 'The number of request couldnt be updated'
+                                'message' => $ex->getMessage()
                             ],
                         ]
                     ], Response::HTTP_INTERNAL_SERVER_ERROR);
