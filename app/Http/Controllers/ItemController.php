@@ -16,7 +16,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ItemController extends Controller
 {
 
@@ -85,7 +85,8 @@ class ItemController extends Controller
     }
     public function itemsByLocation(Request $request)
     {
-        $input = $request->all();
+        try {
+            $input = $request->all();
         $addresses = Address::where('city', $input['city'])->where('type', 'item')->get();
         $addresses->each(function ($address, $key) {            
             $address->item->itemSwapType;
@@ -97,6 +98,12 @@ class ItemController extends Controller
             });
         });
         return response()->json($addresses, 200);
+        } catch (ModelNotFoundException $ex) { // User not found
+            abort(422, 'Invalid email: administrator not found');
+        } catch (Exception $ex) { // Anything that went wrong
+            abort(500, 'Could not create office or assign it to administrator');
+        }      
+        
     }
     /**
      * Store a newly created resource in storage.
