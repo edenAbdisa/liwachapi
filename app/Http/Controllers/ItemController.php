@@ -125,7 +125,7 @@ class ItemController extends Controller
                             'message' => "An address by the given inputs doesnt exist."
                         ],
                     ]
-                ], Response::HTTP_NO_CONTENT);
+                ], Response::HTTP_OK);
             }
             
             return response()
