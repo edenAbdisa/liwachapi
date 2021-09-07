@@ -2894,6 +2894,12 @@
                         "format": "int64",
                         "example": 1
                     },
+                    "used_for": {
+                        "title": "Used by",
+                        "description": "User for",
+                        "type": "string",
+                        "example": "item or service"
+                    },
                     "name": {
                         "title": "Category name",
                         "description": "Category name",
@@ -2928,6 +2934,12 @@
                         "description": "Category name",
                         "type": "string",
                         "example": "Garments"
+                    },
+                    "used_for": {
+                        "title": "Used by",
+                        "description": "User for",
+                        "type": "string",
+                        "example": "item or service"
                     },                  
                     "status": {
                         "title": "Status",
@@ -3836,6 +3848,12 @@
                         "type": "string",
                         "example": "A nice project"
                     },
+                    "used_for": {
+                        "title": "Used by",
+                        "description": "User for",
+                        "type": "string",
+                        "example": "item or service"
+                    },
                     "status": {
                         "title": "Status",
                         "description": "Describes if the type data is deleted ,active",
@@ -3872,6 +3890,12 @@
                         "description": "This type is under a certain category.",
                         "type": "big integer",
                         "example": 123
+                    },
+                    "used_for": {
+                        "title": "Used by",
+                        "description": "User for",
+                        "type": "string",
+                        "example": "item or service"
                     },
                     "status": {
                         "title": "Status",
