@@ -125,8 +125,7 @@ class ItemController extends Controller
                     ]
                 ], Response::HTTP_NO_CONTENT);
             }
-            $addresses->each(function ($address, $key) {            
-            $address->item->itemSwapType;
+            $addresses->each(function ($address, $key) {  
             $address->item->user;
             $address->item->bartering_location;
             $address->item->media;
