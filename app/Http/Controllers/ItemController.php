@@ -111,7 +111,7 @@ class ItemController extends Controller
             $addresses = Address::where('latitude', $input['latitude'])
                                   ->where('longitude', $input['longitude'])
                                   ->where('type', 'item')->get();
-            if(!$addresses ){
+            if($addresses->empty() ){
                 return response()
                 ->json([
                     'data' =>null,
@@ -125,14 +125,7 @@ class ItemController extends Controller
                     ]
                 ], Response::HTTP_NO_CONTENT);
             }
-            $addresses->each(function ($address, $key) {  
-            $address->item->user;
-            $address->item->bartering_location;
-            $address->item->media;
-            $address->item->itemSwapType->each(function ($type, $key) {
-                $type->type;
-            });
-            });
+            
             return response()
                 ->json([
                     'data' =>$addresses,
