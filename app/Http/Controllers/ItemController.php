@@ -19,6 +19,8 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use PhpParser\Node\Expr\Cast\Double;
+
 class ItemController extends Controller
 {
 
@@ -108,13 +110,13 @@ class ItemController extends Controller
                     ]
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $addresses = Address::where('latitude', $input['latitude'])
-                                  ->where('longitude', $input['longitude'])
+            $addresses = Address::where('latitude',(Double) $input['latitude'])
+                                  ->where('longitude',(Double)  $input['longitude'])
                                   ->where('type', 'item')->get();
             if($addresses->empty() ){
                 return response()
                 ->json([
-                    'data' =>null,
+                    'data' =>"null",
                     'success' => false,
                     'errors' => [
                         [
