@@ -85,8 +85,17 @@ class ItemController extends Controller
     }
     public function itemsByLocation(Request $request)
     {
+        $input = $request->all();
         try {
-            $input = $request->all();
+            
+            $validatedData = $request->validate([
+                'country' => ['required', 'max:50'],
+                'city' => ['required','max:50'],
+                'latitude' => ['required'],
+                'longitude' => ['required'],
+                'type' => ['required','max:10'],
+            ]);
+            
             $addresses = Address::where('latitude', $input['latitude'])
                                   ->where('longitude', $input['longitude'])
                                   ->where('type', 'item')->get();
@@ -105,6 +114,7 @@ class ItemController extends Controller
         } catch (Exception $ex) { // Anything that went wrong
             return response()
                     ->json([
+                        'success' => false,
                         'errors' => [
                             [
                                 'status' => 500,
@@ -113,7 +123,7 @@ class ItemController extends Controller
                             ],
                         ]
                     ], Response::HTTP_INTERNAL_SERVER_ERROR);
-                      }      
+        }      
         
     }
     /**
