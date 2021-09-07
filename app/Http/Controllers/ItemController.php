@@ -87,8 +87,10 @@ class ItemController extends Controller
     {
         try {
             $input = $request->all();
-        $addresses = Address::where('city', $input['city'])->where('type', 'item')->get();
-        $addresses->each(function ($address, $key) {            
+            $addresses = Address::where('latitude', $input['latitude'])
+                                  ->where('longitude', $input['longitude'])
+                                  ->where('type', 'item')->get();
+            $addresses->each(function ($address, $key) {            
             $address->item->itemSwapType;
             $address->item->user;
             $address->item->bartering_location;
@@ -96,13 +98,22 @@ class ItemController extends Controller
             $address->item->itemSwapType->each(function ($type, $key) {
                 $type->type;
             });
-        });
-        return response()->json($addresses, 200);
+            });
+            return response()->json($addresses, 200);
         } catch (ModelNotFoundException $ex) { // User not found
             abort(422, 'Invalid email: administrator not found');
         } catch (Exception $ex) { // Anything that went wrong
-            abort(500, 'Could not create office or assign it to administrator');
-        }      
+            return response()
+                    ->json([
+                        'errors' => [
+                            [
+                                'status' => 500,
+                                'title' => 'Internal server error',
+                                'message' => 'The number of request couldnt be updated'
+                            ],
+                        ]
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                      }      
         
     }
     /**

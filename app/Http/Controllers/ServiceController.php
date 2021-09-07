@@ -196,7 +196,9 @@ class ServiceController extends Controller
     public function serviceByLocation(Request $request)
     {
         $input = $request->all();
-        $addresses = Address::where('city', $input['city'])->where('type', 'service')->get();
+        $addresses = Address::where('latitude', $input['latitude'])
+                            ->where('longitude', $input['longitude'])
+                            ->where('type', 'service')->get();
         $addresses->each(function ($address, $key) {
             $address->service->serviceSwapType;
             $address->service->user;
