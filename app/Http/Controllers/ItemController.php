@@ -126,7 +126,7 @@ class ItemController extends Controller
                 ], Response::HTTP_OK);
             }
             $addresses->each(function ($address, $key) { 
-                 
+
                 $address->item->user;
                 $address->item->bartering_location;
                 $address->item->media;
@@ -145,7 +145,7 @@ class ItemController extends Controller
                             'message' => "These are the list of items near the address you choose."
                         ],
                     ]
-                ], Response::HTTP_NO_CONTENT); 
+                ], Response::HTTP_OK); 
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
                     ->json([
