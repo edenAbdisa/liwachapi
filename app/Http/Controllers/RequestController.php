@@ -121,7 +121,7 @@ class RequestController extends Controller
         //dd("line 81"); 
         $request_already_exist=RequestOrder::where('requester_id',$request->requester_id)
                                ->where('status','!=','expired')
-                               ->where('requested_item_id',$request->requested_item_id)->get();
+                               ->where('requested_item_id',$request->requested_item_id)->first();
         if($request_already_exist){
             //Can add set data to send a datamessage fitsums
             return (new RequestResource($request_already_exist))
