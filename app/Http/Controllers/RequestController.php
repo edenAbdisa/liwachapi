@@ -128,15 +128,15 @@ class RequestController extends Controller
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         }
-        $request = new RequestOrder($request->all());
-        $request->status="pending"; 
-        $request->token=Hash::make(Str::random());
-        if ($request->save()) {
-            $request->requester;
-            $request->requested_item;
-            $request->requester_item;
-            if ($request->type==='item') {
-                $requested_item=Item::where('id',$request->requested_item_id);
+        $requestOrder = new RequestOrder($request->all());
+        $requestOrder->status="pending"; 
+        $requestOrder->token=Hash::make(Str::random());
+        if ($requestOrder->save()) {
+            $requestOrder->requester;
+            $requestOrder->requested_item;
+            $requestOrder->requester_item;
+            if ($requestOrder->type==='item') {
+                $requested_item=Item::where('id',$request->requested_item_id)->first();
                 $requested_item->number_of_request=(int)$requested_item->number_of_request + 1;
                 if(!$requested_item->save()){
                     return response()
@@ -154,7 +154,7 @@ class RequestController extends Controller
                 // $requester_item->number_of_request=$requester_item->number_of_request+1;
                 // $requester_item->save();
             }else{
-                $requested_service=Service::where('id',$request->requested_item_id);
+                $requested_service=Service::where('id',$request->requested_item_id)->first();
                 $requested_service->number_of_request=(int)$requested_service->number_of_request+1;
                 if(!$requested_service->save()){
                     return response()
@@ -172,7 +172,7 @@ class RequestController extends Controller
                 // $requester_service->number_of_request=$requester_service->number_of_request+1;
                 // $requester_service->save();
             }
-            return (new RequestResource($request))
+            return (new RequestResource($requestOrder))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         } else {
