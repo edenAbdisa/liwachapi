@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 class ItemController extends Controller
 {
 
@@ -88,17 +90,30 @@ class ItemController extends Controller
         $input = $request->all();
         try {
             
-            $validatedData = $request->validate([
+            Validator::make($request->all(),[
                 'country' => ['required', 'max:50'],
                 'city' => ['required','max:50'],
-                'latitude' => ['required'],
-                'longitude' => ['required'],
+                'latitude' => ['required','numeric'],
+                'longitude' => ['required','numeric'],
                 'type' => ['required','max:10'],
             ]);
             
             $addresses = Address::where('latitude', $input['latitude'])
                                   ->where('longitude', $input['longitude'])
                                   ->where('type', 'item')->get();
+            if(!$addresses ){
+                return response()
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_NO_CONTENT,
+                            'title' => 'Address doesnt exist',
+                            'message' => "An address by the given inputs doesnt exist"
+                        ],
+                    ]
+                ], Response::HTTP_NO_CONTENT);
+            }
             $addresses->each(function ($address, $key) {            
             $address->item->itemSwapType;
             $address->item->user;
