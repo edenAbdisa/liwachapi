@@ -90,14 +90,27 @@ class ItemController extends Controller
         $input = $request->all();
         try {
             
-            $validatedData = $request->validate([
+            $validatedData = Validator::make($request->all(),[
                 'country' => ['required', 'max:50'],
                 'city' => ['required','max:50'],
                 'latitude' => ['required','numeric'],
                 'longitude' => ['required','numeric'],
                 'type' => ['required','max:10'],
             ]);
-            
+            if ($validatedData->fails()) {
+                return response()
+                ->json([
+                    'data' =>null,
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_BAD_REQUEST,
+                            'title' => $validatedData,
+                            'message' => $validatedData->errors()
+                        ],
+                    ]
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $addresses = Address::where('latitude', $input['latitude'])
                                   ->where('longitude', $input['longitude'])
                                   ->where('type', 'item')->get();
