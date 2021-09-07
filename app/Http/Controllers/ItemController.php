@@ -90,12 +90,9 @@ class ItemController extends Controller
         $input = $request->all();
         try {
             
-            $validatedData = Validator::make($request->all(),[
-                'country' => ['required', 'max:50'],
-                'city' => ['required','max:50'],
+            $validatedData = Validator::make($request->all(),[ 
                 'latitude' => ['required','numeric'],
-                'longitude' => ['required','numeric'],
-                'type' => ['required','max:10'],
+                'longitude' => ['required','numeric']
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -105,7 +102,7 @@ class ItemController extends Controller
                     'errors' => [
                         [
                             'status' => Response::HTTP_BAD_REQUEST,
-                            'title' => $validatedData,
+                            'title' => "Validation failed check JSON request",
                             'message' => $validatedData->errors()
                         ],
                     ]
@@ -123,7 +120,7 @@ class ItemController extends Controller
                         [
                             'status' => Response::HTTP_NO_CONTENT,
                             'title' => 'Address doesnt exist',
-                            'message' => "An address by the given inputs doesnt exist"
+                            'message' => "An address by the given inputs doesnt exist."
                         ],
                     ]
                 ], Response::HTTP_NO_CONTENT);
@@ -137,9 +134,30 @@ class ItemController extends Controller
                 $type->type;
             });
             });
-            return response()->json($addresses, 200);
+            return response()
+                ->json([
+                    'data' =>$addresses,
+                    'success' => true,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_OK,
+                            'title' => 'Address doesnt exist',
+                            'message' => "An address by the given inputs doesnt exist."
+                        ],
+                    ]
+                ], Response::HTTP_NO_CONTENT); 
         } catch (ModelNotFoundException $ex) { // User not found
-            abort(422, 'Invalid email: administrator not found');
+            return response()
+                    ->json([
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                                'title' => 'The model doesnt exist.',
+                                'message' => $ex->getMessage()
+                            ],
+                        ]
+                    ], Response::HTTP_UNPROCESSABLE_ENTITY); 
         } catch (Exception $ex) { // Anything that went wrong
             return response()
                     ->json([
