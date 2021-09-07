@@ -28,14 +28,14 @@ class Address extends Model
     ];
     public function user()
     {
-        return $this->hasOne(User::class);
+        return $this->hasOne(User::class,'id','address_id');
     }
     public function item()
     {
-        return $this->hasOne(Item::class, 'bartering_location_id');
+        return $this->hasOne(Item::class,'id', 'bartering_location_id');
     }
     public function service()
     {
-        return $this->hasOne(Service::class, 'bartering_location_id');
+        return $this->hasOne(Service::class,'id', 'bartering_location_id');
     }
 }
