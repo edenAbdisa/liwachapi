@@ -40,7 +40,18 @@ class AddressController extends Controller
     {
         //abort_if(Gate::denies('address_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        return (new AddressResource(Address::all()))
+        $addresses=Address::all();
+        $addresses->each(function ($address, $key) { 
+
+            $address->item->user;
+            $address->item->bartering_location;
+            $address->item->media;
+            $address->item->itemSwapType->each(function ($type, $key) {
+                $type->type;
+            });
+        });
+
+        return ($addresses)
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
