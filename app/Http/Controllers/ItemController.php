@@ -127,12 +127,7 @@ class ItemController extends Controller
             }
             $addresses->each(function ($address, $key) { 
 
-                $address->item->user;
-                $address->item->bartering_location;
-                $address->item->media;
-                $address->item->itemSwapType->each(function ($type, $key) {
-                    $type->type;
-                });
+                $address->item ;
             });
             return response()
                 ->json([
