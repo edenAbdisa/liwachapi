@@ -111,11 +111,11 @@ class ItemController extends Controller
             $addresses = Address::where('latitude', $input['latitude'])
                                   ->where('longitude', $input['longitude'])
                                   ->where('type', 'item')->get();
-            if($addresses->empty() ){
+            if(!$addresses ){
                 return response()
                 ->json([
-                    'data' => $input['latitude'],
-                    'success' =>  $addresses,
+                    'data' => $addresses,
+                    'success' =>  false,
                     'errors' => [
                         [
                             'status' => Response::HTTP_NO_CONTENT,
