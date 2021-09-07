@@ -90,7 +90,7 @@ class ItemController extends Controller
         $input = $request->all();
         try {
             
-            Validator::make($request->all(),[
+            $validatedData = $request->validate([
                 'country' => ['required', 'max:50'],
                 'city' => ['required','max:50'],
                 'latitude' => ['required','numeric'],
@@ -104,6 +104,7 @@ class ItemController extends Controller
             if(!$addresses ){
                 return response()
                 ->json([
+                    'data' =>null,
                     'success' => false,
                     'errors' => [
                         [
