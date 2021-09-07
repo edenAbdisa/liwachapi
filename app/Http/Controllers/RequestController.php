@@ -130,9 +130,8 @@ class RequestController extends Controller
         }
         $request = new RequestOrder($request->all());
         $request->status="pending"; 
+        $request->token=Hash::make(Str::random());
         if ($request->save()) {
-            $request->token=Hash::make(Str::random());
-            $request->save();
             $request->requester;
             $request->requested_item;
             $request->requester_item;
@@ -161,8 +160,16 @@ class RequestController extends Controller
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         } else {
-            return response()
-                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->mess
+                ->json([
+                    'errors' => [
+                        [
+                            'status' => 500,
+                            'title' => 'Internal server error',
+                            'message' => 'A more detailed error message to show the end user'
+                        ],
+                    ]
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
     public function requestCountByDate($attribute,$start,$end)
