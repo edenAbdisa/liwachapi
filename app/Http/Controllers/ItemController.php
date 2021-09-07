@@ -125,7 +125,8 @@ class ItemController extends Controller
                     ]
                 ], Response::HTTP_OK);
             }
-            $addresses->each(function ($address, $key) {  
+            $addresses->each(function ($address, $key) { 
+                 
                 $address->item->user;
                 $address->item->bartering_location;
                 $address->item->media;

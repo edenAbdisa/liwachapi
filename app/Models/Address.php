@@ -21,6 +21,8 @@ class Address extends Model
         'type'
     ];
     protected $casts = [
+        'latitude' => 'double',
+        'longitude' => 'double',
         'created_at' => 'datetime:Y-m-d',
         'updated_at' => 'datetime:Y-m-d',
     ];
