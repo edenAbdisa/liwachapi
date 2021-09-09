@@ -346,7 +346,7 @@ class CategoryController extends Controller
                 ]
             ], Response::HTTP_CONFLICT); 
         }
-        if (in_array('name', $input)) {            
+        if ($request->name) {            
             $category = Category::where('name', Str::ucfirst($request->name))->first();
             if ($category) {
                 $category->type;
@@ -361,7 +361,8 @@ class CategoryController extends Controller
                             'message' => "This category already exist in the database."
                         ],
                     ]
-                ], Response::HTTP_CONFLICT);        }
+                ], Response::HTTP_CONFLICT);        
+            }
             $input['name'] = Str::ucfirst($input['name']);
         }
         if ($category_to_be_updated->fill($input)->save()) {
