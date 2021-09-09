@@ -357,7 +357,8 @@ class TypeController extends Controller
         }}
         if ($request->category_id) {
             $category = Category::where('id', $request->category_id)->first();
-            if ($category==null){
+            if ($category){}
+            else{
                 return response()
                 ->json([
                     'data' =>$category ,
