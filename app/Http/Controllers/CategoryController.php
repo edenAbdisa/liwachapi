@@ -47,8 +47,8 @@ class CategoryController extends Controller
             ->each(function ($item, $key) {
                 $item->type;
             });
-        return response()
-            ->json(new CategoryResource($categories), Response::HTTP_OK);
+        return (new CategoryResource($categories))->response()
+            ->setStatusCode(Response::HTTP_OK);
         /* try{
             $categories = Category::where('status', '!=', 'deleted')->orWhereNull('status')->get()
             ->each(function ($item, $key) {
