@@ -310,9 +310,11 @@ class ReportTypeController extends Controller
                 ]
             ], Response::HTTP_CONFLICT); 
         }
-            if (in_array('report_detail', $input)) {
+            if ($request->report_detail) {
                 $reporttype = ReportType::where('report_detail', Str::ucfirst($request->name))->first();
-                if ($reporttype) {
+                if ($reporttype && $request->used_for) {
+                    $used_for_is_same= strcmp($reporttype->used_for,$request->used_for)==0?true:false;            
+            if ($used_for_is_same) {
                     return response()
                 ->json([
                     'data' =>$reporttype ,
@@ -326,7 +328,7 @@ class ReportTypeController extends Controller
                     ]
                 ], Response::HTTP_CONFLICT);  }
                 $input['report_detail'] = Str::ucfirst($input['report_detail']);
-            }
+            }}
             if ($reporttype_to_be_edited->fill($input)->save()) {
                 return response()
                 ->json([

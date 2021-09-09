@@ -315,7 +315,7 @@ class MembershipController extends Controller
                 ]
             ], Response::HTTP_CONFLICT); 
         }
-        if (in_array('name', $input)) {
+        if ($request->name) {
             $membership = Membership::where('name', Str::ucfirst($request->name))->first();
             if ($membership) {
                 return response()

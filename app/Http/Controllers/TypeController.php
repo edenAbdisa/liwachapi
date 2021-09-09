@@ -335,9 +335,11 @@ class TypeController extends Controller
                 ]
             ], Response::HTTP_CONFLICT); 
         }
-        if (in_array('name', $input)) {
+        if ($request->name) {
             $type = Type::where('name', Str::ucfirst($request->name))->first();
-            if ($type) {
+            if($type && $request->used_for){
+                $used_for_is_same= strcmp($type->used_for,$request->used_for)==0?true:false;            
+            if ($used_for_is_same) {
                 return response()
                 ->json([
                     'data' =>$type ,
@@ -352,8 +354,8 @@ class TypeController extends Controller
                 ], Response::HTTP_CONFLICT); 
             }
             $input['name'] = Str::ucfirst($input['name']);
-        }
-        if (in_array('category_id', $input)) {
+        }}
+        if ($request->category_id) {
             $category = Category::where('id', $request->category_id)->first();
             if (!$category) {
                 return response()
