@@ -296,7 +296,20 @@ class ReportTypeController extends Controller
             }
         $input = $request->all();
         $reporttype_to_be_edited = ReportType::where('id', $id)->first();
-        if ($reporttype_to_be_edited) {
+        if(!$reporttype_to_be_edited){
+            return response()
+            ->json([
+                'data' =>null ,
+                'success' => false,
+                'errors' => [
+                    [
+                        'status' => Response::HTTP_CONFLICT,
+                        'title' => 'Report type doesnt exist.',
+                        'message' => "This report type doesnt exist in the database."
+                    ],
+                ]
+            ], Response::HTTP_CONFLICT); 
+        }
             if (in_array('report_detail', $input)) {
                 $reporttype = ReportType::where('report_detail', Str::ucfirst($request->name))->first();
                 if ($reporttype) {
@@ -342,7 +355,7 @@ class ReportTypeController extends Controller
                     ], Response::HTTP_INTERNAL_SERVER_ERROR); 
                 }
             }
-            }catch (ModelNotFoundException $ex) { // User not found
+            catch (ModelNotFoundException $ex) { // User not found
                 return response()
                         ->json([
                             'success' => false,

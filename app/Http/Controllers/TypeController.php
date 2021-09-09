@@ -321,6 +321,20 @@ class TypeController extends Controller
             }
         $input = $request->all();
         $type_to_be_updated = Type::where('id', $id)->first();
+        if(!$type_to_be_updated){
+            return response()
+            ->json([
+                'data' =>null ,
+                'success' => false,
+                'errors' => [
+                    [
+                        'status' => Response::HTTP_CONFLICT,
+                        'title' => 'Type doesnt exist.',
+                        'message' => "This type doesnt exist in the database."
+                    ],
+                ]
+            ], Response::HTTP_CONFLICT); 
+        }
         if (in_array('name', $input)) {
             $type = Type::where('name', Str::ucfirst($request->name))->first();
             if ($type) {

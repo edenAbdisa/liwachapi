@@ -300,7 +300,21 @@ class MembershipController extends Controller
                 ], Response::HTTP_BAD_REQUEST);
             }
         $input = $request->all();
-        $membership_to_be_updated = Membership::where('id', $id)->first();
+        $membership_to_be_updated = Membership::where('id', $id)->first(); 
+        if(!$membership_to_be_updated){
+            return response()
+            ->json([
+                'data' =>null ,
+                'success' => false,
+                'errors' => [
+                    [
+                        'status' => Response::HTTP_CONFLICT,
+                        'title' => 'Membership doesnt exist.',
+                        'message' => "This membership doesnt exist in the database."
+                    ],
+                ]
+            ], Response::HTTP_CONFLICT); 
+        }
         if (in_array('name', $input)) {
             $membership = Membership::where('name', Str::ucfirst($request->name))->first();
             if ($membership) {

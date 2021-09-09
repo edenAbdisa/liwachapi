@@ -332,6 +332,20 @@ class CategoryController extends Controller
             ], Response::HTTP_BAD_REQUEST);
         }
         $category_to_be_updated = Category::where('id', $id)->first();
+        if(!$category_to_be_updated){
+            return response()
+            ->json([
+                'data' =>null ,
+                'success' => false,
+                'errors' => [
+                    [
+                        'status' => Response::HTTP_CONFLICT,
+                        'title' => 'Category doesnt exist.',
+                        'message' => "This category doesnt exist in the database."
+                    ],
+                ]
+            ], Response::HTTP_CONFLICT); 
+        }
         if (in_array('name', $input)) {            
             $category = Category::where('name', Str::ucfirst($request->name))->first();
             if ($category) {
