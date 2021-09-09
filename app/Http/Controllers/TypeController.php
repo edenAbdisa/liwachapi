@@ -337,9 +337,10 @@ class TypeController extends Controller
         }
         if ($request->name) {
             $type = Type::where('name', Str::ucfirst($request->name))->first();
-            if($type && $request->used_for){
-                $used_for_is_same= strcmp($type->used_for,$request->used_for)==0?true:false;            
-            if ($used_for_is_same) {
+            if($type && $request->category_id){
+                
+                $category_is_same= strcmp($type->category_id,$request->category_id)==0?true:false;            
+            if ($category_is_same) {
                 return response()
                 ->json([
                     'data' =>$type ,
@@ -356,9 +357,11 @@ class TypeController extends Controller
             $input['name'] = Str::ucfirst($input['name']);
         }}
         if ($request->category_id) {
-            $category = Category::where('id', $request->category_id)->first();
-            if ($category){}
-            else{
+            $category = Category::where('id', $request->category_id)->
+                                  where('status', 'active')->first();
+            if ($category){
+                $type_to_be_updated->used_for=$category->used_for;
+            }else{
                 return response()
                 ->json([
                     'data' =>$category ,
