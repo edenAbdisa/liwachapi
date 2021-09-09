@@ -348,7 +348,9 @@ class CategoryController extends Controller
         }
         if ($request->name) {            
             $category = Category::where('name', Str::ucfirst($request->name))->first();
-            if ($category) {
+            if($request->used_for){
+                $used_for_is_same= $category->used_for== $request->used_for?true:false;            
+            if ($category && $used_for_is_same ) {
                 $category->type;
                 return response()
                 ->json([
@@ -363,6 +365,9 @@ class CategoryController extends Controller
                     ]
                 ], Response::HTTP_CONFLICT);        
             }
+        }
+
+    
             $input['name'] = Str::ucfirst($input['name']);
         }
         if ($category_to_be_updated->fill($input)->save()) {
