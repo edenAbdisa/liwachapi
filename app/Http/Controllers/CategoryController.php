@@ -312,24 +312,96 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
         $input = $request->all();
+        try{
+        $validatedData = Validator::make($request->all(),[ 
+            'name' => ['max:30'],
+            'used_for' => ['max:50']
+        ]);
+        if ($validatedData->fails()) {
+            return response()
+            ->json([
+                'data' =>null,
+                'success' => false,
+                'errors' => [
+                    [
+                        'status' => Response::HTTP_BAD_REQUEST,
+                        'title' => "Validation failed check JSON request",
+                        'message' => $validatedData->errors()
+                    ],
+                ]
+            ], Response::HTTP_BAD_REQUEST);
+        }
         $category_to_be_updated = Category::where('id', $id)->first();
-        if (in_array('name', $input)) {
+        if (in_array('name', $input)) {            
             $category = Category::where('name', Str::ucfirst($request->name))->first();
             if ($category) {
                 $category->type;
-                return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);
-            }
+                return response()
+                ->json([
+                    'data' =>$category ,
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_CONFLICT,
+                            'title' => 'Category already exist.',
+                            'message' => "This category already exist in the database."
+                        ],
+                    ]
+                ], Response::HTTP_CONFLICT);        }
             $input['name'] = Str::ucfirst($input['name']);
         }
         if ($category_to_be_updated->fill($input)->save()) {
             $category_to_be_updated->type;
-            return (new CategoryResource($category_to_be_updated))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
+                return response()
+                ->json([
+                    'data' =>$category_to_be_updated,
+                    'success' => true,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_CREATED,
+                            'title' => 'Category updated.',
+                            'message' => "The category is updated sucessfully."
+                        ],
+                    ]
+                ], Response::HTTP_CREATED); 
         } else {
             return response()
-                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+                    ->json([
+                        'data' =>$category_to_be_updated ,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                                'title' => 'Internal error',
+                                'message' => "This category couldnt be updated."
+                            ],
+                        ]
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);   }
+                }catch (ModelNotFoundException $ex) { // User not found
+                    return response()
+                            ->json([
+                                'success' => false,
+                                'errors' => [
+                                    [
+                                        'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                                        'title' => 'The model doesnt exist.',
+                                        'message' => $ex->getMessage()
+                                    ],
+                                ]
+                            ], Response::HTTP_UNPROCESSABLE_ENTITY); 
+                } catch (Exception $ex) { // Anything that went wrong
+                    return response()
+                            ->json([
+                                'success' => false,
+                                'errors' => [
+                                    [
+                                        'status' => 500,
+                                        'title' => 'Internal server error',
+                                        'message' => $ex->getMessage()
+                                    ],
+                                ]
+                            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                } 
     }
 
     /**

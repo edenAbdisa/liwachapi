@@ -147,7 +147,7 @@ class MembershipController extends Controller
                     'errors' => [
                         [
                             'status' => Response::HTTP_CONFLICT,
-                            'title' => 'Category already exist.',
+                            'title' => 'Membership already exist.',
                             'message' => "This membership already exist in the database."
                         ],
                     ]
@@ -279,21 +279,99 @@ class MembershipController extends Controller
      */
     public function update(Request $request, $id)
     {
+        try{ 
+            $validatedData = Validator::make($request->all(),[ 
+                'name' => ['max:30'],
+                'limit_of_post' => ['numeric','min:0','not_in:0'],
+                'transaction_limit' => ['numeric','min:0','not_in:0']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                ->json([
+                    'data' =>null,
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_BAD_REQUEST,
+                            'title' => "Validation failed check JSON request",
+                            'message' => $validatedData->errors()
+                        ],
+                    ]
+                ], Response::HTTP_BAD_REQUEST);
+            }
         $input = $request->all();
         $membership_to_be_updated = Membership::where('id', $id)->first();
         if (in_array('name', $input)) {
             $membership = Membership::where('name', Str::ucfirst($request->name))->first();
             if ($membership) {
-                return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);
-            }
+                return response()
+                ->json([
+                    'data' =>$membership ,
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_CONFLICT,
+                            'title' => 'Membership already exist.',
+                            'message' => "This membership already exist in the database."
+                        ],
+                    ]
+                ], Response::HTTP_CONFLICT);       }
             $input['name'] = Str::ucfirst($input['name']);
         }
 
         if ($membership_to_be_updated->fill($input)->save()) {
-            return (new MembershipResource($membership_to_be_updated))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
+            return response()
+                ->json([
+                    'data' =>$membership_to_be_updated,
+                    'success' => true,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_CREATED,
+                            'title' => 'Membership updated.',
+                            'message' => "The membership is updated sucessfully."
+                        ],
+                    ]
+                ], Response::HTTP_CREATED);
+        }else {
+            return response()
+                    ->json([
+                        'data' =>$membership ,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                                'title' => 'Internal error',
+                                'message' => "This membership couldnt be saved."
+                            ],
+                        ]
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        
         }
+    }catch (ModelNotFoundException $ex) { // User not found
+        return response()
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                            'title' => 'The model doesnt exist.',
+                            'message' => $ex->getMessage()
+                        ],
+                    ]
+                ], Response::HTTP_UNPROCESSABLE_ENTITY); 
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => 500,
+                            'title' => 'Internal server error',
+                            'message' => $ex->getMessage()
+                        ],
+                    ]
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    } 
     }
 
     /**

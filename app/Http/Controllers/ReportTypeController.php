@@ -275,22 +275,99 @@ class ReportTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
+        try{ 
+            $validatedData = Validator::make($request->all(),[ 
+                'report_detail' => ['max:250'],
+                'type_for' => ['max:50']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                ->json([
+                    'data' =>null,
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_BAD_REQUEST,
+                            'title' => "Validation failed check JSON request",
+                            'message' => $validatedData->errors()
+                        ],
+                    ]
+                ], Response::HTTP_BAD_REQUEST);
+            }
         $input = $request->all();
         $reporttype_to_be_edited = ReportType::where('id', $id)->first();
         if ($reporttype_to_be_edited) {
             if (in_array('report_detail', $input)) {
                 $reporttype = ReportType::where('report_detail', Str::ucfirst($request->name))->first();
                 if ($reporttype) {
-                    return response()->json("A resource exist by this name.", Response::HTTP_CONFLICT);
-                }
+                    return response()
+                ->json([
+                    'data' =>$reporttype ,
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_CONFLICT,
+                            'title' => 'Report type already exist.',
+                            'message' => "This report type already exist in the database."
+                        ],
+                    ]
+                ], Response::HTTP_CONFLICT);  }
                 $input['report_detail'] = Str::ucfirst($input['report_detail']);
             }
             if ($reporttype_to_be_edited->fill($input)->save()) {
-                return (new ReportType($reporttype_to_be_edited))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
+                return response()
+                ->json([
+                    'data' =>$reporttype_to_be_edited,
+                    'success' => true,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_CREATED,
+                            'title' => 'Report type updated.',
+                            'message' => "The report type is updated sucessfully."
+                        ],
+                    ]
+                ], Response::HTTP_CREATED);
+            }else {
+                return response()
+                    ->json([
+                        'data' =>$reporttype ,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                                'title' => 'Internal error',
+                                'message' => "This report type couldnt be updated."
+                            ],
+                        ]
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR); 
+                }
             }
-        }
+            }catch (ModelNotFoundException $ex) { // User not found
+                return response()
+                        ->json([
+                            'success' => false,
+                            'errors' => [
+                                [
+                                    'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                                    'title' => 'The model doesnt exist.',
+                                    'message' => $ex->getMessage()
+                                ],
+                            ]
+                        ], Response::HTTP_UNPROCESSABLE_ENTITY); 
+            } catch (Exception $ex) { // Anything that went wrong
+                return response()
+                        ->json([
+                            'success' => false,
+                            'errors' => [
+                                [
+                                    'status' => 500,
+                                    'title' => 'Internal server error',
+                                    'message' => $ex->getMessage()
+                                ],
+                            ]
+                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            } 
+    
     }
 
     /**
