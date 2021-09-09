@@ -118,7 +118,7 @@ class TypeController extends Controller
                         [
                             'status' => Response::HTTP_CONFLICT,
                             'title' => "Category doesn't exist.",
-                            'message' => "A category with this ID doesn't exist in the database."
+                            'message' => "A category with this ID doesn't exist in the database.Please select the right category."
                         ],
                     ]
                 ], Response::HTTP_CONFLICT); 
