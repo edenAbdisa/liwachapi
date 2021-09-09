@@ -349,8 +349,8 @@ class CategoryController extends Controller
         if ($request->name) {            
             $category = Category::where('name', Str::ucfirst($request->name))->first();
             if($request->used_for){
-                $used_for_is_same= $category->used_for=== $request->used_for?true:false;            
-            if ($category && $used_for_is_same ) {
+                $used_for_is_same= strcmp($category->used_for,$request->used_for)?true:false;            
+            if ($category && $used_for_is_same) {
                 $category->type;
                 return response()
                 ->json([
