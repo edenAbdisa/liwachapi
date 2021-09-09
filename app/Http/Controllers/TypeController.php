@@ -87,8 +87,7 @@ class TypeController extends Controller
     {
         try{ 
             $validatedData = Validator::make($request->all(),[ 
-                'name' => ['required','max:30'],
-                'used_for' => ['required','max:50'],
+                'name' => ['required','max:30'], 
                 'category_id' => ['required','numeric']
             ]);
             if ($validatedData->fails()) {
@@ -125,7 +124,8 @@ class TypeController extends Controller
                 ], Response::HTTP_CONFLICT); 
             }
             $type = new Type($request->all());
-            $type->status="active"; 
+            $type->status="active";
+            $type->used_for=$category->used_for; 
             //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
             //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
 
