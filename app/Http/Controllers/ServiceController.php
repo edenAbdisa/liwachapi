@@ -16,7 +16,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 class ServiceController extends Controller
 {
     
@@ -196,11 +198,44 @@ class ServiceController extends Controller
     public function serviceByLocation(Request $request)
     {
         $input = $request->all();
+        try {            
+            $validatedData = Validator::make($request->all(),[ 
+                'latitude' => ['required','numeric'],
+                'longitude' => ['required','numeric']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                ->json([
+                    'data' =>null,
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_BAD_REQUEST,
+                            'title' => "Validation failed check JSON request",
+                            'message' => $validatedData->errors()
+                        ],
+                    ]
+                ], Response::HTTP_BAD_REQUEST);
+            }
         $addresses = Address::where('latitude', $input['latitude'])
                             ->where('longitude', $input['longitude'])
                             ->where('type', 'service')->get();
-        $addresses->each(function ($address, $key) {
-            $address->service->serviceSwapType;
+        if( $addresses->count() <= 0){
+            return response()
+                   ->json([
+                          'data' => $addresses,
+                          'success' =>  false,
+                           'errors' => [
+                                [
+                                   'status' => Response::HTTP_NO_CONTENT,
+                                    'title' => 'Address doesnt exist',
+                                   'message' => "An address by the given inputs doesnt exist."
+                                    ],
+                                ]
+                            ], Response::HTTP_OK);
+        }
+        
+        $addresses->each(function ($address, $key) { 
             $address->service->user;
             $address->service->bartering_location;
             $address->service->media;
@@ -208,7 +243,43 @@ class ServiceController extends Controller
                 $type->type;
             });
         });
-        return response()->json($addresses, 200);
+        return response()
+                ->json([
+                    'data' =>$addresses,
+                    'success' => true,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_OK,
+                            'title' => 'List of address with their item.',
+                            'message' => "These are the list of items near the address you choose."
+                        ],
+                    ]
+                ], Response::HTTP_OK); 
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                    ->json([
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                                'title' => 'The model doesnt exist.',
+                                'message' => $ex->getMessage()
+                            ],
+                        ]
+                    ], Response::HTTP_UNPROCESSABLE_ENTITY); 
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                    ->json([
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => 500,
+                                'title' => 'Internal server error',
+                                'message' => $ex->getMessage()
+                            ],
+                        ]
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
     /**
      * @OA\Get(

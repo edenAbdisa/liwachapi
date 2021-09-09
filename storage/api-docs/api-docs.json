@@ -221,9 +221,7 @@
             }
         },
         "/address": {
-            "get": {
-                "security":
-                  {"access_token": []},
+            "get": {               
                 "tags": [
                     "Address"
                 ],
@@ -2875,11 +2873,17 @@
                 "title": "Address",
                 "description": "Address model",
                 "properties": {
-                    "city": {
-                        "title": "City",
-                        "description": "City name",
-                        "type": "string",
-                        "example": "Addis Ababa"
+                    "latitude": {
+                        "title": "Latitude",
+                        "description": "Latitude",
+                        "type": "double",
+                        "example": 3.9
+                    },
+                    "longitude": {
+                        "title": "Longitude",
+                        "description": "Longitude",
+                        "type": "double",
+                        "example": 3.9
                     }
                 }
             },

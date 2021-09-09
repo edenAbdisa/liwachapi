@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Exception;
 use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\MediaResource;
 use Symfony\Component\HttpFoundation\Response;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 class MediaController extends Controller
 {
     /**

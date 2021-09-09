@@ -88,8 +88,7 @@ class ItemController extends Controller
     public function itemsByLocation(Request $request)
     {
         $input = $request->all();
-        try {
-            
+        try {            
             $validatedData = Validator::make($request->all(),[ 
                 'latitude' => ['required','numeric'],
                 'longitude' => ['required','numeric']
@@ -126,7 +125,6 @@ class ItemController extends Controller
                 ], Response::HTTP_OK);
             }
             $addresses->each(function ($address, $key) { 
-
                 $address->item->user;
                 $address->item->bartering_location;
                 $address->item->media;
@@ -170,8 +168,7 @@ class ItemController extends Controller
                             ],
                         ]
                     ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }      
-        
+        }              
     }
     /**
      * Store a newly created resource in storage.

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Exception;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Gate;
@@ -11,7 +11,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 class MessageController extends Controller
 {
     /**

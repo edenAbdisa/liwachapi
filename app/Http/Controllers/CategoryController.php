@@ -11,7 +11,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 class CategoryController extends Controller
 {
     /**
@@ -41,12 +44,41 @@ class CategoryController extends Controller
         //abort_if(Gate::denies('category_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
         $categories = Category::where('status', '!=', 'deleted')->orWhereNull('status')->get()
-        ->each(function ($item, $key) {
-            $item->type;
-       });
-        return (new CategoryResource($categories))
-            ->response()
-            ->setStatusCode(Response::HTTP_OK);
+            ->each(function ($item, $key) {
+                $item->type;
+            });
+        return response()
+            ->json(new CategoryResource($categories), Response::HTTP_OK);
+        /* try{
+            $categories = Category::where('status', '!=', 'deleted')->orWhereNull('status')->get()
+            ->each(function ($item, $key) {
+                $item->type;
+            });
+            return response()
+                ->json([
+                    'data' =>new CategoryResource($categories),
+                    'success' => true,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_OK,
+                            'title' => 'List of categories.',
+                            'message' => "These are the list of categories."
+                        ],
+                    ]
+                ], Response::HTTP_OK); 
+        }catch (Exception $ex) { // Anything that went wrong
+            return response()
+                    ->json([
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => 500,
+                                'title' => 'Internal server error',
+                                'message' => $ex->getMessage()
+                            ],
+                        ]
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } */
     }
 
 
@@ -82,26 +114,98 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //Str::upper(str)
-        $category = Category::where('name', Str::ucfirst($request->name))->first();
-        if (!$category) {
-            $input = $request->all();
-            $input['name'] = Str::ucfirst($input['name']);
-            $category = new Category($input);
-            $category->status="active";
-            //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-            //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST            
-            if ($category->save()) {
-                return (new CategoryResource($category))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
+        try{ 
+            $validatedData = Validator::make($request->all(),[ 
+                'name' => ['required','max:30'],
+                'used_for' => ['required','max:50']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                ->json([
+                    'data' =>null,
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_BAD_REQUEST,
+                            'title' => "Validation failed check JSON request",
+                            'message' => $validatedData->errors()
+                        ],
+                    ]
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $category = Category::where('name', Str::ucfirst($request->name))->first();
+            if (!$category) {
+                $input = $request->all();
+                $input['name'] = Str::ucfirst($input['name']);
+                $category = new Category($input);
+                $category->status="active";            
+                if ($category->save()) {
+                    return response()
+                ->json([
+                    'data' =>$category,
+                    'success' => true,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_CREATED,
+                            'title' => 'Category created.',
+                            'message' => "The category is created sucessfully."
+                        ],
+                    ]
+                ], Response::HTTP_CREATED);  
+                } else {
+                    return response()
+                    ->json([
+                        'data' =>$category ,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                                'title' => 'Internal error',
+                                'message' => "This category couldnt be saved."
+                            ],
+                        ]
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
             } else {
                 return response()
-                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json([
+                    'data' =>$category ,
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => Response::HTTP_CONFLICT,
+                            'title' => 'Category already exist.',
+                            'message' => "This category already exist in the database."
+                        ],
+                    ]
+                ], Response::HTTP_CONFLICT);  
             }
-        } else {
-            return response()->json("This resource already exist.", Response::HTTP_CONFLICT);
-        }
+
+        }catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                    ->json([
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                                'title' => 'The model doesnt exist.',
+                                'message' => $ex->getMessage()
+                            ],
+                        ]
+                    ], Response::HTTP_UNPROCESSABLE_ENTITY); 
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                    ->json([
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => 500,
+                                'title' => 'Internal server error',
+                                'message' => $ex->getMessage()
+                            ],
+                        ]
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } 
     }
 
     /**
