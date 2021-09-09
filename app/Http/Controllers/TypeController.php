@@ -337,8 +337,7 @@ class TypeController extends Controller
         }
         if ($request->name) {
             $type = Type::where('name', Str::ucfirst($request->name))->first();
-            if($type && $request->category_id){
-                
+            if($type && $request->category_id){                
                 $category_is_same= strcmp($type->category_id,$request->category_id)==0?true:false;            
             if ($category_is_same) {
                 return response()
@@ -356,7 +355,7 @@ class TypeController extends Controller
             }
             $input['name'] = Str::ucfirst($input['name']);
         }}
-        if ($request->category_id) {
+        if ($request->category_id || $request->category_id==0) {
             $category = Category::where('id', $request->category_id)->
                                   where('status', 'active')->first();
             if ($category){
