@@ -85,8 +85,8 @@ class MembershipController extends Controller
         try{ 
             $validatedData = Validator::make($request->all(),[ 
                 'name' => ['required','max:30'],
-                'limit_of_post' => ['required','numeric'],
-                'transaction_limit' => ['required','mumeric']
+                'limit_of_post' => ['required','numeric','min:0','not_in:0'],
+                'transaction_limit' => ['required','numeric','min:0','not_in:0']
             ]);
             if ($validatedData->fails()) {
                 return response()
