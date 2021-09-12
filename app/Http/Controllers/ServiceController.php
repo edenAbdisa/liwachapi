@@ -167,9 +167,12 @@ class ServiceController extends Controller
                     $swap->type_id = $t;
                     $swap->service_id = $service->id;
                     if (!$swap->save()) {
-                        return response()
-                            ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
-                    }
+                        return  response()
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
+                     }
                 }
                 $serviceMedia = $request->media;
                 foreach ($serviceMedia as $m) {
@@ -179,9 +182,12 @@ class ServiceController extends Controller
                     $media->url = $m;
                     $media->item_id = $service->id;
                     if (!$media->save()) {
-                        return response()
-                            ->json("The media $media resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
-                    }
+                        return  response()
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Internal error", "", "The media $media resource couldn't be saved due to internal error"),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
+                     }
                 }
                 $service->media;
                 $service->bartering_location;
@@ -191,14 +197,25 @@ class ServiceController extends Controller
                 $service->serviceSwapType->each(function ($type, $key) {
                     $type->type;
                 });
-                return (new ServiceResource($service))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
+                return  response()
+                ->json(
+                    HelperClass::responeObject($service, true, Response::HTTP_CREATED, "Item created.", "The item has been created.", ""),
+                    Response::HTTP_CREATED
+                );
             } else {
-                return response()
-                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
+                return  response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Item couldn't be saved.", "","Item couldn't be saved"),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    ); 
+             }
             //}
+        } else {
+            return  response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Address couldn't be saved.","",  "Address couldn't be saved"),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    );
         }
     } catch (ModelNotFoundException $ex) { // User not found
         return response()

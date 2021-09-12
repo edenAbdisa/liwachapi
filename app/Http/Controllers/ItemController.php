@@ -239,8 +239,11 @@ class ItemController extends Controller
                     $swap->type_id = $t;
                     $swap->item_id = $item->id;
                     if (!$swap->save()) {
-                        return response()
-                            ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                        return  response()
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        ); 
                     }
                 }
                 $itemMedia = $request->media;
@@ -250,9 +253,12 @@ class ItemController extends Controller
                     $media->type = 'item';
                     $media->url = $m;
                     $media->item_id = $item->id;
-                    if (!$media->save()) {
-                        return response()
-                            ->json("The media $media resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                    if (!$media->save()) { 
+                            return  response()
+                            ->json(
+                                HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Internal error", "", "The media $media resource couldn't be saved due to internal error"),
+                                Response::HTTP_INTERNAL_SERVER_ERROR
+                            );
                     }
                 }
                 $item->bartering_location;
@@ -263,20 +269,29 @@ class ItemController extends Controller
                 $item->user;
                 $item->media;
                 $item->request;
-                return (new ItemResource($item))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
+                return 
+                    response()
+                    ->json(
+                        HelperClass::responeObject($item, true, Response::HTTP_CREATED, "Item created.", "The item has been created.", ""),
+                        Response::HTTP_CREATED
+                    );
             } else {
-                return response()
-                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                return  response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Item couldn't be saved.", "","Item couldn't be saved"),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    ); 
             }
             /* } else {
                     return response()
                         ->json("No such type",Response::HTTP_INTERNAL_SERVER_ERROR);
                 } */
         } else {
-            return response()
-                ->json("The address couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            return  response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Address couldn't be saved.","",  "Address couldn't be saved"),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    );
         }
     } catch (ModelNotFoundException $ex) { // User not found
         return response()
