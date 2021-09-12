@@ -18,7 +18,7 @@ use Illuminate\Http\Controllers;
 Route::post('/user/logout', 'UserController@logout');
 }); 
 
-Route::middleware(['auth:api', 'scope:user;admin;organization'])->group(function () {
+Route::middleware(['auth:api', 'scope:user,admin,organization'])->group(function () {
     Route::get('/user', 'UserController@index');
     Route::get('/users', 'UserController@index');
     
@@ -73,7 +73,7 @@ Route::middleware(['auth:api', 'scope:admin'])->group(function () {
 });
 Route::middleware(['auth:api', 'scope:organization'])->group(function () {
 });
-Route::middleware(['auth:api', 'scope:user;organization'])->group(function () {
+Route::middleware(['auth:api', 'scope:user,organization'])->group(function () {
     Route::delete('/user/{id}', 'UserController@destroy');
     Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
     Route::get('/itemswaptype', 'ItemSwapTypeController@index');
