@@ -105,11 +105,11 @@ class FlagController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+        try {
             $validatedData = Validator::make($request->all(), [
-                'reason_id' => ['numeric'],
-                'flagged_item_id' => ['numeric'],
-                'type' => ['max:30']
+                'reason_id' => ['required','numeric'],
+                'flagged_item_id' => ['required','numeric'],
+                'type' => ['required','max:30',Rule::in(['item', 'service'])]
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -118,47 +118,66 @@ class FlagController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $input = $request->all();
-        $reason = ReportType::where('report_detail', $input['reason'])->first();
-        if (!$reason) {
-            return response()
-                ->json("No such kind of report type", Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        $input['reason_id'] = $reason->id;
-        $flag = Flag::create($input);
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        //dd("line 81"); 
-        if ($flag->save()) {
-            if ($flag->type === 'item') {
-                $flagged_item = Item::where('id', $flag->flagged_item_id);
+            $input = $request->all();
+            $user = $request->user();
+            if(strcmp($request->type,'item')==0){
+                $flagged_item = Item::where('id', $request->flagged_item_id)->where('status', '!=', 'deleted')->first();
+            }elseif(strcmp($request->type,'service')==0){
+                $flagged_item = Service::where('id', $request->flagged_item_id)->where('status', '!=', 'deleted')->first();
+            }
+            if(!$flagged_item){
+                return response()
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Not valid "+$request->type+" id passed", "", $request->type+" doesnt exist by this id."),
+                    Response::HTTP_BAD_REQUEST
+                ); 
+            }
+            $reason = ReportType::where('id', $request->reason_id)->where('status', '!=', 'deleted')->first();
+            if (!$reason) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Not valid reason id passed", "", "A reason doesnt exist by this id."),
+                        Response::HTTP_BAD_REQUEST
+                    ); 
+            }
+            $previouslyflagged = Flag::where('flagged_item_id', $request->flagged_item_id)->where('flagged_by_id', $user->id)->first();
+            if ($previouslyflagged) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject($previouslyflagged, false, Response::HTTP_CONFLICT, "Already flagged", "", "You have previously flagged this "+$request->type),
+                        Response::HTTP_CONFLICT
+                    );
+            }
+            $flag = Flag::create($input);
+            $flag->flagged_by_id = $user->id;
+            if ($flag->save()) {
                 $flagged_item->number_of_flag = $flagged_item->number_of_flag + 1;
                 $flagged_item->save();
+                return response()
+                ->json(
+                    HelperClass::responeObject($flag, true, Response::HTTP_CREATED, $request->type+" flagged", "", "This "+$request->type+"is flagged."),
+                    Response::HTTP_CREATED
+                ); 
             } else {
-                $flagged_service = Service::where('id', $flag->flagged_item_id);
-                $flagged_service->number_of_flag = $flagged_service->number_of_flag + 1;
-                $flagged_service->save();
+                return response()
+                ->json(
+                    HelperClass::responeObject($flag, false, Response::HTTP_INTERNAL_SERVER_ERROR, $request->type+" couldnt be flagged.", "", "This "+$request->type+" couldnt be flagged due to internal error."),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );  
             }
-            return (new FlagResource($flag))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        } else {
+        } catch (ModelNotFoundException $ex) { // User not found
             return response()
-                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-    }catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-    }
     }
     public function flaggedProductCountByDate($attribute, $start, $end)
     {
@@ -215,51 +234,50 @@ class FlagController extends Controller
      */
     public function search(Request $request)
     {
-        try{
-        $validatedData = Validator::make($request->all(), [
-            'reason_id' => ['numeric'],
-            'flagged_item_id' => ['numeric'],
-            'type' => ['max:30']
-        ]);
-        if ($validatedData->fails()) {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'reason_id' => ['numeric'],
+                'flagged_item_id' => ['numeric'],
+                'type' => ['max:30']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
+            $input = $request->all();
+            $flags = Flag::all();
+            $col = DB::getSchemaBuilder()->getColumnListing('flags');
+            $requestKeys = collect($request->all())->keys();
+            foreach ($requestKeys as $key) {
+                if (empty($flags)) {
+                    return response()->json($flags, 200);
+                }
+                if (in_array($key, $col)) {
+                    $flags = $flags->where($key, $input[$key])->values();
+                }
+            }
+            $flags->each(function ($flag, $key) {
+                $flag->reason;
+                $flag->flagged_by;
+                $flag->flagged_item;
+            });
+            return response()->json($flags, 200);
+        } catch (ModelNotFoundException $ex) { // User not found
             return response()
                 ->json(
-                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
-                    Response::HTTP_BAD_REQUEST
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
                 );
         }
-        $input = $request->all();
-        $flags = Flag::all();
-        $col = DB::getSchemaBuilder()->getColumnListing('flags');
-        $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($flags)) {
-                return response()->json($flags, 200);
-            }
-            if (in_array($key, $col)) {
-                $flags = $flags->where($key, $input[$key])->values();
-            }
-        }
-        $flags->each(function ($flag, $key) {
-            $flag->reason;
-            $flag->flagged_by;
-            $flag->flagged_item;
-        });
-        return response()->json($flags, 200);
-    }catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-    }
-
     }
 
     /**

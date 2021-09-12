@@ -99,11 +99,11 @@ class AddressController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
-                'latitude' => ['numeric'],
-                'longitude' => ['numeric'],
-                'country' => ['max:50'],
-                'city' => ['max:50'],
-                'type' => ['max:10']
+                'latitude' => ['required','numeric'],
+                'longitude' => ['required','numeric'],
+                'country' => ['required','max:50'],
+                'city' => ['required','max:50'],
+                'type' => ['required','max:10']
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -112,29 +112,29 @@ class AddressController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $address = Address::create($request->all());
-        if ($address->save()) {
-            return (new AddressResource($address))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        } else {
-            return (new AddressResource($address))
-                ->response()
-                ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            $address = Address::create($request->all());
+            if ($address->save()) {
+                return (new AddressResource($address))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_CREATED);
+            } else {
+                return (new AddressResource($address))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-    } catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-    }
     }
 
     /**
@@ -372,7 +372,5 @@ class AddressController extends Controller
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
         }
-    }
-    //cant be deletd alone since it violates foreign key no need
-    //to delete this data by an end point
+    } 
 }

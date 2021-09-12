@@ -140,12 +140,12 @@ class TypeController extends Controller
                             'success' => false,
                             'errors' => [
                                 [
-                                    'status' => Response::HTTP_CONFLICT,
+                                    'status' => Response::HTTP_BAD_REQUEST,
                                     'title' => "Category doesn't exist.",
                                     'message' => "A category with this ID doesn't exist in the database.Please select the right category."
                                 ],
                             ]
-                        ], Response::HTTP_CONFLICT);
+                        ], Response::HTTP_BAD_REQUEST);
                 }
                 $type = new Type($request->all());
                 $type->status = "active";
