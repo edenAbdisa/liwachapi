@@ -14,11 +14,11 @@ use Illuminate\Http\Controllers;
 |
 */
 
- Route::middleware('auth:api')->group(function () {
-Route::post('/user/logout', 'UserController@logout');
-}); 
+Route::middleware('auth:api')->group(function () {
+    Route::post('/user/logout', 'UserController@logout');
+//}); 
 
-Route::middleware(['auth:api', 'scope:user,admin,organization'])->group(function () {
+//Route::middleware(['auth:api', 'scope:user,admin,organization'])->group(function () {
     Route::get('/user', 'UserController@index');
     Route::get('/users', 'UserController@index');
     
@@ -38,8 +38,38 @@ Route::middleware(['auth:api', 'scope:user,admin,organization'])->group(function
     Route::post('/service/search', 'ServiceController@search');
     Route::put('/service/{id}', 'ServiceController@update');
     Route::post('/reporttype/search', 'ReportTypeController@search');
+//});
+//Route::middleware(['auth:api', 'scope:organization'])->group(function () {
+//});
+//Route::middleware(['auth:api', 'scope:user,organization'])->group(function () {
+    Route::delete('/user/{id}', 'UserController@destroy');
+    Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
+    Route::get('/itemswaptype', 'ItemSwapTypeController@index');
+    Route::post('/flag', 'FlagController@store');
+    Route::put('/flag/{id}', 'FlagController@update');
+    Route::put('/item/{id}', 'ItemController@update');
+    Route::delete('/item/{id}', 'ItemController@destroy');
+    Route::get('/subscription', 'SubscriptionController@index');
+    Route::post('/subscription/search', 'SubscriptionController@search');
+    Route::post('/subscription', 'SubscriptionController@store');
+    Route::put('/subscription/{id}', 'SubscriptionController@update');
+    Route::delete('/subscription/{id}', 'SubscriptionController@destroy');
+    Route::delete('/service/{id}', 'ServiceController@destroy');
+    Route::get('/message', 'MessageController@index');
+    Route::post('/message/search', 'MessageController@search');
+    Route::post('/message', 'MessageController@store');
+    Route::put('/message/{id}', 'MessageController@update');
+    Route::delete('/message/{id}', 'MessageController@destroy');
+    Route::get('/request', 'RequestController@index');
+    Route::post('/request/search', 'RequestController@search');
+    Route::post('/request', 'RequestController@store');
+    Route::put('/request/{id}', 'RequestController@update');
+    Route::delete('/request/{id}', 'RequestController@destroy');
+    Route::post('/service/uploadPicture', 'FileController@uploadFile');
 });
-Route::middleware(['auth:api', 'scope:admin'])->group(function () {
+//Route::middleware(['auth:api', 'scope:admin'])->group(function () {
+Route::group(['middleware' => ['auth:api','scope:admin']], function () {
+ 
     Route::get('/address', 'AddressController@index');
     Route::post('/address/search', 'AddressController@search');
     Route::post('/address', 'AddressController@store');
@@ -71,34 +101,7 @@ Route::middleware(['auth:api', 'scope:admin'])->group(function () {
     Route::get('/request/countByDate/{attribute}/{start}/{end}', 'RequestController@requestCountByDate');
     Route::get('/request/count/{type}', 'RequestController@requestCount');
 });
-Route::middleware(['auth:api', 'scope:organization'])->group(function () {
-});
-Route::middleware(['auth:api', 'scope:user,organization'])->group(function () {
-    Route::delete('/user/{id}', 'UserController@destroy');
-    Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
-    Route::get('/itemswaptype', 'ItemSwapTypeController@index');
-    Route::post('/flag', 'FlagController@store');
-    Route::put('/flag/{id}', 'FlagController@update');
-    Route::put('/item/{id}', 'ItemController@update');
-    Route::delete('/item/{id}', 'ItemController@destroy');
-    Route::get('/subscription', 'SubscriptionController@index');
-    Route::post('/subscription/search', 'SubscriptionController@search');
-    Route::post('/subscription', 'SubscriptionController@store');
-    Route::put('/subscription/{id}', 'SubscriptionController@update');
-    Route::delete('/subscription/{id}', 'SubscriptionController@destroy');
-    Route::delete('/service/{id}', 'ServiceController@destroy');
-    Route::get('/message', 'MessageController@index');
-    Route::post('/message/search', 'MessageController@search');
-    Route::post('/message', 'MessageController@store');
-    Route::put('/message/{id}', 'MessageController@update');
-    Route::delete('/message/{id}', 'MessageController@destroy');
-    Route::get('/request', 'RequestController@index');
-    Route::post('/request/search', 'RequestController@search');
-    Route::post('/request', 'RequestController@store');
-    Route::put('/request/{id}', 'RequestController@update');
-    Route::delete('/request/{id}', 'RequestController@destroy');
-    Route::post('/service/uploadPicture', 'FileController@uploadFile');
-});
+
 
 Route::post('/item', 'ItemController@store');
 Route::post('/service', 'ServiceController@store');
