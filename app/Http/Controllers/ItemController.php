@@ -201,13 +201,15 @@ class ItemController extends Controller
         //the memebrship of this user enables the user to enter a new product
         try {
             $validatedData = Validator::make($request->all(), [
-                'name' => ['max:50'],
-                'description' => ['max:255'],
-                'status' => ['max:15'],
-                'number_of_flag' => ['numeric'],
-                'number_of_request' => ['numeric'],
-                'bartering_location_id' => ['numeric'],
-                'type_id' => ['numeric']
+                'name' => ['required','max:50'],
+                'description' => ['required','max:255'],  
+                'type_id' => ['required','numeric'],
+                'address.latitude' => ['required','numeric'],
+                'address.longitude' => ['required','numeric'],
+                'address.country' => ['required','max:50'],
+                'address.city' => ['required','max:50'],
+                'address.type' => ['required','max:10']
+
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -217,8 +219,8 @@ class ItemController extends Controller
                     );
             }           
         $input = $request->all();
-        $address = $request->address;
-        // $address = json_decode($address, true,512,JSON_BIGINT_AS_STRING);
+        $user =$request->user();
+        $address = $request->address; 
         $address = new Address($address);
         $address->type = 'item';
         if ($address->save()) {
@@ -230,7 +232,8 @@ class ItemController extends Controller
             $input['bartering_location_id'] = $address->id;
             // $input['type_id'] = $type->id;
             // $input['picture'] = $filename;                    
-            $item = Item::create($input);
+            $item = new Item($input);
+            $item->user_id = $user->id;
             if ($item->save()) {
                 $itemSwapType = $request->swap_type;
                 foreach ($itemSwapType as $t) {

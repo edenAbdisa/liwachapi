@@ -150,7 +150,7 @@ class FlagController extends Controller
                     );
             }
             $flag = new Flag($input);
-            $flag->flagged_by_id =(int) $user->id;
+            $flag->flagged_by_id = $user->id;
             if ($flag->save()) {
                 $flagged_item->number_of_flag = (int)$flagged_item->number_of_flag + 1;
                 $flagged_item->save();

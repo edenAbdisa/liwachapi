@@ -132,8 +132,7 @@ class ServiceController extends Controller
                 'description' => ['max:255'],
                 'status' => ['max:15'],
                 'number_of_flag' => ['numeric'],
-                'number_of_request' => ['numeric'],
-                'bartering_location_id' => ['numeric'],
+                'number_of_request' => ['numeric'], 
                 'type_id' => ['numeric']
             ]);
             if ($validatedData->fails()) {
