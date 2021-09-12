@@ -14,14 +14,14 @@ use Illuminate\Http\Controllers;
 |
 */
 
-/* Route::middleware(['auth:api','scope:user;admin;organization'])->get('/user', function (Request $request) {
-return $request->user();
-}); */
+ Route::middleware('auth:api')->group(function () {
+Route::post('/user/logout', 'UserController@logout');
+}); 
 
 Route::middleware(['auth:api', 'scope:user;admin;organization'])->group(function () {
     Route::get('/user', 'UserController@index');
     Route::get('/users', 'UserController@index');
-    Route::post('/user/logout', 'UserController@logout');
+    
     Route::post('/user/search', 'UserController@search');
     Route::put('/user/{id}', 'UserController@update');
     Route::post('/category/search', 'CategoryController@search');
