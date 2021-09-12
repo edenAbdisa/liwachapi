@@ -208,7 +208,7 @@ class ItemController extends Controller
                 'address.longitude' => ['required','numeric'],
                 'address.country' => ['required','max:50'],
                 'address.city' => ['required','max:50'],
-                'address.type' => ['required','max:10']
+                'address.type' => ['required','max:10',Rule::in(['item'])]
 
             ]);
             if ($validatedData->fails()) {
