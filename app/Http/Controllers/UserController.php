@@ -45,17 +45,29 @@ class UserController extends Controller
      *     )
      */
     public function index()
-    {
-        $user = User::where('status', '!=', 'deleted')
+    { 
+            try{
+                $user = User::where('status', '!=', 'deleted')
             ->orWhereNull('status')->get()
             ->each(function ($item, $key) {
                 $item->address;
                 $item->membership;
                 $item->remember_token = "";
             });
-        return (new UserResource($user))
-            ->response()
-            ->setStatusCode(Response::HTTP_OK);
+                return response()
+                ->json(HelperClass::responeObject(
+                    $user,true, Response::HTTP_OK,'Successfully fetched.',"Users are fetched sucessfully.","")
+                    , Response::HTTP_OK);
+            } catch (ModelNotFoundException $ex) { // User not found
+                return response()
+                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
+                  , Response::HTTP_UNPROCESSABLE_ENTITY);
+            } catch (Exception $ex) { // Anything that went wrong
+                return response()
+                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
+                , Response::HTTP_UNPROCESSABLE_ENTITY);
+                   
+            }
     }
     public function internalUsers($status)
     {
@@ -323,6 +335,23 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'first_name' => ['max:20'],
+                'last_name' => ['max:20'],
+                'email' => ['max:255'],
+                'phone_number' => ['max:30'],
+                'status' => ['max:255'],
+                'birthdate' => ['max:15'],
+                'type' => ['numeric'],
+                'address_id' => ['numeric'],
+                'memebrship_id' => ['numeric']            
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
+                , Response::HTTP_BAD_REQUEST);
+            }
         $input = $request->all();
         $user = User::where('id', $id)->first();
         if ($request->address) {
@@ -345,6 +374,19 @@ class UserController extends Controller
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         }
+    } catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    }
     }
     /**
      * @OA\Delete(
@@ -381,15 +423,36 @@ class UserController extends Controller
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $user = User::find($id);
-        if (!$user) {
+        try { 
+            $user = $request->user();
+            if (!$user) {
+                response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, "Resource Not Found", '', "User by this id doesnt exist."),
+                        Response::HTTP_NOT_FOUND
+                    );
+            }
+            $user->status = 'deleted';
+            $user->save();
             return response()
-                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+                ->json(
+                    HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "User is deleted sucessfully.", ""),
+                    Response::HTTP_NO_CONTENT
+                );
+        } catch (ModelNotFoundException $ex) { 
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        $user->status = 'deleted';
-        $user->save();
-        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

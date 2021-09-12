@@ -11,7 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-
+use Exception;
+use Faker\Extension\Helper;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -42,14 +43,21 @@ class AddressController extends Controller
      */
     public function index()
     {
-        //abort_if(Gate::denies('address_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        //User::with(['roles'])->get() 
-
-        return (new AddressResource(Address::all()))
-            ->response()
-            ->setStatusCode(Response::HTTP_OK);
+        try{
+            $address=Address::all();
+            return response()
+            ->json( HelperClass::responeObject($address,true, Response::HTTP_OK,'Successfully fetched.',"Address are fetched sucessfully.","")
+               , Response::HTTP_OK);
+        } catch (ModelNotFoundException $ex) { 
+            return response()
+            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
+              , Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
+            , Response::HTTP_UNPROCESSABLE_ENTITY);               
+        }
     }
-
 
     /**
      * @OA\Post(
@@ -195,12 +203,35 @@ class AddressController extends Controller
      */
     public function update(Request $request, $id)
     {
+        try {
         $input = $request->all();
         $address = Address::where('id', $id)->first();
+        if (!$address) {
+            return response()
+            ->json( HelperClass::responeObject(null,false, Response::HTTP_NOT_FOUND,'Address doesnt exist.',"This address doesnt exist in the database.","")
+            , Response::HTTP_OK);
+        }
         if ($address->fill($input)->save()) {
-            return (new AddressResource($address))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
+            return response()
+            ->json( HelperClass::responeObject($address,true, Response::HTTP_CREATED,'Address Updated.',"The address is updated sucessfully.","")
+            , Response::HTTP_OK);
+        }else {
+            return response()
+            ->json( HelperClass::responeObject($address,false, Response::HTTP_INTERNAL_SERVER_ERROR,'Internal error.',"","This address couldnt be updated.")
+            , Response::HTTP_INTERNAL_SERVER_ERROR);
+        }   
+    } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
     }
 
@@ -240,10 +271,23 @@ class AddressController extends Controller
      * )
      */
     public function destroy($id)
-    {
-        $address = Address::findOrFail($id);
-        $address->delete();
-        return response(null, Response::HTTP_NO_CONTENT);
+    { 
+        try{
+            $address = Address::findOrFail($id);
+            $address->delete();
+            return response()
+                        ->json(
+                            HelperClass::responeObject(null,true, Response::HTTP_NO_CONTENT,'Successfully deleted.',"Address is deleted sucessfully.","")
+                            , Response::HTTP_NO_CONTENT);
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
+           , Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal error occured.',"",$ex->getMessage())
+            , Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
     //cant be deletd alone since it violates foreign key no need
     //to delete this data by an end point

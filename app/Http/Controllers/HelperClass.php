@@ -21,4 +21,18 @@ class HelperClass
     {
         return $fileToBeUploaded->move($location, $filename);
     }
+     public static function responeObject($data,$success,$status,$title,$message,$error){
+         return [
+            'data' => $data,
+            'success' => $success,
+            'content' => [
+                [
+                    'status' => $status,
+                    'title' => $title,
+                    'message' => $message,
+                    'error'=> $error
+                ],
+            ]
+            ];
+     }
 }

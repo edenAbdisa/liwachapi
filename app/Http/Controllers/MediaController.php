@@ -20,11 +20,23 @@ class MediaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        $items = Media::all();
-        return (new MediaResource($items))
-            ->response()
-            ->setStatusCode(Response::HTTP_OK);
+    { 
+            try{
+                $medias=Media::all();
+                return response()
+                ->json(HelperClass::responeObject(
+                                    $medias,true, Response::HTTP_OK,'Successfully fetched.',"Medias are fetched sucessfully.","")
+                                    , Response::HTTP_OK);
+            } catch (ModelNotFoundException $ex) { // User not found
+                return response()
+                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
+                  , Response::HTTP_UNPROCESSABLE_ENTITY);
+            } catch (Exception $ex) { // Anything that went wrong
+                return response()
+                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
+                , Response::HTTP_UNPROCESSABLE_ENTITY);
+                   
+            }
     }
 
     /**
@@ -81,6 +93,16 @@ class MediaController extends Controller
      */
     public function update(Request $request, $id)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'item_id' => ['numeric'],
+                'type' => ['max:10']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
+                , Response::HTTP_BAD_REQUEST);
+            }
         $input = $request->all();
         $media = Media::where('id', $id)->first();
         if ($media->fill($input)->save()) {
@@ -92,6 +114,19 @@ class MediaController extends Controller
             return response()
                 ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    } catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    }
     }
 
     /**
@@ -102,12 +137,33 @@ class MediaController extends Controller
      */
     public function destroy($id)
     {
-        $media = Media::find($id);
-        if (!$media) {
+        try {
+            $media = Media::find($id);
+            if (!$media) {
+                response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, "Resource Not Found", '', "Media by this id doesnt exist."),
+                        Response::HTTP_NOT_FOUND
+                    );
+            }
+            $media->delete();
             return response()
-                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+                ->json(
+                    HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Media is deleted sucessfully.", ""),
+                    Response::HTTP_NO_CONTENT
+                );
+        } catch (ModelNotFoundException $ex) { 
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        $media->delete();
-        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

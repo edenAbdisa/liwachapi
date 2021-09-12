@@ -44,18 +44,27 @@ class FlagController extends Controller
      */
     public function index()
     {
-        //abort_if(Gate::denies('flag_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        //User::with(['roles'])->get() 
-        $flag = Flag::all();
+        try{
+                $flag = Flag::all();
         foreach ($flag as $f) {
             $f->reason;
             $f->flagged_by;
             $f->flagged_item;
         }
-        return (new FlagResource($flag))
-            ->response()
-            ->setStatusCode(Response::HTTP_OK);
-    }
+                return response()
+                ->json(HelperClass::responeObject($flag,true, Response::HTTP_OK,'Successfully fetched.',"Flag is fetched sucessfully.","")
+                , Response::HTTP_OK);
+            } catch (ModelNotFoundException $ex) { // User not found
+                return response()
+                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
+                  , Response::HTTP_UNPROCESSABLE_ENTITY);
+            } catch (Exception $ex) { // Anything that went wrong
+                return response()
+                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
+                , Response::HTTP_UNPROCESSABLE_ENTITY);
+                   
+            }
+ }
 
 
     /**
@@ -239,10 +248,21 @@ class FlagController extends Controller
      */
     public function update(Request $request, $id)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'reason_id' => ['numeric'],
+                'flagged_item_id' => ['numeric'],
+                'type' => ['max:30']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
+                , Response::HTTP_BAD_REQUEST);
+            }
         $input = $request->all();
         $flag = Flag::where('id', $id)->first();
-        if ($flag->fill($input)->save()) {
-            
+        $flag->flagged_by_id=$flag->flagged_by_id;
+        if ($flag->fill($input)->save()) {            
             $flag->reason;
             $flag->flagged_by;
             $flag->flagged_item;
@@ -253,6 +273,19 @@ class FlagController extends Controller
         } else {
             return response()
                 ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+     } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
     }
 
@@ -292,13 +325,34 @@ class FlagController extends Controller
      * )
      */
     public function destroy($id)
-    {
-        $flag = Flag::find($id);
-        if (!$flag) {
+    { 
+        try {
+            $flag = Flag::find($id);
+            if (!$flag) {
+                response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, "Resource Not Found", '', "Flag by this id doesnt exist."),
+                        Response::HTTP_NOT_FOUND
+                    );
+            }
+            $flag->delete();
             return response()
-                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+                ->json(
+                    HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Flag is deleted sucessfully.", ""),
+                    Response::HTTP_NO_CONTENT
+                );
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        $flag->delete();
-        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

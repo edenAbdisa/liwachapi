@@ -32,21 +32,38 @@ class ItemController extends Controller
      */
     public function index()
     {
-        $items = Item::where('status', '!=', 'deleted')
-            ->orWhereNull('status')->get()
-            ->each(function ($item, $key) {
-                $item->itemSwapType->each(function ($type, $key) {
-                    $type->type;
+        try {
+            $items = Item::where('status', '!=', 'deleted')
+                ->orWhereNull('status')->get()
+                ->each(function ($item, $key) {
+                    $item->itemSwapType->each(function ($type, $key) {
+                        $type->type;
+                    });
+                    $item->bartering_location;
+                    $item->type;
+                    $item->user;
+                    $item->media;
+                    $item->request;
                 });
-                $item->bartering_location;
-                $item->type;
-                $item->user;
-                $item->media;
-                $item->request;
-            });
-        return (new ItemResource($items))
-            ->response()
-            ->setStatusCode(Response::HTTP_OK);
+
+            return response()
+                ->json(
+                    HelperClass::responeObject($items, true, Response::HTTP_OK, 'Successfully fetched.', "Item are fetched sucessfully.", ""),
+                    Response::HTTP_OK
+                );
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        }
     }
     /**
      * Display a listing of the resource.
@@ -297,6 +314,21 @@ class ItemController extends Controller
      */
     public function update(Request $request, $id)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['max:50'],
+                'description' => ['max:255'],
+                'status' => ['max:15'],
+                'number_of_flag' => ['numeric'],
+                'number_of_request' => ['numeric'],
+                'bartering_location_id' => ['numeric'],
+                'type_id' => ['numeric']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
+                , Response::HTTP_BAD_REQUEST);
+            }
         $input = $request->all();
         $item = Item::where('id', $id)->first();
         if ($request->address) {
@@ -350,7 +382,19 @@ class ItemController extends Controller
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         }
-        //Item::where('id', $id)->update(['delayed' => 1]);
+    } catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    }
     }
 
     /**
@@ -361,13 +405,34 @@ class ItemController extends Controller
      */
     public function destroy($id)
     {
-        $item = Item::find($id);
-        if (!$item) {
+        try {
+            $item = Item::find($id);
+            if (!$item) {
+                response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, "Resource Not Found", '', "Item by this id doesnt exist."),
+                        Response::HTTP_NOT_FOUND
+                    );
+            }
+            $item->status = 'deleted';
+            $item->save();
             return response()
-                ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
+                ->json(
+                    HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Item is deleted sucessfully.", ""),
+                    Response::HTTP_NO_CONTENT
+                );
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        $item->status = 'deleted';
-        $item->save();
-        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
