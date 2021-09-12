@@ -174,7 +174,7 @@ class FlagController extends Controller
         } catch (Exception $ex) { // Anything that went wrong
             return response()
                 ->json(
-                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    HelperClass::responeObject($user, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
         }
