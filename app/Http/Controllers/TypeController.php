@@ -42,27 +42,38 @@ class TypeController extends Controller
      *     )
      */
     public function index()
-    { 
-            try{
-                $type = Type::where('status', '=', 'active')->orWhereNull('status')->get()
+    {
+        try {
+            $type = Type::where('status', '=', 'active')->orWhereNull('status')->get()
                 ->each(function ($item, $key) {
                     $item->category;
                 });
-           
-                return response()
-                ->json(HelperClass::responeObject(
-                    $type,true, Response::HTTP_OK,'Successfully fetched.',"Types are fetched sucessfully.","")
-                    , Response::HTTP_OK);
-            }catch (ModelNotFoundException $ex) { // User not found
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
-                  , Response::HTTP_UNPROCESSABLE_ENTITY);
-            } catch (Exception $ex) { // Anything that went wrong
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
-                , Response::HTTP_UNPROCESSABLE_ENTITY);
-                   
-            }
+
+            return response()
+                ->json(
+                    HelperClass::responeObject(
+                        $type,
+                        true,
+                        Response::HTTP_OK,
+                        'Successfully fetched.',
+                        "Types are fetched sucessfully.",
+                        ""
+                    ),
+                    Response::HTTP_OK
+                );
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        }
     }
 
 
@@ -184,30 +195,18 @@ class TypeController extends Controller
                         ]
                     ], Response::HTTP_CONFLICT);
             }
-        } catch (ModelNotFoundException $ex) { // User not found
+        }catch (ModelNotFoundException $ex) { // User not found
             return response()
-                ->json([
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
-                            'title' => 'The model doesnt exist.',
-                            'message' => $ex->getMessage()
-                        ],
-                    ]
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         } catch (Exception $ex) { // Anything that went wrong
             return response()
-                ->json([
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => 500,
-                            'title' => 'Internal server error',
-                            'message' => $ex->getMessage()
-                        ],
-                    ]
-                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
     }
 
@@ -248,6 +247,20 @@ class TypeController extends Controller
      */
     public function search(Request $request)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['max:50'],
+                'category_id' => ['numeric'],
+                'status' => ['max:50'],
+                'used_for' => ['max:70']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
         $input = $request->all();
         $types = Type::all();
         $col = DB::getSchemaBuilder()->getColumnListing('types');
@@ -266,6 +279,20 @@ class TypeController extends Controller
             $item->item;
         });
         return response()->json($types, 200);
+    }catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+    }
+
     }
 
     /**
@@ -318,12 +345,14 @@ class TypeController extends Controller
                 'name' => ['max:50'],
                 'category_id' => ['numeric'],
                 'status' => ['max:50'],
-                'used_for' => ['max:70']          
+                'used_for' => ['max:70']
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
-                , Response::HTTP_BAD_REQUEST);
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
             $input = $request->all();
             $type_to_be_updated = Type::where('id', $id)->first();
@@ -477,7 +506,7 @@ class TypeController extends Controller
                     HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Type is deleted sucessfully.", ""),
                     Response::HTTP_NO_CONTENT
                 );
-        } catch (ModelNotFoundException $ex) { 
+        } catch (ModelNotFoundException $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),

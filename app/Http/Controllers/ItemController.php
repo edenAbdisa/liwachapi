@@ -199,13 +199,23 @@ class ItemController extends Controller
     {
         //if organization or user do smt on status. Check if 
         //the memebrship of this user enables the user to enter a new product
-        //$file = $request->file('picture');
-        // if ($file) {
-        // $filename = time() . '_' . $file->getClientOriginalName();
-        //if (!HelperClass::uploadFile($file, $filename, 'files/items')) {
-        // return response()
-        // ->json("The picture couldn't be uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
-        //}            
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['max:50'],
+                'description' => ['max:255'],
+                'status' => ['max:15'],
+                'number_of_flag' => ['numeric'],
+                'number_of_request' => ['numeric'],
+                'bartering_location_id' => ['numeric'],
+                'type_id' => ['numeric']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }           
         $input = $request->all();
         $address = $request->address;
         // $address = json_decode($address, true,512,JSON_BIGINT_AS_STRING);
@@ -268,18 +278,41 @@ class ItemController extends Controller
             return response()
                 ->json("The address couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        /* } else {
-            return response()
-                ->json("The image files isnt uploaded", Response::HTTP_INTERNAL_SERVER_ERROR);
-        } */
-        //$item = Item::create($request->all());
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        //dd("line 81");         
+    } catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    }        
     }
 
     public function search(Request $request)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['max:50'],
+                'description' => ['max:255'],
+                'status' => ['max:15'],
+                'number_of_flag' => ['numeric'],
+                'number_of_request' => ['numeric'],
+                'bartering_location_id' => ['numeric'],
+                'type_id' => ['numeric'],
+                'user_id' =>['numeric']
+            ]);
+        if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
         $input = $request->all();
         $items = Item::all();
         $col = DB::getSchemaBuilder()->getColumnListing('items');
@@ -303,6 +336,20 @@ class ItemController extends Controller
             $item->request;
         });
         return response()->json($items, 200);
+    }catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+    }
+
     }
 
     /**
@@ -326,75 +373,77 @@ class ItemController extends Controller
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
-                , Response::HTTP_BAD_REQUEST);
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
-        $input = $request->all();
-        $item = Item::where('id', $id)->first();
-        if ($request->address) {
-            $address_to_be_updated = $request->address;
-            $address = Address::where('id', $item->bartering_location_id)->first();
-            $address->city = $address_to_be_updated['city'];
-            $address->country = $address_to_be_updated['country'];
-            $address->latitude = (float)$address_to_be_updated['latitude'];
-            $address->longitude = (float)$address_to_be_updated['longitude'];
-            $address->save();
-        }
-        if ($request->media) {
-            $itemMedia = $request->media;
-            foreach ($itemMedia as $m) {
-                $mediaOld = Media::where('id', $m['id'])->first();
-                $mediaOld->url = $m['url'];
-                $mediaOld->save();
+            $input = $request->all();
+            $item = Item::where('id', $id)->first();
+            if ($request->address) {
+                $address_to_be_updated = $request->address;
+                $address = Address::where('id', $item->bartering_location_id)->first();
+                $address->city = $address_to_be_updated['city'];
+                $address->country = $address_to_be_updated['country'];
+                $address->latitude = (float)$address_to_be_updated['latitude'];
+                $address->longitude = (float)$address_to_be_updated['longitude'];
+                $address->save();
             }
-        }
-        //->select('users.*', 'contacts.phone', 'orders.price')
-        if ($request->swap_type) {
-            $toBeRemoved = $request->swap_type["removed"];
-            $newToBeSaved = $request->swap_type["added"];
-            $oldSwap = ItemSwapType::where('item_id', $item->id)
-                ->where('type_id', $toBeRemoved)->get();
-            ItemSwapType::destroy($oldSwap);
-            foreach ($newToBeSaved as $t) {
-                //check if the sent type id is in there 
-                $swap = new ItemSwapType();
-                $swap->type_id = $t;
-                $swap->item_id = $item->id;
-                if (!$swap->save()) {
-                    return response()
-                        ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            if ($request->media) {
+                $itemMedia = $request->media;
+                foreach ($itemMedia as $m) {
+                    $mediaOld = Media::where('id', $m['id'])->first();
+                    $mediaOld->url = $m['url'];
+                    $mediaOld->save();
                 }
             }
+            //->select('users.*', 'contacts.phone', 'orders.price')
+            if ($request->swap_type) {
+                $toBeRemoved = $request->swap_type["removed"];
+                $newToBeSaved = $request->swap_type["added"];
+                $oldSwap = ItemSwapType::where('item_id', $item->id)
+                    ->where('type_id', $toBeRemoved)->get();
+                ItemSwapType::destroy($oldSwap);
+                foreach ($newToBeSaved as $t) {
+                    //check if the sent type id is in there 
+                    $swap = new ItemSwapType();
+                    $swap->type_id = $t;
+                    $swap->item_id = $item->id;
+                    if (!$swap->save()) {
+                        return response()
+                            ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                    }
+                }
+            }
+            //     $input['type_id'] = $type->id;
+            // }
+            //swap update isnt done
+            if ($item->fill($input)->save()) {
+                $item->media;
+                $item->bartering_location;
+                $item->type;
+                $item->user;
+                $item->request;
+                $item->itemSwapType->each(function ($type, $key) {
+                    $type->type;
+                });
+                return (new ItemResource($item))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_CREATED);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
-        //     $input['type_id'] = $type->id;
-        // }
-        //swap update isnt done
-        if ($item->fill($input)->save()) {
-            $item->media;
-            $item->bartering_location;
-            $item->type;
-            $item->user;
-            $item->request;
-            $item->itemSwapType->each(function ($type, $key) {
-                $type->type;
-            });
-            return (new ItemResource($item))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        }
-    } catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    }
     }
 
     /**

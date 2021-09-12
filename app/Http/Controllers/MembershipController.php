@@ -42,23 +42,34 @@ class MembershipController extends Controller
      */
     public function index()
     {
-            try{
-                $membership = Membership::where('status', '=', 'active')->orWhereNull('status')->get();
+        try {
+            $membership = Membership::where('status', '=', 'active')->orWhereNull('status')->get();
 
-                return response()
-                            ->json(HelperClass::responeObject(
-                                    $membership,true, Response::HTTP_OK,'Successfully fetched.',"Membership are fetched sucessfully.","")
-                                    , Response::HTTP_OK);
-            } catch (ModelNotFoundException $ex) { // User not found
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
-                  , Response::HTTP_UNPROCESSABLE_ENTITY);
-            } catch (Exception $ex) { // Anything that went wrong
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
-                , Response::HTTP_UNPROCESSABLE_ENTITY);
-                   
-            }
+            return response()
+                ->json(
+                    HelperClass::responeObject(
+                        $membership,
+                        true,
+                        Response::HTTP_OK,
+                        'Successfully fetched.',
+                        "Membership are fetched sucessfully.",
+                        ""
+                    ),
+                    Response::HTTP_OK
+                );
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        }
     }
 
 
@@ -166,28 +177,16 @@ class MembershipController extends Controller
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
-                ->json([
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
-                            'title' => 'The model doesnt exist.',
-                            'message' => $ex->getMessage()
-                        ],
-                    ]
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         } catch (Exception $ex) { // Anything that went wrong
             return response()
-                ->json([
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => 500,
-                            'title' => 'Internal server error',
-                            'message' => $ex->getMessage()
-                        ],
-                    ]
-                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
     }
     /**
@@ -227,22 +226,49 @@ class MembershipController extends Controller
      */
     public function search(Request $request)
     {
-        $input = $request->all();
-        $memberships = Membership::all();
-        $col = DB::getSchemaBuilder()->getColumnListing('memberships');
-        $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($memberships)) {
-                return response()->json($memberships, 200);
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['max:30'],
+                'status' => ['max:50'],
+                'limit_of_post' => ['numeric', 'min:0', 'not_in:0'],
+                'transaction_limit' => ['numeric', 'min:0', 'not_in:0']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
-            if (in_array($key, $col)) {
-                if ($key == 'name') {
-                    $input[$key] = Str::ucfirst($input[$key]);
+            $input = $request->all();
+            $memberships = Membership::all();
+            $col = DB::getSchemaBuilder()->getColumnListing('memberships');
+            $requestKeys = collect($request->all())->keys();
+            foreach ($requestKeys as $key) {
+                if (empty($memberships)) {
+                    return response()->json($memberships, 200);
                 }
-                $memberships = $memberships->where($key, $input[$key])->values();
+                if (in_array($key, $col)) {
+                    if ($key == 'name') {
+                        $input[$key] = Str::ucfirst($input[$key]);
+                    }
+                    $memberships = $memberships->where($key, $input[$key])->values();
+                }
             }
+            return response()->json($memberships, 200);
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        return response()->json($memberships, 200);
     }
 
     /**
@@ -289,8 +315,8 @@ class MembershipController extends Controller
      * )
      */
     public function update(Request $request, $id)
-    { 
-            
+    {
+
         try {
             $validatedData = Validator::make($request->all(), [
                 'name' => ['max:30'],
@@ -300,8 +326,10 @@ class MembershipController extends Controller
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
-                , Response::HTTP_BAD_REQUEST);
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
             $input = $request->all();
             $membership_to_be_updated = Membership::where('id', $id)->first();
@@ -416,7 +444,7 @@ class MembershipController extends Controller
      * )
      */
     public function destroy($id)
-    { 
+    {
         try {
             $membership = Membership::find($id);
             if (!$membership) {
@@ -433,7 +461,7 @@ class MembershipController extends Controller
                     HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Membership is deleted sucessfully.", ""),
                     Response::HTTP_NO_CONTENT
                 );
-        } catch (ModelNotFoundException $ex) { 
+        } catch (ModelNotFoundException $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),

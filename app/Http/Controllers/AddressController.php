@@ -43,19 +43,25 @@ class AddressController extends Controller
      */
     public function index()
     {
-        try{
-            $address=Address::all();
+        try {
+            $address = Address::all();
             return response()
-            ->json( HelperClass::responeObject($address,true, Response::HTTP_OK,'Successfully fetched.',"Address are fetched sucessfully.","")
-               , Response::HTTP_OK);
-        } catch (ModelNotFoundException $ex) { 
+                ->json(
+                    HelperClass::responeObject($address, true, Response::HTTP_OK, 'Successfully fetched.', "Address are fetched sucessfully.", ""),
+                    Response::HTTP_OK
+                );
+        } catch (ModelNotFoundException $ex) {
             return response()
-            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
-              , Response::HTTP_UNPROCESSABLE_ENTITY);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         } catch (Exception $ex) { // Anything that went wrong
             return response()
-            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
-            , Response::HTTP_UNPROCESSABLE_ENTITY);               
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
     }
 
@@ -91,10 +97,22 @@ class AddressController extends Controller
      */
     public function store(Request $request)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'latitude' => ['numeric'],
+                'longitude' => ['numeric'],
+                'country' => ['max:50'],
+                'city' => ['max:50'],
+                'type' => ['max:10']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
         $address = Address::create($request->all());
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        //dd("line 81"); 
         if ($address->save()) {
             return (new AddressResource($address))
                 ->response()
@@ -104,6 +122,19 @@ class AddressController extends Controller
                 ->response()
                 ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    } catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+    }
     }
 
     /**
@@ -143,19 +174,47 @@ class AddressController extends Controller
      */
     public function search(Request $request)
     {
-        $input = $request->all();
-        $addresses = Address::all();
-        $col = DB::getSchemaBuilder()->getColumnListing('addresses');
-        $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($addresses)) {
-                return response()->json($addresses, 200);
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'latitude' => ['numeric'],
+                'longitude' => ['numeric'],
+                'country' => ['max:50'],
+                'city' => ['max:50'],
+                'type' => ['max:10']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
-            if (in_array($key, $col)) {
-                $addresses = $addresses->where($key, $input[$key])->values();
+            $input = $request->all();
+            $addresses = Address::all();
+            $col = DB::getSchemaBuilder()->getColumnListing('addresses');
+            $requestKeys = collect($request->all())->keys();
+            foreach ($requestKeys as $key) {
+                if (empty($addresses)) {
+                    return response()->json($addresses, 200);
+                }
+                if (in_array($key, $col)) {
+                    $addresses = $addresses->where($key, $input[$key])->values();
+                }
             }
+            return response()->json($addresses, 200);
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        return response()->json($addresses, 200);
     }
 
     /**
@@ -204,23 +263,43 @@ class AddressController extends Controller
     public function update(Request $request, $id)
     {
         try {
-        $input = $request->all();
-        $address = Address::where('id', $id)->first();
-        if (!$address) {
-            return response()
-            ->json( HelperClass::responeObject(null,false, Response::HTTP_NOT_FOUND,'Address doesnt exist.',"This address doesnt exist in the database.","")
-            , Response::HTTP_OK);
-        }
-        if ($address->fill($input)->save()) {
-            return response()
-            ->json( HelperClass::responeObject($address,true, Response::HTTP_CREATED,'Address Updated.',"The address is updated sucessfully.","")
-            , Response::HTTP_OK);
-        }else {
-            return response()
-            ->json( HelperClass::responeObject($address,false, Response::HTTP_INTERNAL_SERVER_ERROR,'Internal error.',"","This address couldnt be updated.")
-            , Response::HTTP_INTERNAL_SERVER_ERROR);
-        }   
-    } catch (ModelNotFoundException $ex) { // User not found
+            $validatedData = Validator::make($request->all(), [
+                'latitude' => ['numeric'],
+                'longitude' => ['numeric'],
+                'country' => ['max:50'],
+                'city' => ['max:50'],
+                'type' => ['max:10']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
+            $input = $request->all();
+            $address = Address::where('id', $id)->first();
+            if (!$address) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, 'Address doesnt exist.', "This address doesnt exist in the database.", ""),
+                        Response::HTTP_OK
+                    );
+            }
+            if ($address->fill($input)->save()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject($address, true, Response::HTTP_CREATED, 'Address Updated.', "The address is updated sucessfully.", ""),
+                        Response::HTTP_OK
+                    );
+            } else {
+                return response()
+                    ->json(
+                        HelperClass::responeObject($address, false, Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal error.', "", "This address couldnt be updated."),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    );
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
@@ -271,22 +350,27 @@ class AddressController extends Controller
      * )
      */
     public function destroy($id)
-    { 
-        try{
+    {
+        try {
             $address = Address::findOrFail($id);
             $address->delete();
             return response()
-                        ->json(
-                            HelperClass::responeObject(null,true, Response::HTTP_NO_CONTENT,'Successfully deleted.',"Address is deleted sucessfully.","")
-                            , Response::HTTP_NO_CONTENT);
+                ->json(
+                    HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Address is deleted sucessfully.", ""),
+                    Response::HTTP_NO_CONTENT
+                );
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
-            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
-           , Response::HTTP_UNPROCESSABLE_ENTITY);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         } catch (Exception $ex) { // Anything that went wrong
             return response()
-            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal error occured.',"",$ex->getMessage())
-            , Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
     }
     //cant be deletd alone since it violates foreign key no need

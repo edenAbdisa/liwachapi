@@ -44,32 +44,43 @@ class RequestController extends Controller
      *     )
      */
     public function index()
-    { 
-            try{
-                $requestOrder = RequestOrder::where('status', '!=', 'deleted')
-            ->orWhereNull('status')->get()
-            ->each(function ($item, $key) {
-                $item->requester;
-                $item->requested_item;
-                $item->requester_item;
-                $item->requested_item->type;
-                $item->requester_item->type;
-            });
-                return response()
-                ->json(HelperClass::responeObject(
-                    $requestOrder,true, Response::HTTP_OK,'Successfully fetched.',"Request Order are fetched sucessfully.","")
-                    , Response::HTTP_OK);
-            }catch (ModelNotFoundException $ex) { // User not found
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
-                  , Response::HTTP_UNPROCESSABLE_ENTITY);
-            } catch (Exception $ex) { // Anything that went wrong
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
-                , Response::HTTP_UNPROCESSABLE_ENTITY);
-                   
-            }
-     }
+    {
+        try {
+            $requestOrder = RequestOrder::where('status', '!=', 'deleted')
+                ->orWhereNull('status')->get()
+                ->each(function ($item, $key) {
+                    $item->requester;
+                    $item->requested_item;
+                    $item->requester_item;
+                    $item->requested_item->type;
+                    $item->requester_item->type;
+                });
+            return response()
+                ->json(
+                    HelperClass::responeObject(
+                        $requestOrder,
+                        true,
+                        Response::HTTP_OK,
+                        'Successfully fetched.',
+                        "Request Order are fetched sucessfully.",
+                        ""
+                    ),
+                    Response::HTTP_OK
+                );
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        }
+    }
     /*  public function statusCountRequest($status,$type)
     {
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -127,11 +138,22 @@ class RequestController extends Controller
      * )
      */
     public function store(Request $request)
-    {
-
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        //dd("line 81"); 
+    {try {
+        $validatedData = Validator::make($request->all(), [
+            'requester_id' => ['numeric'],
+            'requested_item_id' => ['numeric'],
+            'requester_item_id' => ['numeric'],
+            'rating' => ['numeric'],
+            'type' => ['max:10'],
+            'status' => ['max:15']
+        ]);
+        if ($validatedData->fails()) {
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                    Response::HTTP_BAD_REQUEST
+                );
+        }
         $request_already_exist = RequestOrder::where('requester_id', $request->requester_id)
             ->where('status', '!=', 'expired')
             ->where('requested_item_id', $request->requested_item_id)->first();
@@ -200,6 +222,19 @@ class RequestController extends Controller
                     ]
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    } catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    }
     }
     public function requestCountByDate($attribute, $start, $end)
     {
@@ -256,6 +291,22 @@ class RequestController extends Controller
      */
     public function search(Request $request)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'requester_id' => ['numeric'],
+                'requested_item_id' => ['numeric'],
+                'requester_item_id' => ['numeric'],
+                'rating' => ['numeric'],
+                'type' => ['max:10'],
+                'status' => ['max:15']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
         $input = $request->all();
         $requests = RequestOrder::all();
         $col = DB::getSchemaBuilder()->getColumnListing('requests');
@@ -276,6 +327,20 @@ class RequestController extends Controller
             $item->requester_item->type;
         });
         return response()->json($requests, 200);
+    }catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+    }
+
     }
 
     /**
@@ -328,57 +393,59 @@ class RequestController extends Controller
                 'requester_id' => ['numeric'],
                 'requested_item_id' => ['numeric'],
                 'requester_item_id' => ['numeric'],
-                'rating' => ['numeric'], 
+                'rating' => ['numeric'],
                 'type' => ['max:10'],
                 'status' => ['max:15']
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
-                , Response::HTTP_BAD_REQUEST);
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
-        $input = $request->all();
-        $request = RequestOrder::where('id', $id)->first();
-        if (in_array('status', $input)) {
-            if ($input['status'] === 'bartered') {
-                if ($request->type === 'item') {
-                    $requested_item = Item::where('id', $request->requested_item_id);
-                    $requested_item->status = 'bartered';
-                    $requested_item->save();
-                    $requester_item = Item::where('id', $request->requester_item_id);
-                    $requester_item->status = 'bartered';
-                    $requester_item->save();
-                } else {
-                    $requested_service = Service::where('id', $request->requested_item_id);
-                    $requested_service->status = 'bartered';
-                    $requested_service->save();
-                    $requester_service = Service::where('id', $request->requester_item_id);
-                    $requester_service->status = 'bartered';
-                    $requester_service->save();
+            $input = $request->all();
+            $request = RequestOrder::where('id', $id)->first();
+            if (in_array('status', $input)) {
+                if ($input['status'] === 'bartered') {
+                    if ($request->type === 'item') {
+                        $requested_item = Item::where('id', $request->requested_item_id);
+                        $requested_item->status = 'bartered';
+                        $requested_item->save();
+                        $requester_item = Item::where('id', $request->requester_item_id);
+                        $requester_item->status = 'bartered';
+                        $requester_item->save();
+                    } else {
+                        $requested_service = Service::where('id', $request->requested_item_id);
+                        $requested_service->status = 'bartered';
+                        $requested_service->save();
+                        $requester_service = Service::where('id', $request->requester_item_id);
+                        $requester_service->status = 'bartered';
+                        $requester_service->save();
+                    }
                 }
             }
+            if ($request->fill($input)->save()) {
+                $request->requester;
+                $request->requested_item;
+                $request->requester_item;
+                return (new RequestResource($request))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_CREATED);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
-        if ($request->fill($input)->save()) {
-            $request->requester;
-            $request->requested_item;
-            $request->requester_item;
-            return (new RequestResource($request))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        }
-    } catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    }
     }
 
     /**
@@ -434,7 +501,7 @@ class RequestController extends Controller
                     HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Request is deleted sucessfully.", ""),
                     Response::HTTP_NO_CONTENT
                 );
-        } catch (ModelNotFoundException $ex) { 
+        } catch (ModelNotFoundException $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),

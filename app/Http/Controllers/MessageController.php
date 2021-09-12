@@ -48,18 +48,29 @@ class MessageController extends Controller
                 $item->request;
             });
             return response()
-            ->json(HelperClass::responeObject(
-                $message,true, Response::HTTP_OK,'Successfully fetched.',"Message are fetched sucessfully.","")
-                , Response::HTTP_OK);
+                ->json(
+                    HelperClass::responeObject(
+                        $message,
+                        true,
+                        Response::HTTP_OK,
+                        'Successfully fetched.',
+                        "Message are fetched sucessfully.",
+                        ""
+                    ),
+                    Response::HTTP_OK
+                );
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
-            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
-              , Response::HTTP_UNPROCESSABLE_ENTITY);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         } catch (Exception $ex) { // Anything that went wrong
             return response()
-            ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
-            , Response::HTTP_UNPROCESSABLE_ENTITY);
-               
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
     }
 
@@ -96,6 +107,17 @@ class MessageController extends Controller
      */
     public function store(Request $request)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'type' => ['max:10']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
         $message = Message::create($request->all());
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
@@ -110,6 +132,19 @@ class MessageController extends Controller
             return response()
                 ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    } catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    }
     }
 
     /**
@@ -149,23 +184,47 @@ class MessageController extends Controller
      */
     public function search(Request $request)
     {
-        $input = $request->all();
-        $messages = Message::all();
-        $col = DB::getSchemaBuilder()->getColumnListing('messages');
-        $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($messages)) {
-                return response()->json($messages, 200);
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'type' => ['max:10']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
-            if (in_array($key, $col)) {
-                $messages = $messages->where($key, $input[$key])->values();
+            $input = $request->all();
+            $messages = Message::all();
+            $col = DB::getSchemaBuilder()->getColumnListing('messages');
+            $requestKeys = collect($request->all())->keys();
+            foreach ($requestKeys as $key) {
+                if (empty($messages)) {
+                    return response()->json($messages, 200);
+                }
+                if (in_array($key, $col)) {
+                    $messages = $messages->where($key, $input[$key])->values();
+                }
             }
+            $messages->each(function ($item, $key) {
+                $item->bartering_location;
+                $item->type;
+            });
+            return response()->json($messages, 200);
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        $messages->each(function ($item, $key) {
-            $item->bartering_location;
-            $item->type;
-        });
-        return response()->json($messages, 200);
     }
 
     /**
@@ -214,36 +273,38 @@ class MessageController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $validatedData = Validator::make($request->all(), [              
-                'type' => ['max:10'] 
+            $validatedData = Validator::make($request->all(), [
+                'type' => ['max:10']
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
-                , Response::HTTP_BAD_REQUEST);
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
-        $input = $request->all();
-        $message = Message::where('id', $id)->first();
-        if ($message->fill($input)->save()) {
-            $message->bartering_location;
-            $message->type;
-            return ($message)
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
+            $input = $request->all();
+            $message = Message::where('id', $id)->first();
+            if ($message->fill($input)->save()) {
+                $message->bartering_location;
+                $message->type;
+                return ($message)
+                    ->response()
+                    ->setStatusCode(Response::HTTP_CREATED);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
-    } catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    }
     }
 
     /**
@@ -282,7 +343,7 @@ class MessageController extends Controller
      * )
      */
     public function destroy($id)
-    { 
+    {
         try {
             $message = Message::find($id);
             if (!$message) {
@@ -298,7 +359,7 @@ class MessageController extends Controller
                     HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Message is deleted sucessfully.", ""),
                     Response::HTTP_NO_CONTENT
                 );
-        } catch (ModelNotFoundException $ex) { 
+        } catch (ModelNotFoundException $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),

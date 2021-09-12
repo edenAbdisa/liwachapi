@@ -41,24 +41,35 @@ class ReportTypeController extends Controller
      *     )
      */
     public function index()
-    { 
-            try{
-                $reporttype=ReportType::where('status', '!=', 'deleted')->orWhereNull('status')->get();
-                return response()
-                ->json(HelperClass::responeObject(
-                    $reporttype,true, Response::HTTP_OK,'Successfully fetched.',"Report type are fetched sucessfully.","")
-                    , Response::HTTP_OK);
-            } catch (ModelNotFoundException $ex) { // User not found
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
-                  , Response::HTTP_UNPROCESSABLE_ENTITY);
-            } catch (Exception $ex) { // Anything that went wrong
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
-                , Response::HTTP_UNPROCESSABLE_ENTITY);
-                   
-            }
-      }
+    {
+        try {
+            $reporttype = ReportType::where('status', '!=', 'deleted')->orWhereNull('status')->get();
+            return response()
+                ->json(
+                    HelperClass::responeObject(
+                        $reporttype,
+                        true,
+                        Response::HTTP_OK,
+                        'Successfully fetched.',
+                        "Report type are fetched sucessfully.",
+                        ""
+                    ),
+                    Response::HTTP_OK
+                );
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        }
+    }
 
 
     /**
@@ -166,28 +177,16 @@ class ReportTypeController extends Controller
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
-                ->json([
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
-                            'title' => 'The model doesnt exist.',
-                            'message' => $ex->getMessage()
-                        ],
-                    ]
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         } catch (Exception $ex) { // Anything that went wrong
             return response()
-                ->json([
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => 500,
-                            'title' => 'Internal server error',
-                            'message' => $ex->getMessage()
-                        ],
-                    ]
-                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
     }
 
@@ -228,6 +227,20 @@ class ReportTypeController extends Controller
      */
     public function search(Request $request)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'report_detail' => ['max:50'],
+                'type_for' => ['max:30'],
+                'status' => ['max:50']
+
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
         $input = $request->all();
         $reporttypes = ReportType::all();
         $col = DB::getSchemaBuilder()->getColumnListing('report_types');
@@ -241,6 +254,20 @@ class ReportTypeController extends Controller
             }
         }
         return response()->json($reporttypes, 200);
+    }catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+    }
+
     }
 
     /**
@@ -293,12 +320,14 @@ class ReportTypeController extends Controller
                 'report_detail' => ['max:50'],
                 'type_for' => ['max:30'],
                 'status' => ['max:50']
-            
+
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
-                , Response::HTTP_BAD_REQUEST);
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
             $input = $request->all();
             $reporttype_to_be_edited = ReportType::where('id', $id)->first();
@@ -432,7 +461,7 @@ class ReportTypeController extends Controller
                     HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Report type is deleted sucessfully.", ""),
                     Response::HTTP_NO_CONTENT
                 );
-        } catch (ModelNotFoundException $ex) { 
+        } catch (ModelNotFoundException $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),

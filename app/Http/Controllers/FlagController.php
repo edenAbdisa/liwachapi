@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 class FlagController extends Controller
 {
     /**
@@ -44,27 +45,32 @@ class FlagController extends Controller
      */
     public function index()
     {
-        try{
-                $flag = Flag::all();
-        foreach ($flag as $f) {
-            $f->reason;
-            $f->flagged_by;
-            $f->flagged_item;
-        }
-                return response()
-                ->json(HelperClass::responeObject($flag,true, Response::HTTP_OK,'Successfully fetched.',"Flag is fetched sucessfully.","")
-                , Response::HTTP_OK);
-            } catch (ModelNotFoundException $ex) { // User not found
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
-                  , Response::HTTP_UNPROCESSABLE_ENTITY);
-            } catch (Exception $ex) { // Anything that went wrong
-                return response()
-                ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
-                , Response::HTTP_UNPROCESSABLE_ENTITY);
-                   
+        try {
+            $flag = Flag::all();
+            foreach ($flag as $f) {
+                $f->reason;
+                $f->flagged_by;
+                $f->flagged_item;
             }
- }
+            return response()
+                ->json(
+                    HelperClass::responeObject($flag, true, Response::HTTP_OK, 'Successfully fetched.', "Flag is fetched sucessfully.", ""),
+                    Response::HTTP_OK
+                );
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        }
+    }
 
 
     /**
@@ -99,6 +105,19 @@ class FlagController extends Controller
      */
     public function store(Request $request)
     {
+        try{
+            $validatedData = Validator::make($request->all(), [
+                'reason_id' => ['numeric'],
+                'flagged_item_id' => ['numeric'],
+                'type' => ['max:30']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
         $input = $request->all();
         $reason = ReportType::where('report_detail', $input['reason'])->first();
         if (!$reason) {
@@ -111,15 +130,15 @@ class FlagController extends Controller
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
         if ($flag->save()) {
-            if ($flag->type==='item') {
-                $flagged_item=Item::where('id',$flag->flagged_item_id);
-                $flagged_item->number_of_flag=$flagged_item->number_of_flag+1;
+            if ($flag->type === 'item') {
+                $flagged_item = Item::where('id', $flag->flagged_item_id);
+                $flagged_item->number_of_flag = $flagged_item->number_of_flag + 1;
                 $flagged_item->save();
-            }else{
-                $flagged_service=Service::where('id',$flag->flagged_item_id);
-                $flagged_service->number_of_flag=$flagged_service->number_of_flag+1;
+            } else {
+                $flagged_service = Service::where('id', $flag->flagged_item_id);
+                $flagged_service->number_of_flag = $flagged_service->number_of_flag + 1;
                 $flagged_service->save();
-            }  
+            }
             return (new FlagResource($flag))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
@@ -127,24 +146,37 @@ class FlagController extends Controller
             return response()
                 ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
     }
-    public function flaggedProductCountByDate($attribute,$start,$end)
+    }
+    public function flaggedProductCountByDate($attribute, $start, $end)
     {
-        try{
-        $items = Flag::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
-             return $item->created_at->format('Y-m-d');
-       });
-       }catch(Exception $e){
+        try {
+            $items = Flag::orderBy($attribute)->whereBetween($attribute, [$start, $end])->get()->groupBy(function ($item) {
+                return $item->created_at->format('Y-m-d');
+            });
+        } catch (Exception $e) {
+            return response()
+                ->json("There is no such attribute.", Response::HTTP_OK);
+        }
+        foreach ($items as $key => $item) {
+            $day = $key;
+            $totalCount = $item->count();
+            $items[$key] = $totalCount;
+        }
         return response()
-        ->json("There is no such attribute.",Response::HTTP_OK);
-       }
-       foreach($items as $key => $item){
-        $day = $key;
-        $totalCount = $item->count();
-        $items[$key]=$totalCount;
-       }
-        return response()
-            ->json($items,Response::HTTP_OK);
+            ->json($items, Response::HTTP_OK);
     }
     /**
      * @OA\Get(
@@ -183,6 +215,19 @@ class FlagController extends Controller
      */
     public function search(Request $request)
     {
+        try{
+        $validatedData = Validator::make($request->all(), [
+            'reason_id' => ['numeric'],
+            'flagged_item_id' => ['numeric'],
+            'type' => ['max:30']
+        ]);
+        if ($validatedData->fails()) {
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                    Response::HTTP_BAD_REQUEST
+                );
+        }
         $input = $request->all();
         $flags = Flag::all();
         $col = DB::getSchemaBuilder()->getColumnListing('flags');
@@ -192,15 +237,29 @@ class FlagController extends Controller
                 return response()->json($flags, 200);
             }
             if (in_array($key, $col)) {
-                $flags = $flags->where($key, $input[$key])->values(); 
+                $flags = $flags->where($key, $input[$key])->values();
             }
         }
-        $flags->each(function ($flag, $key) { 
+        $flags->each(function ($flag, $key) {
             $flag->reason;
             $flag->flagged_by;
             $flag->flagged_item;
         });
         return response()->json($flags, 200);
+    }catch (ModelNotFoundException $ex) { // User not found
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+    } catch (Exception $ex) { // Anything that went wrong
+        return response()
+            ->json(
+                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+    }
+
     }
 
     /**
@@ -256,25 +315,27 @@ class FlagController extends Controller
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json( HelperClass::responeObject(null,false, Response::HTTP_BAD_REQUEST,"Validation failed check JSON request","",$validatedData->errors())
-                , Response::HTTP_BAD_REQUEST);
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
-        $input = $request->all();
-        $flag = Flag::where('id', $id)->first();
-        $flag->flagged_by_id=$flag->flagged_by_id;
-        if ($flag->fill($input)->save()) {            
-            $flag->reason;
-            $flag->flagged_by;
-            $flag->flagged_item;
-            
-            return (new FlagResource($flag))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        } else {
-            return response()
-                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-     } catch (ModelNotFoundException $ex) { // User not found
+            $input = $request->all();
+            $flag = Flag::where('id', $id)->first();
+            $flag->flagged_by_id = $flag->flagged_by_id;
+            if ($flag->fill($input)->save()) {
+                $flag->reason;
+                $flag->flagged_by;
+                $flag->flagged_item;
+
+                return (new FlagResource($flag))
+                    ->response()
+                    ->setStatusCode(Response::HTTP_CREATED);
+            } else {
+                return response()
+                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
@@ -325,7 +386,7 @@ class FlagController extends Controller
      * )
      */
     public function destroy($id)
-    { 
+    {
         try {
             $flag = Flag::find($id);
             if (!$flag) {
