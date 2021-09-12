@@ -128,12 +128,15 @@ class ServiceController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
-                'name' => ['max:50'],
-                'description' => ['max:255'],
-                'status' => ['max:15'],
-                'number_of_flag' => ['numeric'],
-                'number_of_request' => ['numeric'], 
-                'type_id' => ['numeric']
+                'name' => ['required', 'max:50'],
+                'description' => ['required', 'max:255'],
+                'type_id' => ['required', 'numeric'],
+                'address.latitude' => ['required', 'numeric'],
+                'address.longitude' => ['required', 'numeric'],
+                'address.country' => ['required', 'max:50'],
+                'address.city' => ['required', 'max:50'],
+                'address.type' => ['required', 'max:10', Rule::in(['service'])]
+
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -142,38 +145,49 @@ class ServiceController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $input = $request->all();
-        $address = $request->address;
-        $address = new Address($address);
-        $address->type = 'service';
-        if ($address->save()) {
-            //$type = Type::where('name', $request->type_name)->first();
-            //if ($type) {
-            $input['status'] = 'open';
-            $input['number_of_flag'] = 0;
-            $input['number_of_request'] = 0;
-            $input['bartering_location_id'] = $address->id;
-            //$input['type_id'] = $type->id;
-            //$input['picture'] = $filename;
-            $service = Service::create($input);
-            //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-            //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST                
-            if ($service->save()) {
-                $serviceSwapType = $request->swap_type;
-                foreach ($serviceSwapType as $t) {
-                    //check if the sent type id is in there  
-                    $swap = new ServiceSwapType();
-                    $swap->type_id = $t;
-                    $swap->service_id = $service->id;
-                    if (!$swap->save()) {
-                        return  response()
+            $input = $request->all();
+            $user = $request->user();
+            $address = $request->address;
+            $address = new Address($address);
+            $address->type = 'service';
+            if ($address->save()) {
+                $type = Type::where('id', $request->type_id)->where('status', '!=', 'deleted')->first();
+                if (!$type) {
+                    return response()
                         ->json(
-                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
-                            Response::HTTP_INTERNAL_SERVER_ERROR
+                            HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Not valid type id passed", "", "A type doesnt exist by this id."),
+                            Response::HTTP_BAD_REQUEST
                         );
-                     }
                 }
-                $serviceMedia = $request->media;
+                $input['status'] = 'open';
+                $input['number_of_flag'] = 0;
+                $input['number_of_request'] = 0;
+                $input['bartering_location_id'] = $address->id;
+                $service = new Service($input);
+                $service->user_id = $user->id;
+                if ($service->save()) {
+                    $serviceSwapType = $request->swap_type;
+                    foreach ($serviceSwapType as $t) {
+                        $type = Type::where('id', $t)->where('status', '!=', 'deleted')->first();
+                        if (!$type) {
+                            return response()
+                                ->json(
+                                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Can't do a swap due to type id error.", "", "A type doesnt exist by the id $t."),
+                                    Response::HTTP_BAD_REQUEST
+                                );
+                        }
+                        $swap = new ServiceSwapType();
+                        $swap->type_id = $t;
+                        $swap->service_id = $service->id;
+                        if (!$swap->save()) {
+                            return  response()
+                                ->json(
+                                    HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
+                                    Response::HTTP_INTERNAL_SERVER_ERROR
+                                );
+                        }
+                    }
+                    /* $serviceMedia = $request->media;
                 foreach ($serviceMedia as $m) {
                     //check if the sent type id is in there 
                     $media = new Media();
@@ -188,47 +202,47 @@ class ServiceController extends Controller
                         );
                      }
                 }
-                $service->media;
-                $service->bartering_location;
-                $service->type;
-                $service->user;
-                $service->request;
-                $service->serviceSwapType->each(function ($type, $key) {
-                    $type->type;
-                });
-                return  response()
-                ->json(
-                    HelperClass::responeObject($service, true, Response::HTTP_CREATED, "Item created.", "The item has been created.", ""),
-                    Response::HTTP_CREATED
-                );
+                $service->media; */
+                    $service->bartering_location;
+                    $service->type;
+                    $service->user;
+                    $service->request;
+                    $service->serviceSwapType->each(function ($type, $key) {
+                        $type->type;
+                    });
+                    return  response()
+                        ->json(
+                            HelperClass::responeObject($service, true, Response::HTTP_CREATED, "Item created.", "The item has been created.", ""),
+                            Response::HTTP_CREATED
+                        );
+                } else {
+                    return  response()
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Item couldn't be saved.", "", "Item couldn't be saved"),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
+                }
+                //}
             } else {
                 return  response()
                     ->json(
-                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Item couldn't be saved.", "","Item couldn't be saved"),
-                        Response::HTTP_INTERNAL_SERVER_ERROR
-                    ); 
-             }
-            //}
-        } else {
-            return  response()
-                    ->json(
-                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Address couldn't be saved.","",  "Address couldn't be saved"),
+                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Address couldn't be saved.", "",  "Address couldn't be saved"),
                         Response::HTTP_INTERNAL_SERVER_ERROR
                     );
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
-    } catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    }
     }
     public function serviceCountByDate($attribute, $start, $end)
     {
@@ -258,34 +272,20 @@ class ServiceController extends Controller
             ]);
             if ($validatedData->fails()) {
                 return response()
-                    ->json([
-                        'data' => null,
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_BAD_REQUEST,
-                                'title' => "Validation failed check JSON request",
-                                'message' => $validatedData->errors()
-                            ],
-                        ]
-                    ], Response::HTTP_BAD_REQUEST);
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
             $addresses = Address::where('latitude', $input['latitude'])
                 ->where('longitude', $input['longitude'])
                 ->where('type', 'service')->get();
             if ($addresses->count() <= 0) {
                 return response()
-                    ->json([
-                        'data' => $addresses,
-                        'success' =>  false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_NO_CONTENT,
-                                'title' => 'Address doesnt exist',
-                                'message' => "An address by the given inputs doesnt exist."
-                            ],
-                        ]
-                    ], Response::HTTP_OK);
+                    ->json(
+                        HelperClass::responeObject($addresses, true, Response::HTTP_OK, 'Service doesnt exist', "Service doesn't exist within your location.", ""),
+                        Response::HTTP_OK
+                    );
             }
 
             $addresses->each(function ($address, $key) {
@@ -297,41 +297,22 @@ class ServiceController extends Controller
                 });
             });
             return response()
-                ->json([
-                    'data' => $addresses,
-                    'success' => true,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_OK,
-                            'title' => 'List of address with their item.',
-                            'message' => "These are the list of items near the address you choose."
-                        ],
-                    ]
-                ], Response::HTTP_OK);
-        } catch (ModelNotFoundException $ex) { // User not found
+                ->json(
+                    HelperClass::responeObject($addresses, true, Response::HTTP_OK, 'List of address with their service.', "These are the list of services near the address you choose.", ""),
+                    Response::HTTP_OK
+                );
+        } catch (ModelNotFoundException $ex) {
             return response()
-                ->json([
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
-                            'title' => 'The model doesnt exist.',
-                            'message' => $ex->getMessage()
-                        ],
-                    ]
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         } catch (Exception $ex) { // Anything that went wrong
             return response()
-                ->json([
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => 500,
-                            'title' => 'Internal server error',
-                            'message' => $ex->getMessage()
-                        ],
-                    ]
-                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
     }
     /**
@@ -379,7 +360,8 @@ class ServiceController extends Controller
                 'number_of_flag' => ['numeric'],
                 'number_of_request' => ['numeric'],
                 'bartering_location_id' => ['numeric'],
-                'type_id' => ['numeric']
+                'type_id' => ['numeric'],
+                'user_id' => ['numeric']
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -388,44 +370,50 @@ class ServiceController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $input = $request->all();
-        $services = Service::all();
-        $col = DB::getSchemaBuilder()->getColumnListing('services');
-        $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($services)) {
-                return response()->json($services, 200);
+            $input = $request->all();
+            $services = Service::all();
+            if ($services->count() <= 0) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject($services, true, Response::HTTP_OK, 'List of services.', "There is no service.", ""),
+                        Response::HTTP_OK
+                    );
             }
-            if (in_array($key, $col)) {
-                $services = $services->where($key, $input[$key])->values();
+            $col = DB::getSchemaBuilder()->getColumnListing('services');
+            $requestKeys = collect($request->all())->keys();
+            foreach ($requestKeys as $key) {
+                if (in_array($key, $col)) {
+                    $services = $services->where($key, $input[$key])->values();
+                }
             }
-        }
-        $services->each(function ($item, $key) {
-            $item->media;
-            $item->bartering_location;
-            $item->type;
-            $item->user;
-            $item->request;
-            $item->serviceSwapType->each(function ($type, $key) {
-                $type->type;
+            $services->each(function ($item, $key) {
+                $item->media;
+                $item->bartering_location;
+                $item->type;
+                $item->user;
+                $item->request;
+                $item->serviceSwapType->each(function ($type, $key) {
+                    $type->type;
+                });
             });
-        });
-
-        return response()->json($services, 200);
-    }catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-    }
-
+            return response()
+                ->json(
+                    HelperClass::responeObject($services, true, Response::HTTP_OK, 'List of items.', "These are the list of items based on your search.", ""),
+                    Response::HTTP_OK
+                );
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
+        }
     }
 
     /**
@@ -526,9 +514,12 @@ class ServiceController extends Controller
                     $swap->type_id = $t;
                     $swap->service_id = $service->id;
                     if (!$swap->save()) {
-                        return response()
-                            ->json("The swap type $swap resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
-                    }
+                        return  response()
+                                ->json(
+                                    HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
+                                    Response::HTTP_INTERNAL_SERVER_ERROR
+                                );
+                     }
                 }
             }
             if ($service->fill($input)->save()) {
@@ -540,9 +531,11 @@ class ServiceController extends Controller
                 $service->serviceSwapType->each(function ($type, $key) {
                     $type->type;
                 });
-                return (new ServiceResource($service))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
+                return response()
+                ->json(
+                    HelperClass::responeObject($service, true, Response::HTTP_OK, 'Service detail.', "Service updated successfully.", ""),
+                    Response::HTTP_OK
+                );
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()

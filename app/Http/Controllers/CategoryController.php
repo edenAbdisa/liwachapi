@@ -134,7 +134,7 @@ class CategoryController extends Controller
                 return response()
                 ->json(
                     HelperClass::responeObject($category, false, Response::HTTP_CONFLICT,'Category already exist.', "",  "This category already exist in the database."),
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    Response::HTTP_CONFLICT
                 );
             }
         } catch (ModelNotFoundException $ex) { // User not found

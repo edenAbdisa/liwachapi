@@ -138,6 +138,18 @@ class UserController extends Controller
     }
     public function login(Request $request)
     {
+        try {
+            $validatedData = Validator::make($request->all(), [ 
+                'email' => ['required','max:255'],
+                'password' => ['required','max:255']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
         $user = User::where('email', $request->email)->first();
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
@@ -146,28 +158,81 @@ class UserController extends Controller
                 if ($user->save()) {
                     $user->address;
                     $user->membership;
+                    return response()
+                ->json(
+                    HelperClass::responeObject($user, true, Response::HTTP_OK,'User found',"User is succesfully loged in.",""),
+                    Response::HTTP_OK
+                );
+                }else{
+                    return response()
+                    ->json(
+                        HelperClass::responeObject($user, true, Response::HTTP_INTERNAL_SERVER_ERROR,'Internal Error',"","An error occured while trying to log in."),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    );
                 }
-
-                return response(new UserResource($user), Response::HTTP_CREATED);
+                
             } else {
                 return response()
-                    ->json("Password mismatch", 422);
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_CONFLICT,'Password issue.',"The password doesnt match the email.",""),
+                    Response::HTTP_CONFLICT
+                );
             }
         } else {
             return response()
-                ->json("User doesnt not exist", 422);
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND,'User doesnt exist.',"The is no registered user by this email.",""),
+                    Response::HTTP_NOT_FOUND
+                );
         }
-    }
+    
+} catch (ModelNotFoundException $ex) { // User not found
+    return response()
+        ->json(
+            HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+            Response::HTTP_UNPROCESSABLE_ENTITY
+        );
+} catch (Exception $ex) { // Anything that went wrong
+    return response()
+        ->json(
+            HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+            Response::HTTP_UNPROCESSABLE_ENTITY
+        );
+}}
     public function logout(Request $request)
     {
+        try{
         $token = $request->user()->token();
         //$token = User::where('email', $request->email)->first()->token();
         $token->revoke();
         $user = User::where('id', $token->user_id)->first();
         $user['remember_token'] = '';
-        $response['message'] = $user->save() ? 'You have been successfully logged out!' : 'We could not successfully log out your account please try again!';
-        return response($response, 200);
+        if($user->save()){ 
+        return response()
+        ->json(
+            HelperClass::responeObject(null, true, RESPONSE::HTTP_OK, 'Successfully logged out', "You have been successfully logged out!", ""),
+            Response::HTTP_OK
+        );
+    }else{
+        return response()
+        ->json(
+            HelperClass::responeObject(null, true, RESPONSE::HTTP_INTERNAL_SERVER_ERROR, 'logout failure.', "We could not successfully log out your account please try again!", ""),
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
+} catch (ModelNotFoundException $ex) { // User not found
+    return response()
+        ->json(
+            HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+            Response::HTTP_UNPROCESSABLE_ENTITY
+        );
+} catch (Exception $ex) { // Anything that went wrong
+    return response()
+        ->json(
+            HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+            Response::HTTP_UNPROCESSABLE_ENTITY
+        );
+}}
     /**
      * @OA\Post(
      *      path="/user",
@@ -202,15 +267,19 @@ class UserController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
-                'first_name' => ['max:20'],
-                'last_name' => ['max:20'],
-                'email' => ['max:255'],
-                'phone_number' => ['max:30'],
-                'status' => ['max:255'],
-                'birthdate' => ['max:15'],
-                'type' => ['numeric'],
-                'address_id' => ['numeric'],
-                'memebrship_id' => ['numeric']
+                'first_name' => ['required','max:20'],
+                'last_name' => ['required','max:20'],
+                'email' => ['required','max:255'],
+                'phone_number' => ['required','max:30'], 
+                'birthdate' => ['required','max:15'],
+                'type' => ['required','numeric'], 
+                'memebrship_id' => ['required','numeric'],
+                'address.latitude' => ['required', 'numeric'],
+                'address.longitude' => ['required', 'numeric'],
+                'address.country' => ['required', 'max:50'],
+                'address.city' => ['required', 'max:50'],
+                'address.type' => ['required', 'max:10', Rule::in(['user'])]
+
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -220,19 +289,16 @@ class UserController extends Controller
                     );
             }
         $input = $request->all();
-        /* return $request->all();
-        $input['first_name']=$request->first_name;
-        $input['last_name']=$request->last_name;
-        $input['email']=$request->email;
-        $input['profile_picture']=$request->profile_picture;
-        $input['phone_number']=$request->phone_number;
-        $input['TIN_picture']=$request->TIN_picture;
-        $input['status']=$request->status;
-        $input['birthdate']=$request->birthdate;
-        $input['type']=$request->type;
-        $input['membership_id']=$request->membership_id; */
         $user = User::where('email', $request->email)->first();
         if (!$user) {
+            $user = User::where('phone_number', $request->phone_number)->first();
+            if($user){
+                return response()
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_CONFLICT,'User already exist.', "",  "A user already exist by this phonenumber "),
+                    Response::HTTP_CONFLICT
+                );
+            }
             $user = new User($input);
             $user->password = Hash::make($request->password);
             $user->remember_token  = $user->createToken('Laravel Password Grant')->accessToken;
@@ -242,25 +308,28 @@ class UserController extends Controller
                 $user->status = "pending";
             }
             $user->status = "active";
-            try {
-                $address->save();
-            } catch (\Illuminate\Database\QueryException $ex) {
-                return response()
-                    ->json($ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-            try {
                 $user->address_id = $address->id;
-                $saveduser = $user->save();
-                $user->address;
-                $user->membership;
-                return response(new UserResource($user), Response::HTTP_CREATED);
-            } catch (\Illuminate\Database\QueryException $ex) {
-                return response()
-                    ->json($ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
+                if($user->save()){
+                    $user->address;
+                    $user->membership;
+                    return response()
+                ->json(
+                    HelperClass::responeObject($user, true, Response::HTTP_CREATED,'User created.',"A user is created by the details given.",""),
+                    Response::HTTP_CREATED
+                );
+                }else{
+                    return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR,'Internal error', "",  "This user couldnt be saved."),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    );
+                } 
         } else {
             return response()
-                ->json("An account already exist by this email.", Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_CONFLICT,'User already exist.', "",  "A user already exist by this email "),
+                    Response::HTTP_CONFLICT
+                );
         }
     } catch (ModelNotFoundException $ex) { // User not found
         return response()

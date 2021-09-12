@@ -70,8 +70,8 @@ class MediaController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $serviceMedia = $request->url;
-        foreach ($serviceMedia as $m) {
+        $mediaUrl = $request->url;
+        foreach ($mediaUrl as $m) {
             //check if the sent type id is in there 
             $media = new Media();
             $media->type = $request->type;
@@ -79,13 +79,17 @@ class MediaController extends Controller
             $media->item_id = $request->item_id;
             if (!$media->save()) {
                 return response()
-                    ->json("The media $media resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Media couldnt be saved.", "", "The media $media resource couldn't be saved due to internal error"),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                ); 
             }
         }
-        return (new MediaResource(Media::where('item_id', $request->item_id)->get()))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-   
+        return response()
+                ->json(
+                    HelperClass::responeObject(Media::where('item_id', $request->item_id)->get(), true, Response::HTTP_CREATED, "Media created.", "The media is saved", ""),
+                    Response::HTTP_CREATED
+                );  
    
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
@@ -117,12 +121,16 @@ class MediaController extends Controller
         }
         $input = $request->all();
         $medias = Media::all();
+        if ($medias->count() <= 0) {
+            return response()
+                ->json(
+                    HelperClass::responeObject($medias, true, Response::HTTP_OK, 'List of medias.', "There is no media.", ""),
+                    Response::HTTP_OK
+                );
+        }
         $col = DB::getSchemaBuilder()->getColumnListing('medias');
         $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($medias)) {
-                return response()->json($medias, 200);
-            }
+        foreach ($requestKeys as $key) {            
             if (in_array($key, $col)) {
                 $medias = $medias->where($key, $input[$key])->values();
             }
@@ -132,7 +140,11 @@ class MediaController extends Controller
             $flag->flagged_by;
             $flag->flagged_item;
         });
-        return response()->json($medias, 200);
+        return response()
+                ->json(
+                    HelperClass::responeObject($medias, true, Response::HTTP_CREATED, "List of Medias.", "This is the list of media based on your search", ""),
+                    Response::HTTP_CREATED
+                ); 
     }catch (ModelNotFoundException $ex) { // User not found
         return response()
             ->json(
@@ -171,15 +183,27 @@ class MediaController extends Controller
             }
             $input = $request->all();
             $media = Media::where('id', $id)->first();
+            if(!$media){
+                return response()
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, "Media isn't found.","", "A media by this id doesnt exist."),
+                    Response::HTTP_NOT_FOUND
+                );
+            }
             if ($media->fill($input)->save()) {
 
-                return (new MediaResource($media))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
+                return response()
+                ->json(
+                    HelperClass::responeObject($media, true, Response::HTTP_OK, 'Media updated.', "The media is updated successfully.", ""),
+                    Response::HTTP_OK
+                );
             } else {
                 return response()
-                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, 'Media update failed.', "The media couldn't be updated.", ""),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
+              }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
                 ->json(

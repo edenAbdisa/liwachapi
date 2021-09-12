@@ -250,12 +250,16 @@ class FlagController extends Controller
             }
             $input = $request->all();
             $flags = Flag::all();
+            if ($flags->count() <= 0) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject($flags, true, Response::HTTP_OK, 'List of flags.', "There is no flagged item.", ""),
+                        Response::HTTP_OK
+                    );
+            }
             $col = DB::getSchemaBuilder()->getColumnListing('flags');
             $requestKeys = collect($request->all())->keys();
             foreach ($requestKeys as $key) {
-                if (empty($flags)) {
-                    return response()->json($flags, 200);
-                }
                 if (in_array($key, $col)) {
                     $flags = $flags->where($key, $input[$key])->values();
                 }
@@ -265,7 +269,11 @@ class FlagController extends Controller
                 $flag->flagged_by;
                 $flag->flagged_item;
             });
-            return response()->json($flags, 200);
+            return response()
+                ->json(
+                    HelperClass::responeObject($flags, true, Response::HTTP_OK, 'List of flagged items.', "These are the list of flagged items and service based on your search.", ""),
+                    Response::HTTP_OK
+                );
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
                 ->json(
