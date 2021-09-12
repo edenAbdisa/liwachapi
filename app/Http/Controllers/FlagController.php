@@ -10,6 +10,7 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\FlagResource;
+use App\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
@@ -119,7 +120,7 @@ class FlagController extends Controller
                     );
             }
             $input = $request->all();
-            $user = $request->user()->toJson();
+            $user =$request->user();
             if(strcmp($request->type,'item')==0){
                 $flagged_item = Item::where('id', $request->flagged_item_id)->where('status', '!=', 'deleted')->first();
             }elseif(strcmp($request->type,'service')==0){
@@ -148,7 +149,7 @@ class FlagController extends Controller
                         Response::HTTP_CONFLICT
                     );
             }
-            $flag = Flag::create($input);
+            $flag = new Flag($input);
             $flag->flagged_by_id = $user->id;
             if ($flag->save()) {
                 $flagged_item->number_of_flag = $flagged_item->number_of_flag + 1;
