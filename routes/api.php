@@ -39,7 +39,7 @@ Route::middleware(['auth:api', 'scope:user;admin;organization'])->group(function
     Route::put('/service/{id}', 'ServiceController@update');
     Route::post('/reporttype/search', 'ReportTypeController@search');
 });
-Route::middleware(['auth:api', 'scope:admin;'])->group(function () {
+Route::middleware(['auth:api', 'scope:admin'])->group(function () {
     Route::get('/address', 'AddressController@index');
     Route::post('/address/search', 'AddressController@search');
     Route::post('/address', 'AddressController@store');
