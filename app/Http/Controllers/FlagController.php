@@ -149,7 +149,7 @@ class FlagController extends Controller
                     );
             }
             $flag = Flag::create($input);
-            $flag->flagged_by_id = $user->id;
+            $flag->flagged_by_id = $user->id();
             if ($flag->save()) {
                 $flagged_item->number_of_flag = $flagged_item->number_of_flag + 1;
                 $flagged_item->save();
@@ -174,7 +174,7 @@ class FlagController extends Controller
         } catch (Exception $ex) { // Anything that went wrong
             return response()
                 ->json(
-                    HelperClass::responeObject($user, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
         }
