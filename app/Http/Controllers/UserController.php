@@ -46,12 +46,12 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::where('status','!=','deleted')
-        ->orWhereNull('status')->get()
+        $user = User::where('status', '!=', 'deleted')
+            ->orWhereNull('status')->get()
             ->each(function ($item, $key) {
                 $item->address;
                 $item->membership;
-                $item->remember_token="";
+                $item->remember_token = "";
             });
         return (new UserResource($user))
             ->response()
@@ -59,21 +59,19 @@ class UserController extends Controller
     }
     public function internalUsers($status)
     {
-        $user = User::where('status', '=', $status)->orWhereNull('status')->
-        where('type','!=','user')->
-        where('type','!=','org')->orWhereNull('type')->get();
+        $user = User::where('status', '=', $status)->orWhereNull('status')->where('type', '!=', 'user')->where('type', '!=', 'org')->orWhereNull('type')->get();
         return (new UserResource($user))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
     public function organizationByStatus($status)
     {
-        $user = User::where('status', '=', $status)->
-        where('type','=','org')->get()->each(
-            function ($item, $key) {
-            $item->address;
-            $item->membership;
-        });
+        $user = User::where('status', '=', $status)->where('type', '=', 'org')->get()->each(
+                function ($item, $key) {
+                    $item->address;
+                    $item->membership;
+                }
+            );
         return (new UserResource($user))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
@@ -83,58 +81,58 @@ class UserController extends Controller
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
         //$wordCount = Wordlist::where('id', '<=', $correctedComparisons)->count();
-        $userGrouped = User::where('status', '=', 'active')->where(function($q) {
+        $userGrouped = User::where('status', '=', 'active')->where(function ($q) {
             $q->where('type', 'user')
-              ->orWhere('type', 'org');
-        })->get()->groupBy(function($item) {
+                ->orWhere('type', 'org');
+        })->get()->groupBy(function ($item) {
             return $item->type;
         });
-        foreach($userGrouped as $key => $user){
+        foreach ($userGrouped as $key => $user) {
             $day = $key;
             $totalCount = $user->count();
-            $userGrouped[$key]=$totalCount;
-           }          
+            $userGrouped[$key] = $totalCount;
+        }
         return response()
-        ->json($userGrouped,Response::HTTP_OK);
+            ->json($userGrouped, Response::HTTP_OK);
     }
-    public function userCountByDate($attribute,$start,$end)
+    public function userCountByDate($attribute, $start, $end)
     {
-        try{
-        $items = User::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
-             return $item->created_at->format('Y-m-d');
-       });
-       }catch(Exception $e){
+        try {
+            $items = User::orderBy($attribute)->whereBetween($attribute, [$start, $end])->get()->groupBy(function ($item) {
+                return $item->created_at->format('Y-m-d');
+            });
+        } catch (Exception $e) {
+            return response()
+                ->json("There is no such attribute.", Response::HTTP_OK);
+        }
+        foreach ($items as $key => $item) {
+            $day = $key;
+            $totalCount = $item->count();
+            $items[$key] = $totalCount;
+        }
         return response()
-        ->json("There is no such attribute.",Response::HTTP_OK);
-       }
-       foreach($items as $key => $item){
-        $day = $key;
-        $totalCount = $item->count();
-        $items[$key]=$totalCount;
-       }
-        return response()
-            ->json($items,Response::HTTP_OK);
+            ->json($items, Response::HTTP_OK);
     }
     public function login(Request $request)
     {
-        $user = User::where('email', $request->email)->first(); 
+        $user = User::where('email', $request->email)->first();
         if ($user) {
-            if (Hash::check($request->password, $user->password)) { 
-                $token = $user->createToken('Laravel Password Grant',[$user->type])->accessToken;
-                $user['remember_token']= $token; 
-                if($user->save()){
+            if (Hash::check($request->password, $user->password)) {
+                $token = $user->createToken('Laravel Password Grant', [$user->type])->accessToken;
+                $user['remember_token'] = $token;
+                if ($user->save()) {
                     $user->address;
                     $user->membership;
-                 }
-             
-                return response(new UserResource($user), Response::HTTP_CREATED);            
+                }
+
+                return response(new UserResource($user), Response::HTTP_CREATED);
             } else {
-               return response()
-                    ->json("Password mismatch", 422); 
+                return response()
+                    ->json("Password mismatch", 422);
             }
         } else {
             return response()
-                    ->json("User doesnt not exist", 422); 
+                ->json("User doesnt not exist", 422);
         }
     }
     public function logout(Request $request)
@@ -194,27 +192,27 @@ class UserController extends Controller
         $user = User::where('email', $request->email)->first();
         if (!$user) {
             $user = new User($input);
-            $user->password = Hash::make($request->password);        
+            $user->password = Hash::make($request->password);
             $user->remember_token  = $user->createToken('Laravel Password Grant')->accessToken;
             $address = $request->address;
             $address = Address::create($address);
-            if($user->type==="organization"){
-                $user->status="pending";
-            } 
-            $user->status="active";
-            try{
+            if ($user->type === "organization") {
+                $user->status = "pending";
+            }
+            $user->status = "active";
+            try {
                 $address->save();
-            }catch(\Illuminate\Database\QueryException $ex){
+            } catch (\Illuminate\Database\QueryException $ex) {
                 return response()
                     ->json($ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-            try{
+            try {
                 $user->address_id = $address->id;
                 $saveduser = $user->save();
                 $user->address;
                 $user->membership;
                 return response(new UserResource($user), Response::HTTP_CREATED);
-            }catch(\Illuminate\Database\QueryException $ex){
+            } catch (\Illuminate\Database\QueryException $ex) {
                 return response()
                     ->json($ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
@@ -328,15 +326,15 @@ class UserController extends Controller
         $input = $request->all();
         $user = User::where('id', $id)->first();
         if ($request->address) {
-            $address_to_be_updated=$request->address;
-            $address = Address::where('id', $user->bartering_location_id)->first(); 
-            $address->city=$address_to_be_updated['city'];  
-            $address->country=$address_to_be_updated['country']; 
-            $address->latitude=(float)$address_to_be_updated['latitude'];  
-            $address->longitude=(float)$address_to_be_updated['longitude'];        
-            $address->save(); 
-        } 
-        $user=$user->fill($input);
+            $address_to_be_updated = $request->address;
+            $address = Address::where('id', $user->bartering_location_id)->first();
+            $address->city = $address_to_be_updated['city'];
+            $address->country = $address_to_be_updated['country'];
+            $address->latitude = (float)$address_to_be_updated['latitude'];
+            $address->longitude = (float)$address_to_be_updated['longitude'];
+            $address->save();
+        }
+        $user = $user->fill($input);
         if ($request->password) {
             $user->password = Hash::make($request->password);
         }
@@ -390,7 +388,7 @@ class UserController extends Controller
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
-        $user->status='deleted';
+        $user->status = 'deleted';
         $user->save();
         return response(null, Response::HTTP_NO_CONTENT);
     }

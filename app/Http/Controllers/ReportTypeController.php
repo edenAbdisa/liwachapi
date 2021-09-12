@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Exception;
 use App\Models\ReportType;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 class ReportTypeController extends Controller
 {
     /**
@@ -80,79 +82,79 @@ class ReportTypeController extends Controller
      */
     public function store(Request $request)
     {
-        try{ 
-            $validatedData = Validator::make($request->all(),[ 
-                'report_detail' => ['required','max:250'],
-                'type_for' => ['required','max:50']
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'report_detail' => ['required', 'max:250'],
+                'type_for' => ['required', 'max:50']
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json([
-                    'data' =>null,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_BAD_REQUEST,
-                            'title' => "Validation failed check JSON request",
-                            'message' => $validatedData->errors()
-                        ],
-                    ]
-                ], Response::HTTP_BAD_REQUEST);
-            }
-        $reportType = ReportType::where('report_detail', Str::ucfirst($request->report_detail))
-                               ->where('type_for',$request->type_for)
-                                ->first();       
-        if(!$reportType){
-            $input = $request->all();
-            $input['report_detail'] = Str::ucfirst($input['report_detail']);
-            $reporttype = new ReportType($input);
-            $reporttype->status="active"; 
-            //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-            //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-            //dd("line 81"); 
-            if ($reporttype->save()) {
-                return response()
-                ->json([
-                    'data' =>$reporttype,
-                    'success' => true,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CREATED,
-                            'title' => 'Report type created.',
-                            'message' => "The report type is created sucessfully."
-                        ],
-                    ]
-                ], Response::HTTP_CREATED);  
-            } else {
-                return response()
                     ->json([
-                        'data' =>$reporttype ,
+                        'data' => null,
                         'success' => false,
                         'errors' => [
                             [
-                                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                                'title' => 'Internal error',
-                                'message' => "This report type couldnt be saved."
+                                'status' => Response::HTTP_BAD_REQUEST,
+                                'title' => "Validation failed check JSON request",
+                                'message' => $validatedData->errors()
                             ],
                         ]
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR); 
-                }
-        }else{
-            return response()
-                ->json([
-                    'data' =>$reportType ,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CONFLICT,
-                            'title' => 'Report type already exist.',
-                            'message' => "This report type already exist in the database."
-                        ],
-                    ]
-                ], Response::HTTP_CONFLICT);
+                    ], Response::HTTP_BAD_REQUEST);
             }
-    }catch (ModelNotFoundException $ex) { // User not found
-        return response()
+            $reportType = ReportType::where('report_detail', Str::ucfirst($request->report_detail))
+                ->where('type_for', $request->type_for)
+                ->first();
+            if (!$reportType) {
+                $input = $request->all();
+                $input['report_detail'] = Str::ucfirst($input['report_detail']);
+                $reporttype = new ReportType($input);
+                $reporttype->status = "active";
+                //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+                //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
+                //dd("line 81"); 
+                if ($reporttype->save()) {
+                    return response()
+                        ->json([
+                            'data' => $reporttype,
+                            'success' => true,
+                            'errors' => [
+                                [
+                                    'status' => Response::HTTP_CREATED,
+                                    'title' => 'Report type created.',
+                                    'message' => "The report type is created sucessfully."
+                                ],
+                            ]
+                        ], Response::HTTP_CREATED);
+                } else {
+                    return response()
+                        ->json([
+                            'data' => $reporttype,
+                            'success' => false,
+                            'errors' => [
+                                [
+                                    'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                                    'title' => 'Internal error',
+                                    'message' => "This report type couldnt be saved."
+                                ],
+                            ]
+                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                return response()
+                    ->json([
+                        'data' => $reportType,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_CONFLICT,
+                                'title' => 'Report type already exist.',
+                                'message' => "This report type already exist in the database."
+                            ],
+                        ]
+                    ], Response::HTTP_CONFLICT);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
                 ->json([
                     'success' => false,
                     'errors' => [
@@ -162,9 +164,9 @@ class ReportTypeController extends Controller
                             'message' => $ex->getMessage()
                         ],
                     ]
-                ], Response::HTTP_UNPROCESSABLE_ENTITY); 
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
                 ->json([
                     'success' => false,
                     'errors' => [
@@ -175,8 +177,8 @@ class ReportTypeController extends Controller
                         ],
                     ]
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    } 
-}
+        }
+    }
 
     /**
      * @OA\Get(
@@ -275,77 +277,79 @@ class ReportTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try{ 
-            $validatedData = Validator::make($request->all(),[ 
+        try {
+            $validatedData = Validator::make($request->all(), [
                 'report_detail' => ['max:250'],
                 'type_for' => ['max:50']
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json([
-                    'data' =>null,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_BAD_REQUEST,
-                            'title' => "Validation failed check JSON request",
-                            'message' => $validatedData->errors()
-                        ],
-                    ]
-                ], Response::HTTP_BAD_REQUEST);
+                    ->json([
+                        'data' => null,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_BAD_REQUEST,
+                                'title' => "Validation failed check JSON request",
+                                'message' => $validatedData->errors()
+                            ],
+                        ]
+                    ], Response::HTTP_BAD_REQUEST);
             }
-        $input = $request->all();
-        $reporttype_to_be_edited = ReportType::where('id', $id)->first();
-        if(!$reporttype_to_be_edited){
-            return response()
-            ->json([
-                'data' =>null ,
-                'success' => false,
-                'errors' => [
-                    [
-                        'status' => Response::HTTP_CONFLICT,
-                        'title' => 'Report type doesnt exist.',
-                        'message' => "This report type doesnt exist in the database."
-                    ],
-                ]
-            ], Response::HTTP_CONFLICT); 
-        }
+            $input = $request->all();
+            $reporttype_to_be_edited = ReportType::where('id', $id)->first();
+            if (!$reporttype_to_be_edited) {
+                return response()
+                    ->json([
+                        'data' => null,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_CONFLICT,
+                                'title' => 'Report type doesnt exist.',
+                                'message' => "This report type doesnt exist in the database."
+                            ],
+                        ]
+                    ], Response::HTTP_CONFLICT);
+            }
             if ($request->report_detail) {
                 $reporttype = ReportType::where('report_detail', Str::ucfirst($request->name))->first();
                 if ($reporttype && $request->used_for) {
-                    $used_for_is_same= strcmp($reporttype->used_for,$request->used_for)==0?true:false;            
-            if ($used_for_is_same) {
-                    return response()
-                ->json([
-                    'data' =>$reporttype ,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CONFLICT,
-                            'title' => 'Report type already exist.',
-                            'message' => "This report type already exist in the database."
-                        ],
-                    ]
-                ], Response::HTTP_CONFLICT);  }
-                $input['report_detail'] = Str::ucfirst($input['report_detail']);
-            }}
+                    $used_for_is_same = strcmp($reporttype->used_for, $request->used_for) == 0 ? true : false;
+                    if ($used_for_is_same) {
+                        return response()
+                            ->json([
+                                'data' => $reporttype,
+                                'success' => false,
+                                'errors' => [
+                                    [
+                                        'status' => Response::HTTP_CONFLICT,
+                                        'title' => 'Report type already exist.',
+                                        'message' => "This report type already exist in the database."
+                                    ],
+                                ]
+                            ], Response::HTTP_CONFLICT);
+                    }
+                    $input['report_detail'] = Str::ucfirst($input['report_detail']);
+                }
+            }
             if ($reporttype_to_be_edited->fill($input)->save()) {
                 return response()
-                ->json([
-                    'data' =>$reporttype_to_be_edited,
-                    'success' => true,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CREATED,
-                            'title' => 'Report type updated.',
-                            'message' => "The report type is updated sucessfully."
-                        ],
-                    ]
-                ], Response::HTTP_CREATED);
-            }else {
+                    ->json([
+                        'data' => $reporttype_to_be_edited,
+                        'success' => true,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_CREATED,
+                                'title' => 'Report type updated.',
+                                'message' => "The report type is updated sucessfully."
+                            ],
+                        ]
+                    ], Response::HTTP_CREATED);
+            } else {
                 return response()
                     ->json([
-                        'data' =>$reporttype ,
+                        'data' => $reporttype,
                         'success' => false,
                         'errors' => [
                             [
@@ -354,35 +358,33 @@ class ReportTypeController extends Controller
                                 'message' => "This report type couldnt be updated."
                             ],
                         ]
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR); 
-                }
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-            catch (ModelNotFoundException $ex) { // User not found
-                return response()
-                        ->json([
-                            'success' => false,
-                            'errors' => [
-                                [
-                                    'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
-                                    'title' => 'The model doesnt exist.',
-                                    'message' => $ex->getMessage()
-                                ],
-                            ]
-                        ], Response::HTTP_UNPROCESSABLE_ENTITY); 
-            } catch (Exception $ex) { // Anything that went wrong
-                return response()
-                        ->json([
-                            'success' => false,
-                            'errors' => [
-                                [
-                                    'status' => 500,
-                                    'title' => 'Internal server error',
-                                    'message' => $ex->getMessage()
-                                ],
-                            ]
-                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
-            } 
-    
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                            'title' => 'The model doesnt exist.',
+                            'message' => $ex->getMessage()
+                        ],
+                    ]
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => 500,
+                            'title' => 'Internal server error',
+                            'message' => $ex->getMessage()
+                        ],
+                    ]
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -427,7 +429,7 @@ class ReportTypeController extends Controller
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
-        $reporttype->status='deleted';
+        $reporttype->status = 'deleted';
         $reporttype->save();
         return response(null, Response::HTTP_NO_CONTENT);
     }

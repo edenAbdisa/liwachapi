@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Exception;
 use App\Models\Media;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 class MediaController extends Controller
 {
     /**
@@ -39,16 +41,15 @@ class MediaController extends Controller
             $media = new Media();
             $media->type = $request->type;
             $media->url = $m;
-            $media->item_id =$request->item_id;
+            $media->item_id = $request->item_id;
             if (!$media->save()) {
                 return response()
                     ->json("The media $media resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
-        return (new MediaResource(Media::where('item_id',$request->item_id)->get()))
-                            ->response()
-                            ->setStatusCode(Response::HTTP_CREATED);
-              
+        return (new MediaResource(Media::where('item_id', $request->item_id)->get()))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
     public function search(Request $request)
     {
@@ -61,10 +62,10 @@ class MediaController extends Controller
                 return response()->json($medias, 200);
             }
             if (in_array($key, $col)) {
-                $medias = $medias->where($key, $input[$key])->values(); 
+                $medias = $medias->where($key, $input[$key])->values();
             }
         }
-        $medias->each(function ($flag, $key) { 
+        $medias->each(function ($flag, $key) {
             $flag->reason;
             $flag->flagged_by;
             $flag->flagged_item;
@@ -83,7 +84,7 @@ class MediaController extends Controller
         $input = $request->all();
         $media = Media::where('id', $id)->first();
         if ($media->fill($input)->save()) {
-            
+
             return (new MediaResource($media))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);

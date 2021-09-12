@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 class AddressController extends Controller
 {
     /**
@@ -43,7 +44,7 @@ class AddressController extends Controller
     {
         //abort_if(Gate::denies('address_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        
+
         return (new AddressResource(Address::all()))
             ->response()
             ->setStatusCode(Response::HTTP_OK);

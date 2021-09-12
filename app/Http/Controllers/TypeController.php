@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Exception;
 use App\Models\Type;
 use App\Models\Category;
@@ -15,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 class TypeController extends Controller
 {
     /**
@@ -85,68 +87,68 @@ class TypeController extends Controller
      */
     public function store(Request $request)
     {
-        try{ 
-            $validatedData = Validator::make($request->all(),[ 
-                'name' => ['required','max:30'], 
-                'category_id' => ['required','numeric']
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['required', 'max:30'],
+                'category_id' => ['required', 'numeric']
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json([
-                    'data' =>null,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_BAD_REQUEST,
-                            'title' => "Validation failed check JSON request",
-                            'message' => $validatedData->errors()
-                        ],
-                    ]
-                ], Response::HTTP_BAD_REQUEST);
-            }
-        $type = Type::where('name', Str::ucfirst($request->name))
-                    ->where('category_id',$request->category_id)
-                    ->first();
-        if (!$type) {
-            $category = Category::where('id', $request->category_id)->first();
-            if (!$category) {
-                return response()
-                ->json([
-                    'data' =>$category ,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CONFLICT,
-                            'title' => "Category doesn't exist.",
-                            'message' => "A category with this ID doesn't exist in the database.Please select the right category."
-                        ],
-                    ]
-                ], Response::HTTP_CONFLICT); 
-            }
-            $type = new Type($request->all());
-            $type->status="active";
-            $type->used_for=$category->used_for; 
-            //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-            //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-
-                if ($type->save()) {
-                    $type->category; 
-                        return response()
                     ->json([
-                        'data' =>$type,
-                        'success' => true,
+                        'data' => null,
+                        'success' => false,
                         'errors' => [
                             [
-                                'status' => Response::HTTP_CREATED,
-                                'title' => 'Type created.',
-                                'message' => "The type is created sucessfully."
+                                'status' => Response::HTTP_BAD_REQUEST,
+                                'title' => "Validation failed check JSON request",
+                                'message' => $validatedData->errors()
                             ],
                         ]
-                    ], Response::HTTP_CREATED); 
+                    ], Response::HTTP_BAD_REQUEST);
+            }
+            $type = Type::where('name', Str::ucfirst($request->name))
+                ->where('category_id', $request->category_id)
+                ->first();
+            if (!$type) {
+                $category = Category::where('id', $request->category_id)->first();
+                if (!$category) {
+                    return response()
+                        ->json([
+                            'data' => $category,
+                            'success' => false,
+                            'errors' => [
+                                [
+                                    'status' => Response::HTTP_CONFLICT,
+                                    'title' => "Category doesn't exist.",
+                                    'message' => "A category with this ID doesn't exist in the database.Please select the right category."
+                                ],
+                            ]
+                        ], Response::HTTP_CONFLICT);
+                }
+                $type = new Type($request->all());
+                $type->status = "active";
+                $type->used_for = $category->used_for;
+                //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
+                //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
+
+                if ($type->save()) {
+                    $type->category;
+                    return response()
+                        ->json([
+                            'data' => $type,
+                            'success' => true,
+                            'errors' => [
+                                [
+                                    'status' => Response::HTTP_CREATED,
+                                    'title' => 'Type created.',
+                                    'message' => "The type is created sucessfully."
+                                ],
+                            ]
+                        ], Response::HTTP_CREATED);
                 } else {
                     return response()
                         ->json([
-                            'data' =>$type ,
+                            'data' => $type,
                             'success' => false,
                             'errors' => [
                                 [
@@ -156,23 +158,23 @@ class TypeController extends Controller
                                 ],
                             ]
                         ], Response::HTTP_INTERNAL_SERVER_ERROR);
-                    }
-        } else {
+                }
+            } else {
                 return response()
-                ->json([
-                    'data' =>$type ,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CONFLICT,
-                            'title' => 'Type already exist.',
-                            'message' => "This type already exist in the database."
-                        ],
-                    ]
-                ], Response::HTTP_CONFLICT);  
-        } 
-    }catch (ModelNotFoundException $ex) { // User not found
-        return response()
+                    ->json([
+                        'data' => $type,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_CONFLICT,
+                                'title' => 'Type already exist.',
+                                'message' => "This type already exist in the database."
+                            ],
+                        ]
+                    ], Response::HTTP_CONFLICT);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
                 ->json([
                     'success' => false,
                     'errors' => [
@@ -182,9 +184,9 @@ class TypeController extends Controller
                             'message' => $ex->getMessage()
                         ],
                     ]
-                ], Response::HTTP_UNPROCESSABLE_ENTITY); 
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
                 ->json([
                     'success' => false,
                     'errors' => [
@@ -195,8 +197,8 @@ class TypeController extends Controller
                         ],
                     ]
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    } 
-}
+        }
+    }
 
     /**
      * @OA\Get(
@@ -300,86 +302,86 @@ class TypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try{ 
-            $validatedData = Validator::make($request->all(),[ 
-                'name' => ['max:30'], 
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['max:30'],
                 'category_id' => ['numeric']
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json([
-                    'data' =>null,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_BAD_REQUEST,
-                            'title' => "Validation failed check JSON request",
-                            'message' => $validatedData->errors()
-                        ],
-                    ]
-                ], Response::HTTP_BAD_REQUEST);
-            }
-        $input = $request->all();
-        $type_to_be_updated = Type::where('id', $id)->first();
-        if(!$type_to_be_updated){
-            return response()
-            ->json([
-                'data' =>null ,
-                'success' => false,
-                'errors' => [
-                    [
-                        'status' => Response::HTTP_CONFLICT,
-                        'title' => 'Type doesnt exist.',
-                        'message' => "This type doesnt exist in the database."
-                    ],
-                ]
-            ], Response::HTTP_CONFLICT); 
-        }
-        if ($request->name) {
-            $type = Type::where('name', Str::ucfirst($request->name))->first();
-            if($type && $request->category_id){                
-                $category_is_same= strcmp($type->category_id,$request->category_id)==0?true:false;            
-            if ($category_is_same) {
-                return response()
-                ->json([
-                    'data' =>$type ,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CONFLICT,
-                            'title' => 'Type already exist.',
-                            'message' => "This type already exist in the database."
-                        ],
-                    ]
-                ], Response::HTTP_CONFLICT); 
-            }
-            $input['name'] = Str::ucfirst($input['name']);
-        }}
-        if ($request->category_id || $request->category_id==0) {
-            $category = Category::where('id', $request->category_id)->
-                                  where('status', 'active')->first();
-            if ($category){
-                $type_to_be_updated->used_for=$category->used_for;
-            }else{
-                return response()
-                ->json([
-                    'data' =>$category ,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CONFLICT,
-                            'title' => "Category doesn't exist.",
-                            'message' => "A category with this ID doesn't exist in the database.Please select the right category."
-                        ],
-                    ]
-                ], Response::HTTP_CONFLICT); 
-            }
-        }
-        if ($type_to_be_updated->fill($input)->save()) {
-            $type_to_be_updated->type;
-            return response()
                     ->json([
-                        'data' =>$type_to_be_updated,
+                        'data' => null,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_BAD_REQUEST,
+                                'title' => "Validation failed check JSON request",
+                                'message' => $validatedData->errors()
+                            ],
+                        ]
+                    ], Response::HTTP_BAD_REQUEST);
+            }
+            $input = $request->all();
+            $type_to_be_updated = Type::where('id', $id)->first();
+            if (!$type_to_be_updated) {
+                return response()
+                    ->json([
+                        'data' => null,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_CONFLICT,
+                                'title' => 'Type doesnt exist.',
+                                'message' => "This type doesnt exist in the database."
+                            ],
+                        ]
+                    ], Response::HTTP_CONFLICT);
+            }
+            if ($request->name) {
+                $type = Type::where('name', Str::ucfirst($request->name))->first();
+                if ($type && $request->category_id) {
+                    $category_is_same = strcmp($type->category_id, $request->category_id) == 0 ? true : false;
+                    if ($category_is_same) {
+                        return response()
+                            ->json([
+                                'data' => $type,
+                                'success' => false,
+                                'errors' => [
+                                    [
+                                        'status' => Response::HTTP_CONFLICT,
+                                        'title' => 'Type already exist.',
+                                        'message' => "This type already exist in the database."
+                                    ],
+                                ]
+                            ], Response::HTTP_CONFLICT);
+                    }
+                    $input['name'] = Str::ucfirst($input['name']);
+                }
+            }
+            if ($request->category_id || $request->category_id == 0) {
+                $category = Category::where('id', $request->category_id)->where('status', 'active')->first();
+                if ($category) {
+                    $type_to_be_updated->used_for = $category->used_for;
+                } else {
+                    return response()
+                        ->json([
+                            'data' => $category,
+                            'success' => false,
+                            'errors' => [
+                                [
+                                    'status' => Response::HTTP_CONFLICT,
+                                    'title' => "Category doesn't exist.",
+                                    'message' => "A category with this ID doesn't exist in the database.Please select the right category."
+                                ],
+                            ]
+                        ], Response::HTTP_CONFLICT);
+                }
+            }
+            if ($type_to_be_updated->fill($input)->save()) {
+                $type_to_be_updated->type;
+                return response()
+                    ->json([
+                        'data' => $type_to_be_updated,
                         'success' => true,
                         'errors' => [
                             [
@@ -389,45 +391,45 @@ class TypeController extends Controller
                             ],
                         ]
                     ], Response::HTTP_CREATED);
-                } else {
-                    return response()
-                        ->json([
-                            'data' =>$type ,
-                            'success' => false,
-                            'errors' => [
-                                [
-                                    'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                                    'title' => 'Internal error',
-                                    'message' => "This type couldnt be saved."
-                                ],
-                            ]
-                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
-                    }
-                }catch (ModelNotFoundException $ex) { // User not found
-                    return response()
-                            ->json([
-                                'success' => false,
-                                'errors' => [
-                                    [
-                                        'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
-                                        'title' => 'The model doesnt exist.',
-                                        'message' => $ex->getMessage()
-                                    ],
-                                ]
-                            ], Response::HTTP_UNPROCESSABLE_ENTITY); 
-                } catch (Exception $ex) { // Anything that went wrong
-                    return response()
-                            ->json([
-                                'success' => false,
-                                'errors' => [
-                                    [
-                                        'status' => 500,
-                                        'title' => 'Internal server error',
-                                        'message' => $ex->getMessage()
-                                    ],
-                                ]
-                            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-                } 
+            } else {
+                return response()
+                    ->json([
+                        'data' => $type,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                                'title' => 'Internal error',
+                                'message' => "This type couldnt be saved."
+                            ],
+                        ]
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                            'title' => 'The model doesnt exist.',
+                            'message' => $ex->getMessage()
+                        ],
+                    ]
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => 500,
+                            'title' => 'Internal server error',
+                            'message' => $ex->getMessage()
+                        ],
+                    ]
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -472,7 +474,7 @@ class TypeController extends Controller
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
         }
-        $type->status='deleted';
+        $type->status = 'deleted';
         $type->save();
         return response(null, Response::HTTP_NO_CONTENT);
     }

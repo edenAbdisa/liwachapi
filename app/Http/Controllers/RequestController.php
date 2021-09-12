@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 class RequestController extends Controller
 {
     /**
@@ -46,12 +47,12 @@ class RequestController extends Controller
     {
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
-        $requestOrder = RequestOrder::where('status','!=','deleted')
-        ->orWhereNull('status')->get()
+        $requestOrder = RequestOrder::where('status', '!=', 'deleted')
+            ->orWhereNull('status')->get()
             ->each(function ($item, $key) {
                 $item->requester;
                 $item->requested_item;
-                $item->requester_item;                
+                $item->requester_item;
                 $item->requested_item->type;
                 $item->requester_item->type;
             });
@@ -59,7 +60,7 @@ class RequestController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
-   /*  public function statusCountRequest($status,$type)
+    /*  public function statusCountRequest($status,$type)
     {
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
@@ -74,16 +75,16 @@ class RequestController extends Controller
         //abort_if(Gate::denies('request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //User::with(['roles'])->get() 
         //$wordCount = Wordlist::where('id', '<=', $correctedComparisons)->count();
-        $userGrouped = RequestOrder::where('type', '=', $type)->get()->groupBy(function($item) {
+        $userGrouped = RequestOrder::where('type', '=', $type)->get()->groupBy(function ($item) {
             return $item->status;
         });
-        foreach($userGrouped as $key => $user){
+        foreach ($userGrouped as $key => $user) {
             $day = $key;
             $totalCount = $user->count();
-            $userGrouped[$key]=$totalCount;
-           }          
+            $userGrouped[$key] = $totalCount;
+        }
         return response()
-        ->json($userGrouped,Response::HTTP_OK);
+            ->json($userGrouped, Response::HTTP_OK);
     }
     /**
      * @OA\Post(
@@ -117,58 +118,58 @@ class RequestController extends Controller
      */
     public function store(Request $request)
     {
-        
+
         //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
         //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
         //dd("line 81"); 
-        $request_already_exist=RequestOrder::where('requester_id',$request->requester_id)
-                               ->where('status','!=','expired')
-                               ->where('requested_item_id',$request->requested_item_id)->first();
-        if($request_already_exist){
+        $request_already_exist = RequestOrder::where('requester_id', $request->requester_id)
+            ->where('status', '!=', 'expired')
+            ->where('requested_item_id', $request->requested_item_id)->first();
+        if ($request_already_exist) {
             //Can add set data to send a datamessage fitsums
             return (new RequestResource($request_already_exist))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
         }
         $requestOrder = new RequestOrder($request->all());
-        $requestOrder->status="pending"; 
-        $requestOrder->token=Hash::make(Str::random());
+        $requestOrder->status = "pending";
+        $requestOrder->token = Hash::make(Str::random());
         if ($requestOrder->save()) {
             $requestOrder->requester;
             $requestOrder->requested_item;
             $requestOrder->requester_item;
-            if ($requestOrder->type==='item') {
-                $requested_item=Item::where('id',$request->requested_item_id)->first();
-                $requested_item->number_of_request=(int)$requested_item->number_of_request + 1;
-                if(!$requested_item->save()){
+            if ($requestOrder->type === 'item') {
+                $requested_item = Item::where('id', $request->requested_item_id)->first();
+                $requested_item->number_of_request = (int)$requested_item->number_of_request + 1;
+                if (!$requested_item->save()) {
                     return response()
-                    ->json([
-                        'errors' => [
-                            [
-                                'status' => 500,
-                                'title' => 'Internal server error',
-                                'message' => 'The number of request couldnt be updated'
-                            ],
-                        ]
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR);        
+                        ->json([
+                            'errors' => [
+                                [
+                                    'status' => 500,
+                                    'title' => 'Internal server error',
+                                    'message' => 'The number of request couldnt be updated'
+                                ],
+                            ]
+                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
                 // $requester_item=Item::where('id',$request->requester_item_id);
                 // $requester_item->number_of_request=$requester_item->number_of_request+1;
                 // $requester_item->save();
-            }else{
-                $requested_service=Service::where('id',$request->requested_item_id)->first();
-                $requested_service->number_of_request=(int)$requested_service->number_of_request+1;
-                if(!$requested_service->save()){
+            } else {
+                $requested_service = Service::where('id', $request->requested_item_id)->first();
+                $requested_service->number_of_request = (int)$requested_service->number_of_request + 1;
+                if (!$requested_service->save()) {
                     return response()
-                    ->json([
-                        'errors' => [
-                            [
-                                'status' => 500,
-                                'title' => 'Internal server error',
-                                'message' => 'The number of request couldnt be updated'
-                            ],
-                        ]
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR);       
+                        ->json([
+                            'errors' => [
+                                [
+                                    'status' => 500,
+                                    'title' => 'Internal server error',
+                                    'message' => 'The number of request couldnt be updated'
+                                ],
+                            ]
+                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
                 // $requester_service=Service::where('id',$request->requester_item_id);
                 // $requester_service->number_of_request=$requester_service->number_of_request+1;
@@ -190,23 +191,23 @@ class RequestController extends Controller
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function requestCountByDate($attribute,$start,$end)
+    public function requestCountByDate($attribute, $start, $end)
     {
-        try{
-        $items = RequestOrder::orderBy($attribute)->whereBetween($attribute, [$start,$end])->get()->groupBy(function($item) {
-             return $item->created_at->format('Y-m-d');
-       });
-       }catch(Exception $e){
+        try {
+            $items = RequestOrder::orderBy($attribute)->whereBetween($attribute, [$start, $end])->get()->groupBy(function ($item) {
+                return $item->created_at->format('Y-m-d');
+            });
+        } catch (Exception $e) {
+            return response()
+                ->json("There is no such attribute.", Response::HTTP_OK);
+        }
+        foreach ($items as $key => $item) {
+            $day = $key;
+            $totalCount = $item->count();
+            $items[$key] = $totalCount;
+        }
         return response()
-        ->json("There is no such attribute.",Response::HTTP_OK);
-       }
-       foreach($items as $key => $item){
-        $day = $key;
-        $totalCount = $item->count();
-        $items[$key]=$totalCount;
-       }
-        return response()
-            ->json($items,Response::HTTP_OK);
+            ->json($items, Response::HTTP_OK);
     }
     /**
      * @OA\Get(
@@ -315,20 +316,20 @@ class RequestController extends Controller
         $input = $request->all();
         $request = RequestOrder::where('id', $id)->first();
         if (in_array('status', $input)) {
-            if($input['status']==='bartered'){
-                if ($request->type==='item') {
-                    $requested_item=Item::where('id',$request->requested_item_id);
-                    $requested_item->status='bartered';
+            if ($input['status'] === 'bartered') {
+                if ($request->type === 'item') {
+                    $requested_item = Item::where('id', $request->requested_item_id);
+                    $requested_item->status = 'bartered';
                     $requested_item->save();
-                    $requester_item=Item::where('id',$request->requester_item_id);
-                    $requester_item->status='bartered';
+                    $requester_item = Item::where('id', $request->requester_item_id);
+                    $requester_item->status = 'bartered';
                     $requester_item->save();
-                }else{
-                    $requested_service=Service::where('id',$request->requested_item_id);
-                    $requested_service->status='bartered';
+                } else {
+                    $requested_service = Service::where('id', $request->requested_item_id);
+                    $requested_service->status = 'bartered';
                     $requested_service->save();
-                    $requester_service=Service::where('id',$request->requester_item_id);
-                    $requester_service->status='bartered';
+                    $requester_service = Service::where('id', $request->requester_item_id);
+                    $requester_service->status = 'bartered';
                     $requester_service->save();
                 }
             }

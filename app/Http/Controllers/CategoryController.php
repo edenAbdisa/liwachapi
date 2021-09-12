@@ -15,6 +15,7 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 class CategoryController extends Controller
 {
     /**
@@ -114,98 +115,97 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        try{ 
-            $validatedData = Validator::make($request->all(),[ 
-                'name' => ['required','max:30'],
-                'used_for' => ['required','max:50']
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['required', 'max:30'],
+                'used_for' => ['required', 'max:50']
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json([
-                    'data' =>null,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_BAD_REQUEST,
-                            'title' => "Validation failed check JSON request",
-                            'message' => $validatedData->errors()
-                        ],
-                    ]
-                ], Response::HTTP_BAD_REQUEST);
+                    ->json([
+                        'data' => null,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_BAD_REQUEST,
+                                'title' => "Validation failed check JSON request",
+                                'message' => $validatedData->errors()
+                            ],
+                        ]
+                    ], Response::HTTP_BAD_REQUEST);
             }
             $category = Category::where('name', Str::ucfirst($request->name))->first();
             if (!$category) {
                 $input = $request->all();
                 $input['name'] = Str::ucfirst($input['name']);
                 $category = new Category($input);
-                $category->status="active";            
+                $category->status = "active";
                 if ($category->save()) {
                     return response()
-                ->json([
-                    'data' =>$category,
-                    'success' => true,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CREATED,
-                            'title' => 'Category created.',
-                            'message' => "The category is created sucessfully."
-                        ],
-                    ]
-                ], Response::HTTP_CREATED);  
+                        ->json([
+                            'data' => $category,
+                            'success' => true,
+                            'errors' => [
+                                [
+                                    'status' => Response::HTTP_CREATED,
+                                    'title' => 'Category created.',
+                                    'message' => "The category is created sucessfully."
+                                ],
+                            ]
+                        ], Response::HTTP_CREATED);
                 } else {
                     return response()
-                    ->json([
-                        'data' =>$category ,
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                                'title' => 'Internal error',
-                                'message' => "This category couldnt be saved."
-                            ],
-                        ]
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                        ->json([
+                            'data' => $category,
+                            'success' => false,
+                            'errors' => [
+                                [
+                                    'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                                    'title' => 'Internal error',
+                                    'message' => "This category couldnt be saved."
+                                ],
+                            ]
+                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
             } else {
                 return response()
+                    ->json([
+                        'data' => $category,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_CONFLICT,
+                                'title' => 'Category already exist.',
+                                'message' => "This category already exist in the database."
+                            ],
+                        ]
+                    ], Response::HTTP_CONFLICT);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
                 ->json([
-                    'data' =>$category ,
                     'success' => false,
                     'errors' => [
                         [
-                            'status' => Response::HTTP_CONFLICT,
-                            'title' => 'Category already exist.',
-                            'message' => "This category already exist in the database."
+                            'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                            'title' => 'The model doesnt exist.',
+                            'message' => $ex->getMessage()
                         ],
                     ]
-                ], Response::HTTP_CONFLICT);  
-            }
-
-        }catch (ModelNotFoundException $ex) { // User not found
-            return response()
-                    ->json([
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
-                                'title' => 'The model doesnt exist.',
-                                'message' => $ex->getMessage()
-                            ],
-                        ]
-                    ], Response::HTTP_UNPROCESSABLE_ENTITY); 
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (Exception $ex) { // Anything that went wrong
             return response()
-                    ->json([
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => 500,
-                                'title' => 'Internal server error',
-                                'message' => $ex->getMessage()
-                            ],
-                        ]
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        } 
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => 500,
+                            'title' => 'Internal server error',
+                            'message' => $ex->getMessage()
+                        ],
+                    ]
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -312,82 +312,82 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
         $input = $request->all();
-        try{
-        $validatedData = Validator::make($request->all(),[ 
-            'name' => ['max:30'],
-            'used_for' => ['max:50']
-        ]);
-        if ($validatedData->fails()) {
-            return response()
-            ->json([
-                'data' =>null,
-                'success' => false,
-                'errors' => [
-                    [
-                        'status' => Response::HTTP_BAD_REQUEST,
-                        'title' => "Validation failed check JSON request",
-                        'message' => $validatedData->errors()
-                    ],
-                ]
-            ], Response::HTTP_BAD_REQUEST);
-        }
-        $category_to_be_updated = Category::where('id', $id)->first();
-        if(!$category_to_be_updated){
-            return response()
-            ->json([
-                'data' =>null ,
-                'success' => false,
-                'errors' => [
-                    [
-                        'status' => Response::HTTP_CONFLICT,
-                        'title' => 'Category doesnt exist.',
-                        'message' => "This category doesnt exist in the database."
-                    ],
-                ]
-            ], Response::HTTP_CONFLICT); 
-        }
-        if ($request->name) {            
-            $category = Category::where('name', Str::ucfirst($request->name))->first();
-            if($category && $request->used_for){
-                $used_for_is_same= strcmp($category->used_for,$request->used_for)==0?true:false;            
-            if ($used_for_is_same) {
-                $category->type;
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['max:30'],
+                'used_for' => ['max:50']
+            ]);
+            if ($validatedData->fails()) {
                 return response()
-                ->json([
-                    'data' =>$category ,
-                    'success' => false,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CONFLICT,
-                            'title' => 'Category already exist.',
-                            'message' => "This category already exist in the database."
-                        ],
-                    ]
-                ], Response::HTTP_CONFLICT);        
-            }
-        }
-
-    
-            $input['name'] = Str::ucfirst($input['name']);
-        }
-        if ($category_to_be_updated->fill($input)->save()) {
-            $category_to_be_updated->type;
-                return response()
-                ->json([
-                    'data' =>$category_to_be_updated,
-                    'success' => true,
-                    'errors' => [
-                        [
-                            'status' => Response::HTTP_CREATED,
-                            'title' => 'Category updated.',
-                            'message' => "The category is updated sucessfully."
-                        ],
-                    ]
-                ], Response::HTTP_CREATED); 
-        } else {
-            return response()
                     ->json([
-                        'data' =>$category_to_be_updated ,
+                        'data' => null,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_BAD_REQUEST,
+                                'title' => "Validation failed check JSON request",
+                                'message' => $validatedData->errors()
+                            ],
+                        ]
+                    ], Response::HTTP_BAD_REQUEST);
+            }
+            $category_to_be_updated = Category::where('id', $id)->first();
+            if (!$category_to_be_updated) {
+                return response()
+                    ->json([
+                        'data' => null,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_CONFLICT,
+                                'title' => 'Category doesnt exist.',
+                                'message' => "This category doesnt exist in the database."
+                            ],
+                        ]
+                    ], Response::HTTP_CONFLICT);
+            }
+            if ($request->name) {
+                $category = Category::where('name', Str::ucfirst($request->name))->first();
+                if ($category && $request->used_for) {
+                    $used_for_is_same = strcmp($category->used_for, $request->used_for) == 0 ? true : false;
+                    if ($used_for_is_same) {
+                        $category->type;
+                        return response()
+                            ->json([
+                                'data' => $category,
+                                'success' => false,
+                                'errors' => [
+                                    [
+                                        'status' => Response::HTTP_CONFLICT,
+                                        'title' => 'Category already exist.',
+                                        'message' => "This category already exist in the database."
+                                    ],
+                                ]
+                            ], Response::HTTP_CONFLICT);
+                    }
+                }
+
+
+                $input['name'] = Str::ucfirst($input['name']);
+            }
+            if ($category_to_be_updated->fill($input)->save()) {
+                $category_to_be_updated->type;
+                return response()
+                    ->json([
+                        'data' => $category_to_be_updated,
+                        'success' => true,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_CREATED,
+                                'title' => 'Category updated.',
+                                'message' => "The category is updated sucessfully."
+                            ],
+                        ]
+                    ], Response::HTTP_CREATED);
+            } else {
+                return response()
+                    ->json([
+                        'data' => $category_to_be_updated,
                         'success' => false,
                         'errors' => [
                             [
@@ -396,32 +396,33 @@ class CategoryController extends Controller
                                 'message' => "This category couldnt be updated."
                             ],
                         ]
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR);   }
-                }catch (ModelNotFoundException $ex) { // User not found
-                    return response()
-                            ->json([
-                                'success' => false,
-                                'errors' => [
-                                    [
-                                        'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
-                                        'title' => 'The model doesnt exist.',
-                                        'message' => $ex->getMessage()
-                                    ],
-                                ]
-                            ], Response::HTTP_UNPROCESSABLE_ENTITY); 
-                } catch (Exception $ex) { // Anything that went wrong
-                    return response()
-                            ->json([
-                                'success' => false,
-                                'errors' => [
-                                    [
-                                        'status' => 500,
-                                        'title' => 'Internal server error',
-                                        'message' => $ex->getMessage()
-                                    ],
-                                ]
-                            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-                } 
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => RESPONSE::HTTP_UNPROCESSABLE_ENTITY,
+                            'title' => 'The model doesnt exist.',
+                            'message' => $ex->getMessage()
+                        ],
+                    ]
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json([
+                    'success' => false,
+                    'errors' => [
+                        [
+                            'status' => 500,
+                            'title' => 'Internal server error',
+                            'message' => $ex->getMessage()
+                        ],
+                    ]
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -465,8 +466,8 @@ class CategoryController extends Controller
         if (!$category) {
             return response()
                 ->json("Resource Not Found", Response::HTTP_NOT_FOUND);
-        }        
-        $category->status='deleted';
+        }
+        $category->status = 'deleted';
         $category->save();
         return response(null, Response::HTTP_NO_CONTENT);
     }
