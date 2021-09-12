@@ -15,13 +15,13 @@ use Illuminate\Http\Controllers;
 */
 
 Route::middleware('auth:api')->group(function () {
-    Route::post('/user/logout', 'UserController@logout');
-//}); 
-
+   
+}); 
+Route::group(['middleware' => ['auth:api','scope:user,admin,organization']], function () { 
 //Route::middleware(['auth:api', 'scope:user,admin,organization'])->group(function () {
     Route::get('/user', 'UserController@index');
     Route::get('/users', 'UserController@index');
-    
+    Route::post('/user/logout', 'UserController@logout');
     Route::post('/user/search', 'UserController@search');
     Route::put('/user/{id}', 'UserController@update');
     Route::post('/category/search', 'CategoryController@search');
@@ -38,10 +38,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/service/search', 'ServiceController@search');
     Route::put('/service/{id}', 'ServiceController@update');
     Route::post('/reporttype/search', 'ReportTypeController@search');
-//});
-//Route::middleware(['auth:api', 'scope:organization'])->group(function () {
-//});
-//Route::middleware(['auth:api', 'scope:user,organization'])->group(function () {
+});
+Route::group(['middleware' => ['auth:api','scope:organization']], function () {  
+});
+Route::group(['middleware' => ['auth:api','scope:user,organization']], function () { 
     Route::delete('/user/{id}', 'UserController@destroy');
     Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
     Route::get('/itemswaptype', 'ItemSwapTypeController@index');
