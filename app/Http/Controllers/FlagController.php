@@ -119,7 +119,7 @@ class FlagController extends Controller
                     );
             }
             $input = $request->all();
-            $user = $request->user();
+            $user = $request->user()->toJson();
             if(strcmp($request->type,'item')==0){
                 $flagged_item = Item::where('id', $request->flagged_item_id)->where('status', '!=', 'deleted')->first();
             }elseif(strcmp($request->type,'service')==0){
@@ -149,7 +149,7 @@ class FlagController extends Controller
                     );
             }
             $flag = Flag::create($input);
-            $flag->flagged_by_id = $user->id();
+            $flag->flagged_by_id = $user->id;
             if ($flag->save()) {
                 $flagged_item->number_of_flag = $flagged_item->number_of_flag + 1;
                 $flagged_item->save();
