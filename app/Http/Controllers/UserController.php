@@ -120,7 +120,7 @@ class UserController extends Controller
         $user = User::where('email', $request->email)->first(); 
         if ($user) {
             if (Hash::check($request->password, $user->password)) { 
-                $token = $user->createToken('Laravel Password Grant')->accessToken;
+                $token = $user->createToken('Laravel Password Grant',[$user->type])->accessToken;
                 $user['remember_token']= $token; 
                 if($user->save()){
                     $user->address;
