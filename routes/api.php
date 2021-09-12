@@ -79,7 +79,6 @@ Route::middleware(['auth:api', 'scope:user;organization'])->group(function () {
     Route::get('/itemswaptype', 'ItemSwapTypeController@index');
     Route::post('/flag', 'FlagController@store');
     Route::put('/flag/{id}', 'FlagController@update');
-    Route::post('/item', 'ItemController@store');
     Route::put('/item/{id}', 'ItemController@update');
     Route::delete('/item/{id}', 'ItemController@destroy');
     Route::get('/subscription', 'SubscriptionController@index');
@@ -87,7 +86,6 @@ Route::middleware(['auth:api', 'scope:user;organization'])->group(function () {
     Route::post('/subscription', 'SubscriptionController@store');
     Route::put('/subscription/{id}', 'SubscriptionController@update');
     Route::delete('/subscription/{id}', 'SubscriptionController@destroy');
-    Route::post('/service', 'ServiceController@store');
     Route::delete('/service/{id}', 'ServiceController@destroy');
     Route::get('/message', 'MessageController@index');
     Route::post('/message/search', 'MessageController@search');
@@ -101,6 +99,9 @@ Route::middleware(['auth:api', 'scope:user;organization'])->group(function () {
     Route::delete('/request/{id}', 'RequestController@destroy');
     Route::post('/service/uploadPicture', 'FileController@uploadFile');
 });
+
+Route::post('/item', 'ItemController@store');
+Route::post('/service', 'ServiceController@store');
 
 Route::post('/user', 'UserController@store');
 Route::post('/user/login', 'UserController@login');
