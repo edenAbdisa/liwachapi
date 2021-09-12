@@ -66,6 +66,9 @@ Route::group(['middleware' => ['auth:api','scope:user,organization']], function 
     Route::put('/request/{id}', 'RequestController@update');
     Route::delete('/request/{id}', 'RequestController@destroy');
     Route::post('/service/uploadPicture', 'FileController@uploadFile');
+    Route::post('/item', 'ItemController@store');
+    Route::post('/service', 'ServiceController@store');
+    
 });
 //Route::middleware(['auth:api', 'scope:admin'])->group(function () {
 Route::group(['middleware' => ['auth:api','scope:admin']], function () {
@@ -102,9 +105,6 @@ Route::group(['middleware' => ['auth:api','scope:admin']], function () {
     Route::get('/request/count/{type}', 'RequestController@requestCount');
 });
 
-
-Route::post('/item', 'ItemController@store');
-Route::post('/service', 'ServiceController@store');
 
 Route::post('/user', 'UserController@store');
 Route::post('/user/login', 'UserController@login');
