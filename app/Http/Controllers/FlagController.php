@@ -129,7 +129,7 @@ class FlagController extends Controller
             if(!$flagged_item){
                 return response()
                 ->json(
-                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Not valid "+$request->type+" id passed", "", $request->type+" doesnt exist by this id."),
+                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Not valid "+$request->type+" id passed", "", "$request->type doesnt exist by this id."),
                     Response::HTTP_BAD_REQUEST
                 ); 
             }
@@ -145,24 +145,24 @@ class FlagController extends Controller
             if ($previouslyflagged) {
                 return response()
                     ->json(
-                        HelperClass::responeObject($previouslyflagged, false, Response::HTTP_CONFLICT, "Already flagged", "", "You have previously flagged this "+$request->type),
+                        HelperClass::responeObject($previouslyflagged, false, Response::HTTP_CONFLICT, "Already flagged", "", "You have previously flagged this $request->type"),
                         Response::HTTP_CONFLICT
                     );
             }
             $flag = new Flag($input);
-            $flag->flagged_by_id = $user->id;
+            $flag->flagged_by_id =(int) $user->id;
             if ($flag->save()) {
-                $flagged_item->number_of_flag = $flagged_item->number_of_flag + 1;
+                $flagged_item->number_of_flag = (int)$flagged_item->number_of_flag + 1;
                 $flagged_item->save();
                 return response()
                 ->json(
-                    HelperClass::responeObject($flag, true, Response::HTTP_CREATED, $request->type+" flagged", "", "This "+$request->type+"is flagged."),
+                    HelperClass::responeObject($flag, true, Response::HTTP_CREATED, "$request->type flagged", "", "This $request->type is flagged."),
                     Response::HTTP_CREATED
                 ); 
             } else {
                 return response()
                 ->json(
-                    HelperClass::responeObject($flag, false, Response::HTTP_INTERNAL_SERVER_ERROR, $request->type+" couldnt be flagged.", "", "This "+$request->type+" couldnt be flagged due to internal error."),
+                    HelperClass::responeObject($flag, false, Response::HTTP_INTERNAL_SERVER_ERROR, "$request->type couldnt be flagged.", "", "This $request->type couldnt be flagged due to internal error."),
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );  
             }
