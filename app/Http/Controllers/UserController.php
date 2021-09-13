@@ -271,7 +271,7 @@ class UserController extends Controller
                 'email' => ['required','max:255'],
                 'phone_number' => ['required','max:30'], 
                 'birthdate' => ['required','max:15'],
-                'type' => ['required','numeric'], 
+                'type' => ['required',Rule::in(['user','organization'])], 
                 'memebrship_id' => ['required','numeric'],
                 'address.latitude' => ['required', 'numeric'],
                 'address.longitude' => ['required', 'numeric'],
@@ -500,6 +500,7 @@ class UserController extends Controller
             }
             $input = $request->all();
             $user = User::where('id', $id)->first();
+            
             if ($request->address) {
                 $address_to_be_updated = $request->address;
                 $address = Address::where('id', $user->bartering_location_id)->first();
@@ -509,16 +510,25 @@ class UserController extends Controller
                 $address->longitude = (float)$address_to_be_updated['longitude'];
                 $address->save();
             }
-            $user = $user->fill($input);
+            $user_to_be_updated = $user->fill($input);
+            $user_to_be_updated->status=$user->status;
             if ($request->password) {
-                $user->password = Hash::make($request->password);
+                $user_to_be_updated->password = Hash::make($request->password);
             }
-            if ($user->save()) {
-                $user->address;
-                $user->membership;
-                return (new UserResource($user))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
+            if ($user_to_be_updated->save()) {
+                $user_to_be_updated->address;
+                $user_to_be_updated->membership;
+                return response()
+                    ->json(
+                        HelperClass::responeObject($user_to_be_updated, true, Response::HTTP_CREATED, 'User updated.', "The user is updated sucessfully.", ""),
+                        Response::HTTP_CREATED
+                    );
+            } else {
+                return response()
+                    ->json(
+                        HelperClass::responeObject($user_to_be_updated, false, Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal error', "", "This user couldnt be updated."),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    );
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
