@@ -152,10 +152,7 @@ class TypeController extends Controller
             if (!$type) {
                 $type = new Type($request->all());
                 $type->status = "active";
-                $type->used_for = $category->used_for;
-                //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-                //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-
+                $type->used_for = $category->used_for; 
                 if ($type->save()) {
                     $type->category;
                     return response()

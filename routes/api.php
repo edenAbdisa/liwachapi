@@ -33,6 +33,7 @@ Route::group(['middleware' => ['auth:api','scope:user,admin,organization']], fun
     Route::post('/media/search', 'MediaController@search');
     Route::post('/media', 'MediaController@store');
     Route::put('/media/{id}', 'MediaController@update');
+    Route::put('/media', 'MediaController@updateAllMedia');
     Route::delete('/media/{id}', 'MediaController@destroy');
     Route::post('/type/search', 'TypeController@search');
     Route::post('/service/search', 'ServiceController@search');

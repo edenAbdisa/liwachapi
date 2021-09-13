@@ -113,67 +113,36 @@ class MembershipController extends Controller
             ]);
             if ($validatedData->fails()) {
                 return response()
-                    ->json([
-                        'data' => null,
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_BAD_REQUEST,
-                                'title' => "Validation failed check JSON request",
-                                'message' => $validatedData->errors()
-                            ],
-                        ]
-                    ], Response::HTTP_BAD_REQUEST);
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                    Response::HTTP_BAD_REQUEST
+                );
             }
             $membership = Membership::where('name', Str::ucfirst($request->name))->where('status', '!=', 'deleted')->first();
             if (!$membership) {
                 $input = $request->all();
                 $input['name'] = Str::ucfirst($input['name']);
                 $membership = new Membership($input);
-                $membership->status = "active";
-                //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-                //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-                //dd("line 81"); 
+                $membership->status = "active"; 
                 if ($membership->save()) {
                     return response()
-                        ->json([
-                            'data' => $membership,
-                            'success' => true,
-                            'errors' => [
-                                [
-                                    'status' => Response::HTTP_CREATED,
-                                    'title' => 'Membership created.',
-                                    'message' => "The membership is created sucessfully."
-                                ],
-                            ]
-                        ], Response::HTTP_CREATED);
+                    ->json(
+                        HelperClass::responeObject($membership, true, Response::HTTP_CREATED, "Membership created.", "The membership is saved", ""),
+                        Response::HTTP_CREATED
+                    );
                 } else {
                     return response()
-                        ->json([
-                            'data' => $membership,
-                            'success' => false,
-                            'errors' => [
-                                [
-                                    'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                                    'title' => 'Internal error',
-                                    'message' => "This membership couldnt be saved."
-                                ],
-                            ]
-                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Membership couldnt be saved.", "", "The membership couldn't be saved due to internal error"),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
                 }
             } else {
                 return response()
-                    ->json([
-                        'data' => $membership,
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_CONFLICT,
-                                'title' => 'Membership already exist.',
-                                'message' => "This membership already exist in the database."
-                            ],
-                        ]
-                    ], Response::HTTP_CONFLICT);
+                    ->json(
+                        HelperClass::responeObject($membership, false, Response::HTTP_CONFLICT, 'Membership already exist.', "",  "This memebrship already exist in the database."),
+                        Response::HTTP_CONFLICT
+                    );
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
@@ -335,63 +304,35 @@ class MembershipController extends Controller
             $membership_to_be_updated = Membership::where('id', $id)->first();
             if (!$membership_to_be_updated) {
                 return response()
-                    ->json([
-                        'data' => null,
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_CONFLICT,
-                                'title' => 'Membership doesnt exist.',
-                                'message' => "This membership doesnt exist in the database."
-                            ],
-                        ]
-                    ], Response::HTTP_CONFLICT);
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, 'Membership doesnt exist.', "This membership doesnt exist in the database.", ""),
+                            Response::HTTP_OK
+                        );
             }
             if ($request->name) {
                 $membership = Membership::where('name', Str::ucfirst($request->name))->first();
                 if ($membership) {
                     return response()
-                        ->json([
-                            'data' => $membership,
-                            'success' => false,
-                            'errors' => [
-                                [
-                                    'status' => Response::HTTP_CONFLICT,
-                                    'title' => 'Membership already exist.',
-                                    'message' => "This membership already exist in the database."
-                                ],
-                            ]
-                        ], Response::HTTP_CONFLICT);
+                    ->json(
+                        HelperClass::responeObject($membership, false, Response::HTTP_CONFLICT, 'Membership already exist.', "",  "This memebrship already exist in the database."),
+                        Response::HTTP_CONFLICT
+                    );
                 }
                 $input['name'] = Str::ucfirst($input['name']);
             }
 
             if ($membership_to_be_updated->fill($input)->save()) {
                 return response()
-                    ->json([
-                        'data' => $membership_to_be_updated,
-                        'success' => true,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_CREATED,
-                                'title' => 'Membership updated.',
-                                'message' => "The membership is updated sucessfully."
-                            ],
-                        ]
-                    ], Response::HTTP_CREATED);
+                    ->json(
+                        HelperClass::responeObject($membership_to_be_updated, true, Response::HTTP_CREATED, "Membership updated.", "The membership is updated sucessfully.", ""),
+                        Response::HTTP_CREATED
+                    );
             } else {
                 return response()
-                    ->json([
-                        'data' => $membership,
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                                'title' => 'Internal error',
-                                'message' => "This membership couldnt be saved."
-                            ],
-                        ]
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Membership couldnt be updated.", "", "The membership couldn't be updated due to internal error"),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()

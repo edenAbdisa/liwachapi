@@ -168,11 +168,11 @@ class ServiceController extends Controller
                 if ($service->save()) {
                     $serviceSwapType = $request->swap_type;
                     foreach ($serviceSwapType as $t) {
-                        $type = Type::where('id', $t)->where('status', '!=', 'deleted')->first();
+                        $type = Type::where('id', $t)->where('used_for','service')->where('status', '!=', 'deleted')->first();
                         if (!$type) {
                             return response()
                                 ->json(
-                                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Can't do a swap due to type id error.", "", "A type doesnt exist by the id $t."),
+                                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Can't do a swap due to selected type error.", "", "A type doesnt exist by the id $t that is used for service."),
                                     Response::HTTP_BAD_REQUEST
                                 );
                         }
@@ -222,7 +222,6 @@ class ServiceController extends Controller
                             Response::HTTP_INTERNAL_SERVER_ERROR
                         );
                 }
-                //}
             } else {
                 return  response()
                     ->json(
@@ -236,7 +235,7 @@ class ServiceController extends Controller
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
-        } catch (Exception $ex) { // Anything that went wrong
+        } catch (Exception $ex) { 
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
@@ -496,33 +495,35 @@ class ServiceController extends Controller
                     $mediaOld->url = $m['url'];
                     $mediaOld->save();
                 }
-            }
-            /* if (in_array('type_name', $input)) {
-            $type = Type::where('name', $request->type_name)->first();
-            $input['type_id'] = $type->id;
-        } */
-            //swap update isnt done
-            if ($request->swap_type) {
-                $toBeRemoved = $request->swap_type["removed"];
-                $newToBeSaved = $request->swap_type["added"];
-                $oldSwap = ServiceSwapType::where('service_id', $service->id)
-                    ->where('type_id', $toBeRemoved)->get();
-                ServiceSwapType::destroy($oldSwap);
-                foreach ($newToBeSaved as $t) {
-                    //check if the sent type id is in there 
-                    $swap = new ServiceSwapType();
-                    $swap->type_id = $t;
-                    $swap->service_id = $service->id;
-                    if (!$swap->save()) {
-                        return  response()
-                                ->json(
-                                    HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
-                                    Response::HTTP_INTERNAL_SERVER_ERROR
-                                );
-                     }
-                }
-            }
+            }           
             if ($service->fill($input)->save()) {
+                if ($request->swap_type) {
+                    $toBeRemoved = $request->swap_type["removed"];
+                    $newToBeSaved = $request->swap_type["added"];
+                    $oldSwap = ServiceSwapType::where('service_id', $service->id)
+                        ->where('type_id', $toBeRemoved)->get();
+                    ServiceSwapType::destroy($oldSwap);
+                    foreach ($newToBeSaved as $t) {
+                        $type = Type::where('id', $t)->where('used_for','service')->where('status', '!=', 'deleted')->first();
+                            if (!$type) {
+                                return response()
+                                    ->json(
+                                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Can't do a swap due to selected type error.", "", "A type doesnt exist by the id $t that is used for service."),
+                                        Response::HTTP_BAD_REQUEST
+                                    );
+                        } 
+                        $swap = new ServiceSwapType();
+                        $swap->type_id = $t;
+                        $swap->service_id = $service->id;
+                        if (!$swap->save()) {
+                            return  response()
+                                    ->json(
+                                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
+                                        Response::HTTP_INTERNAL_SERVER_ERROR
+                                    );
+                         }
+                    }
+                }
                 $service->media;
                 $service->bartering_location;
                 $service->type;
@@ -537,13 +538,13 @@ class ServiceController extends Controller
                     Response::HTTP_OK
                 );
             }
-        } catch (ModelNotFoundException $ex) { // User not found
+        } catch (ModelNotFoundException $ex) { 
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
-        } catch (Exception $ex) { // Anything that went wrong
+        } catch (Exception $ex) { 
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),

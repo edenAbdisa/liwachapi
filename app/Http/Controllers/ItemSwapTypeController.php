@@ -21,28 +21,18 @@ class ItemSwapTypeController extends Controller
             return response()
             ->json(HelperClass::responeObject($itemswap,true, Response::HTTP_OK,'Successfully fetched.',"Item swap is fetched sucessfully.","")
                 , Response::HTTP_OK);
-        } catch (ModelNotFoundException $ex) { // User not found
+        } catch (ModelNotFoundException $ex) {
             return response()
             ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'The model doesnt exist.',"",$ex->getMessage())
               , Response::HTTP_UNPROCESSABLE_ENTITY);
-        } catch (Exception $ex) { // Anything that went wrong
+        } catch (Exception $ex) { 
             return response()
             ->json( HelperClass::responeObject(null,false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY,'Internal server error.',"",$ex->getMessage())
             , Response::HTTP_UNPROCESSABLE_ENTITY);
                
         }
-
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -55,27 +45,6 @@ class ItemSwapTypeController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\SwapType  $swapType
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ItemSwapType $swapType)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\SwapType  $swapType
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ItemSwapType $swapType)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -86,7 +55,7 @@ class ItemSwapTypeController extends Controller
      */
     public function update(Request $request, ItemSwapType $swapType)
     {
-        //
+        
     }
 
     /**

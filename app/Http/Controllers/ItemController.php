@@ -115,19 +115,18 @@ class ItemController extends Controller
                         HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
                         Response::HTTP_BAD_REQUEST
                     );
-            }
-            //x(t) = r cos(t) + lat
-            //y(t) = r sin(t) + long
+            } 
             $addresses = DB::table("addresses")
-    ->select("*"
-        ,DB::raw("6371 * acos(cos(radians(" . $request->latitude . ")) 
-        * cos(radians(latitude)) 
-        * cos(radians(longitude) - radians(" . $request->longitude . ")) 
-        + sin(radians(" .$request->latitude. ")) 
-        * sin(latitude))) AS distance"))
-        ->having("distance","<",20)
-        ->orderBy('distance', 'asc')
-        ->get();
+                ->select(
+                    "*",
+                    DB::raw("6371 * acos(cos(radians(" . $request->latitude . ")) * cos(radians(latitude)) 
+                            * cos(radians(longitude) - radians(" . $request->longitude . ")) 
+                            + sin(radians(" . $request->latitude . ")) 
+                            * sin(latitude))) AS distance")
+                )
+                ->having("distance", "<", 20)
+                ->orderBy('distance', 'asc')
+                ->get();
             /* $addresses = Address:: where('latitude', $input['latitude'])
                 ->where('longitude', $input['longitude'])
                 ->where('type', 'item')->get(); */
@@ -176,6 +175,8 @@ class ItemController extends Controller
         //if organization or user do smt on status. Check if 
         //the memebrship of this user enables the user to enter a new product
         try {
+            //check memebrship and decide if they can upload item.
+            $user = $request->user();            
             $validatedData = Validator::make($request->all(), [
                 'name' => ['required', 'max:50'],
                 'description' => ['required', 'max:255'],
@@ -195,7 +196,7 @@ class ItemController extends Controller
                     );
             }
             $input = $request->all();
-            $user = $request->user();
+           
             $address = $request->address;
             $address = new Address($address);
             $address->type = 'item';
@@ -217,11 +218,11 @@ class ItemController extends Controller
                 if ($item->save()) {
                     $itemSwapType = $request->swap_type;
                     foreach ($itemSwapType as $t) {
-                        $type = Type::where('id', $t)->where('status', '!=', 'deleted')->first();
+                        $type = Type::where('id', $t)->where('used_for','item')->where('status', '!=', 'deleted')->first();
                         if (!$type) {
                             return response()
                                 ->json(
-                                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Can't do a swap due to type id error.", "", "A type doesnt exist by the id $t."),
+                                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Can't do a swap due to selected type error.", "", "A type doesnt exist by the id $t that is used for item."),
                                     Response::HTTP_BAD_REQUEST
                                 );
                         }
@@ -404,32 +405,36 @@ class ItemController extends Controller
                     $mediaOld->url = $m['url'];
                     $mediaOld->save();
                 }
-            }
-            //->select('users.*', 'contacts.phone', 'orders.price')
-            if ($request->swap_type) {
-                $toBeRemoved = $request->swap_type["removed"];
-                $newToBeSaved = $request->swap_type["added"];
-                $oldSwap = ItemSwapType::where('item_id', $item->id)
-                    ->where('type_id', $toBeRemoved)->get();
-                ItemSwapType::destroy($oldSwap);
-                foreach ($newToBeSaved as $t) {
-                    //check if the sent type id is in there 
-                    $swap = new ItemSwapType();
-                    $swap->type_id = $t;
-                    $swap->item_id = $item->id;
-                    if (!$swap->save()) {
-                        return  response()
-                            ->json(
-                                HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
-                                Response::HTTP_INTERNAL_SERVER_ERROR
-                            );
+            } 
+             
+            if ($item->fill($input)->save()) {
+                if ($request->swap_type) {
+                    $toBeRemoved = $request->swap_type["removed"];
+                    $newToBeSaved = $request->swap_type["added"];
+                    $oldSwap = ItemSwapType::where('item_id', $item->id)
+                        ->where('type_id', $toBeRemoved)->get();
+                    ItemSwapType::destroy($oldSwap);
+                    foreach ($newToBeSaved as $t) {
+                        $type = Type::where('id', $t)->where('used_for','item')->where('status', '!=', 'deleted')->first();
+                            if (!$type) {
+                                return response()
+                                    ->json(
+                                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Can't do a swap due to selected type error.", "", "A type doesnt exist by the id $t that is used for item."),
+                                        Response::HTTP_BAD_REQUEST
+                                    );
+                            }
+                        $swap = new ItemSwapType();
+                        $swap->type_id = $t;
+                        $swap->item_id = $item->id;
+                        if (!$swap->save()) {
+                            return  response()
+                                ->json(
+                                    HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
+                                    Response::HTTP_INTERNAL_SERVER_ERROR
+                                );
+                        }
                     }
                 }
-            }
-            //     $input['type_id'] = $type->id;
-            // }
-            //swap update isnt done
-            if ($item->fill($input)->save()) {
                 $item->media;
                 $item->bartering_location;
                 $item->type;
