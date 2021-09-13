@@ -51,13 +51,13 @@ class ItemController extends Controller
                     HelperClass::responeObject($items, true, Response::HTTP_OK, 'Successfully fetched.', "Item are fetched sucessfully.", ""),
                     Response::HTTP_OK
                 );
-        } catch (ModelNotFoundException $ex) { // User not found
+        } catch (ModelNotFoundException $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
-        } catch (Exception $ex) { // Anything that went wrong
+        } catch (Exception $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
@@ -116,9 +116,21 @@ class ItemController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-            $addresses = Address::where('latitude', $input['latitude'])
+            //x(t) = r cos(t) + lat
+            //y(t) = r sin(t) + long
+            $addresses = DB::table("addresses")
+    ->select("*"
+        ,DB::raw("6371 * acos(cos(radians(" . $request->latitude . ")) 
+        * cos(radians(latitude)) 
+        * cos(radians(longitude) - radians(" . $request->longitude . ")) 
+        + sin(radians(" .$request->latitude. ")) 
+        * sin(latitude))) AS distance"))
+        ->having("distance","<",20)
+        ->orderBy('distance', 'asc')
+        ->get();
+            /* $addresses = Address:: where('latitude', $input['latitude'])
                 ->where('longitude', $input['longitude'])
-                ->where('type', 'item')->get();
+                ->where('type', 'item')->get(); */
             if ($addresses->count() <= 0) {
                 return response()
                     ->json(
@@ -407,11 +419,11 @@ class ItemController extends Controller
                     $swap->item_id = $item->id;
                     if (!$swap->save()) {
                         return  response()
-                                ->json(
-                                    HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
-                                    Response::HTTP_INTERNAL_SERVER_ERROR
-                                );
-                      }
+                            ->json(
+                                HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
+                                Response::HTTP_INTERNAL_SERVER_ERROR
+                            );
+                    }
                 }
             }
             //     $input['type_id'] = $type->id;
@@ -427,10 +439,10 @@ class ItemController extends Controller
                     $type->type;
                 });
                 return response()
-                ->json(
-                    HelperClass::responeObject($item, true, Response::HTTP_OK, 'Item detail.', "Item updated successfully.", ""),
-                    Response::HTTP_OK
-                );
+                    ->json(
+                        HelperClass::responeObject($item, true, Response::HTTP_OK, 'Item detail.', "Item updated successfully.", ""),
+                        Response::HTTP_OK
+                    );
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()

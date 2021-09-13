@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\ReportType;
+use App\Models\Flag;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\ReportTypeResource;
@@ -124,7 +125,7 @@ class ReportTypeController extends Controller
                     ], Response::HTTP_BAD_REQUEST);
             }
             $reportType = ReportType::where('report_detail', Str::ucfirst($request->report_detail))
-                ->where('type_for', $request->type_for)
+                ->where('type_for', $request->type_for)->where('status', '!=', 'deleted')
                 ->first();
             if (!$reportType) {
                 $input = $request->all();
@@ -344,6 +345,14 @@ class ReportTypeController extends Controller
                             ],
                         ]
                     ], Response::HTTP_CONFLICT);
+            }
+            $reason_used_to_flag = Flag::where('reason_id', $id)->get()->count();
+            if ($reason_used_to_flag > 0) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_CONFLICT, "Reason isn't updated.", "", "Couldn't update the reason as it has already been used to flag items and services."),
+                        Response::HTTP_CONFLICT
+                    );
             }
             if ($request->report_detail) {
                 $reporttype = ReportType::where('report_detail', Str::ucfirst($request->name))->first();

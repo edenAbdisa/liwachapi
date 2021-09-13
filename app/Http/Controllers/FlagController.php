@@ -58,13 +58,13 @@ class FlagController extends Controller
                     HelperClass::responeObject($flag, true, Response::HTTP_OK, 'Successfully fetched.', "Flag is fetched sucessfully.", ""),
                     Response::HTTP_OK
                 );
-        } catch (ModelNotFoundException $ex) { // User not found
+        } catch (ModelNotFoundException $ex) { 
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
-        } catch (Exception $ex) { // Anything that went wrong
+        } catch (Exception $ex) { 
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
@@ -354,13 +354,17 @@ class FlagController extends Controller
                 $flag->reason;
                 $flag->flagged_by;
                 $flag->flagged_item;
-
-                return (new FlagResource($flag))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
+                return response()
+                ->json(
+                    HelperClass::responeObject($flag, true, Response::HTTP_CREATED, "$flag->type flagged", "", "This $flag->type is flagged."),
+                    Response::HTTP_CREATED
+                ); 
             } else {
                 return response()
-                    ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->json(
+                    HelperClass::responeObject($flag, false, Response::HTTP_INTERNAL_SERVER_ERROR, "$flag->type couldnt be flagged.", "", "This $flag->type couldnt be flagged due to internal error."),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                ); 
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()

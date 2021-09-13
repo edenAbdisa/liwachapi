@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\Type;
 use App\Models\Category;
+use App\Models\Item;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\TypeResource;
@@ -110,6 +112,7 @@ class TypeController extends Controller
     public function store(Request $request)
     {
         try {
+
             $validatedData = Validator::make($request->all(), [
                 'name' => ['required', 'max:30'],
                 'category_id' => ['required', 'numeric']
@@ -128,25 +131,25 @@ class TypeController extends Controller
                         ]
                     ], Response::HTTP_BAD_REQUEST);
             }
+            $category = Category::where('id', $request->category_id)->first();
+            if (!$category) {
+                return response()
+                    ->json([
+                        'data' => $category,
+                        'success' => false,
+                        'errors' => [
+                            [
+                                'status' => Response::HTTP_BAD_REQUEST,
+                                'title' => "Category doesn't exist.",
+                                'message' => "A category with this ID doesn't exist in the database.Please select the right category."
+                            ],
+                        ]
+                    ], Response::HTTP_BAD_REQUEST);
+            }
             $type = Type::where('name', Str::ucfirst($request->name))
-                ->where('category_id', $request->category_id)
+                ->where('category_id', $request->category_id)->where('status', '!=', 'deleted')
                 ->first();
             if (!$type) {
-                $category = Category::where('id', $request->category_id)->first();
-                if (!$category) {
-                    return response()
-                        ->json([
-                            'data' => $category,
-                            'success' => false,
-                            'errors' => [
-                                [
-                                    'status' => Response::HTTP_BAD_REQUEST,
-                                    'title' => "Category doesn't exist.",
-                                    'message' => "A category with this ID doesn't exist in the database.Please select the right category."
-                                ],
-                            ]
-                        ], Response::HTTP_BAD_REQUEST);
-                }
                 $type = new Type($request->all());
                 $type->status = "active";
                 $type->used_for = $category->used_for;
@@ -195,7 +198,7 @@ class TypeController extends Controller
                         ]
                     ], Response::HTTP_CONFLICT);
             }
-        }catch (ModelNotFoundException $ex) { // User not found
+        } catch (ModelNotFoundException $ex) { // User not found
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
@@ -261,38 +264,37 @@ class TypeController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $input = $request->all();
-        $types = Type::all();
-        $col = DB::getSchemaBuilder()->getColumnListing('types');
-        $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($types)) {
-                return response()->json($types, 200);
+            $input = $request->all();
+            $types = Type::all();
+            $col = DB::getSchemaBuilder()->getColumnListing('types');
+            $requestKeys = collect($request->all())->keys();
+            foreach ($requestKeys as $key) {
+                if (empty($types)) {
+                    return response()->json($types, 200);
+                }
+                if (in_array($key, $col)) {
+                    $types = $types->where($key, $input[$key])->values();
+                }
             }
-            if (in_array($key, $col)) {
-                $types = $types->where($key, $input[$key])->values();
-            }
+            $types->each(function ($item, $key) {
+                $item->category;
+                $item->service;
+                $item->item;
+            });
+            return response()->json($types, 200);
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        $types->each(function ($item, $key) {
-            $item->category;
-            $item->service;
-            $item->item;
-        });
-        return response()->json($types, 200);
-    }catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-    }
-
     }
 
     /**
@@ -341,6 +343,7 @@ class TypeController extends Controller
     public function update(Request $request, $id)
     {
         try {
+
             $validatedData = Validator::make($request->all(), [
                 'name' => ['max:50'],
                 'category_id' => ['numeric'],
@@ -369,6 +372,22 @@ class TypeController extends Controller
                             ],
                         ]
                     ], Response::HTTP_CONFLICT);
+            }
+            $item = Item::where('type_id', $id)->get()->count();
+            if ($item > 0) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_CONFLICT, "Type isn't updated.", "", "Couldn't update the type, items are already registered by this type."),
+                        Response::HTTP_CONFLICT
+                    );
+            }
+            $service = Service::where('type_id', $id)->get()->count();
+            if ($service > 0) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_CONFLICT, "Type isn't updated.", "", "Couldn't update the type, service are already registered by this type."),
+                        Response::HTTP_CONFLICT
+                    );
             }
             if ($request->name) {
                 $type = Type::where('name', Str::ucfirst($request->name))->first();

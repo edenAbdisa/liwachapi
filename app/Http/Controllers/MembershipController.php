@@ -125,7 +125,7 @@ class MembershipController extends Controller
                         ]
                     ], Response::HTTP_BAD_REQUEST);
             }
-            $membership = Membership::where('name', Str::ucfirst($request->name))->first();
+            $membership = Membership::where('name', Str::ucfirst($request->name))->where('status', '!=', 'deleted')->first();
             if (!$membership) {
                 $input = $request->all();
                 $input['name'] = Str::ucfirst($input['name']);

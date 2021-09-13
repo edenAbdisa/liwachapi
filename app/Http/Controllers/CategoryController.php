@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Type;
+use App\Models\Item;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\CategoryResource;
@@ -52,13 +55,13 @@ class CategoryController extends Controller
                     HelperClass::responeObject($categories, true, Response::HTTP_OK, 'Successfully fetched.', "Category is fetched sucessfully.", ""),
                     Response::HTTP_OK
                 );
-        } catch (ModelNotFoundException $ex) { // User not found
+        } catch (ModelNotFoundException $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
-        } catch (Exception $ex) { // Anything that went wrong
+        } catch (Exception $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
@@ -106,12 +109,13 @@ class CategoryController extends Controller
             ]);
             if ($validatedData->fails()) {
                 return response()
-                ->json(
-                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
-                    Response::HTTP_BAD_REQUEST
-                );
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
             }
-            $category = Category::where('name', Str::ucfirst($request->name))->first();
+            $category = Category::where('name', Str::ucfirst($request->name))->where('used_for', $request->used_for)
+            ->where('status', '!=', 'deleted')->first();
             if (!$category) {
                 $input = $request->all();
                 $input['name'] = Str::ucfirst($input['name']);
@@ -119,23 +123,23 @@ class CategoryController extends Controller
                 $category->status = "active";
                 if ($category->save()) {
                     return response()
-                    ->json(
-                        HelperClass::responeObject($category, true, Response::HTTP_CREATED,'Category created.', "The category is created sucessfully.", ""),
-                        Response::HTTP_CREATED
-                    );
+                        ->json(
+                            HelperClass::responeObject($category, true, Response::HTTP_CREATED, 'Category created.', "The category is created sucessfully.", ""),
+                            Response::HTTP_CREATED
+                        );
                 } else {
                     return response()
-                    ->json(
-                        HelperClass::responeObject($category, false, Response::HTTP_INTERNAL_SERVER_ERROR,'Internal error', "",  "This category couldnt be saved."),
-                        Response::HTTP_INTERNAL_SERVER_ERROR
-                    );
+                        ->json(
+                            HelperClass::responeObject($category, false, Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal error', "",  "This category couldnt be saved."),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
                 }
             } else {
                 return response()
-                ->json(
-                    HelperClass::responeObject($category, false, Response::HTTP_CONFLICT,'Category already exist.', "",  "This category already exist in the database."),
-                    Response::HTTP_CONFLICT
-                );
+                    ->json(
+                        HelperClass::responeObject($category, false, Response::HTTP_CONFLICT, 'Category already exist.', "",  "This category already exist in the database."),
+                        Response::HTTP_CONFLICT
+                    );
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
@@ -203,12 +207,16 @@ class CategoryController extends Controller
             }
             $input = $request->all();
             $categories = Category::all();
+            if ($categories->count() <= 0) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject($categories, true, Response::HTTP_OK, 'List of categories.', "There is no category by the search.", ""),
+                        Response::HTTP_OK
+                    );
+            }
             $col = DB::getSchemaBuilder()->getColumnListing('categories');
             $requestKeys = collect($request->all())->keys();
-            foreach ($requestKeys as $key) {
-                if (empty($categories)) {
-                    return response()->json($categories, 200);
-                }
+            foreach ($requestKeys as $key) { 
                 if (in_array($key, $col)) {
                     if ($key == 'name') {
                         $input[$key] = Str::ucfirst($input[$key]);
@@ -219,14 +227,18 @@ class CategoryController extends Controller
             $categories->each(function ($item, $key) {
                 $item->type;
             });
-            return response()->json($categories, Response::HTTP_OK);
-        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                    ->json(
+                        HelperClass::responeObject($categories, true, Response::HTTP_OK, 'List of categories.', "List of categories by this search.", ""),
+                        Response::HTTP_OK
+                    ); 
+        }catch (ModelNotFoundException $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
-        } catch (Exception $ex) { // Anything that went wrong
+        }catch (Exception $ex) {
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
@@ -281,8 +293,26 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-       
-        try {
+        try {            
+            $types=Type::where('category_id',$id)->get();
+            foreach($types as $t){
+                $item=Item::where('type_id',$t->id)->get()->count();
+                if($item > 0){
+                    return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_CONFLICT, "Category isn't updated.", "", "Couldn't update the category, items are already registered by this category."),
+                        Response::HTTP_CONFLICT
+                    );
+                }
+                $service=Service::where('type_id',$t->id)->get()->count();
+                if($service > 0){
+                    return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_CONFLICT, "Category isn't updated.", "", "Couldn't update the category, service are already registered by this category."),
+                        Response::HTTP_CONFLICT
+                    );
+                }
+            }
             $input = $request->all();
             $validatedData = Validator::make($request->all(), [
                 'name' => ['max:30'],
@@ -311,17 +341,22 @@ class CategoryController extends Controller
                         $category->type;
                         return response()
                             ->json(
-                                HelperClass::responeObject($category, false, Response::HTTP_CONFLICT, 'Category already exist.', "This category already exist in the database.", ""),
+                                HelperClass::responeObject($category, false, Response::HTTP_CONFLICT, 'Category already exist.', "", "This category already exist in the database."),
                                 Response::HTTP_CONFLICT
                             );
                     }
                 }
-
-
                 $input['name'] = Str::ucfirst($input['name']);
             }
             if ($category_to_be_updated->fill($input)->save()) {
                 $category_to_be_updated->type;
+                foreach ($types as $t) {
+                    $type = Type::where('id', $t)->where('status', '!=', 'deleted')->first();
+                    if ($type) {
+                        $type->used_for=$category_to_be_updated->used_for;
+                        $type->save();
+                    }
+                }
                 return response()
                     ->json(
                         HelperClass::responeObject($category_to_be_updated, true, Response::HTTP_CREATED, 'Category updated.', "The category is updated sucessfully.", ""),
