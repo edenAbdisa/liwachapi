@@ -388,12 +388,17 @@ class ServiceController extends Controller
             }
             $col = DB::getSchemaBuilder()->getColumnListing('services');
             $user = $request->user();
+            $line="391";
             if($user){
+                $line="393";
                 $request->request->add(['user_id' => $user->id]);
             } 
+            $line="396";
             $requestKeys = collect($request->all())->keys();
+            $line="398";
             foreach ($requestKeys as $key) {
                 if (in_array($key, $col)) {
+                    $line="401";
                     $services = $services->where($key, $input[$key])->values();
                 }
             }
@@ -421,7 +426,7 @@ class ServiceController extends Controller
         } catch (Exception $ex) { // Anything that went wrong
             return response()
                 ->json(
-                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    HelperClass::responeObject($request->all(), $line, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
         }
