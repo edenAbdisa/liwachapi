@@ -108,6 +108,12 @@ Route::group(['middleware' => ['auth:api','scope:admin']], function () {
 
 
 Route::post('/item/searchAll', 'ItemController@search');
+Route::post('/service/searchAll', 'ServiceController@search');
+Route::post('/message/searchAll', 'MessageController@search');
+Route::post('/request/searchAll', 'RequestController@search');
+Route::post('/subscription/searchAll', 'SubscriptionController@search');
+Route::post('/flag/searchAll', 'FlagController@search');
+
 Route::post('/user', 'UserController@store');
 Route::post('/user/login', 'UserController@login');
 Route::post('/service/byLocation', 'ServiceController@serviceByLocation');
