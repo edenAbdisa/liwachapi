@@ -271,8 +271,8 @@ class UserController extends Controller
                 'email' => ['required','max:255'],
                 'phone_number' => ['required','max:30'], 
                 'birthdate' => ['required','max:15'],
-                'type' => ['required',Rule::in(['user','organization'])], 
-                'memebrship_id' => ['required','numeric'],
+                'type' => ['required',Rule::in(['user','organization','hr'])], 
+                'membership_id' => ['required','numeric'],
                 'address.latitude' => ['required', 'numeric'],
                 'address.longitude' => ['required', 'numeric'],
                 'address.country' => ['required', 'max:50'],
@@ -392,7 +392,7 @@ class UserController extends Controller
                 'birthdate' => ['max:15'],
                 'type' => ['numeric'],
                 'address_id' => ['numeric'],
-                'memebrship_id' => ['numeric']
+                'membership_id' => ['numeric']
             ]);
             if ($validatedData->fails()) {
                 return response()
