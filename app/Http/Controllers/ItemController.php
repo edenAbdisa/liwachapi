@@ -315,8 +315,7 @@ class ItemController extends Controller
                         HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
                         Response::HTTP_BAD_REQUEST
                     );
-            }
-            $input = $request->all();
+            } 
             $items = Item::all();
             if ($items->count() <= 0) {
                 return response()
@@ -326,10 +325,11 @@ class ItemController extends Controller
                     );
             }
             $col = DB::getSchemaBuilder()->getColumnListing('items');
-            /* $user = $request->user();
+            $user = $request->user();
             if($user){
                 $request->request->add(['user_id' => $user->id]);
-            } */
+            }
+            $input = $request->all();
             
             $requestKeys = collect($request->all())->keys();
             foreach ($requestKeys as $key) {

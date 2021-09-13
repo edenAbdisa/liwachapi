@@ -111,7 +111,7 @@ class SubscriptionController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
-                'type_id' => ['required','numeric']
+                'type_id' => ['required', 'numeric']
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -122,42 +122,42 @@ class SubscriptionController extends Controller
             }
             $type = Type::where('id', $request->type_id)->where('status', '!=', 'deleted')->first();
             if (!$type) {
-                                return response()
-                                    ->json(
-                                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Type doesnt exist.", "", "A type doesnt exist by the given id."),
-                                        Response::HTTP_BAD_REQUEST
-                                    );
-                            }
-        $subscription = new Subscription($request->all()); 
-        $subscription->user_id =$request->user()->id;  
-        if ($subscription->save()) {
-            $subscription->type;
-            $subscription->user;
-            return  response()
-            ->json(
-                HelperClass::responeObject($subscription, true, Response::HTTP_CREATED, "Subscription created.", "You have subscribed to $type->name .", ""),
-                Response::HTTP_CREATED
-            );
-        } else {
-            return  response()
-            ->json(
-                HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Subscription couldn't be saved.", "",  "Subscription couldn't be saved"),
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Type doesnt exist.", "", "A type doesnt exist by the given id."),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
+            $subscription = new Subscription($request->all());
+            $subscription->user_id = $request->user()->id;
+            if ($subscription->save()) {
+                $subscription->type;
+                $subscription->user;
+                return  response()
+                    ->json(
+                        HelperClass::responeObject($subscription, true, Response::HTTP_CREATED, "Subscription created.", "You have subscribed to $type->name .", ""),
+                        Response::HTTP_CREATED
+                    );
+            } else {
+                return  response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Subscription couldn't be saved.", "",  "Subscription couldn't be saved"),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    );
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
-    } catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    }
     }
 
     /**
@@ -208,41 +208,41 @@ class SubscriptionController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $input = $request->all();
-        $subscriptions = Subscription::all();
-        $col = DB::getSchemaBuilder()->getColumnListing('subscriptions');
-        $user = $request->user();
-            if($user){
+            
+            $subscriptions = Subscription::all();
+            $col = DB::getSchemaBuilder()->getColumnListing('subscriptions');
+            $user = $request->user();
+            if ($user) {
                 $request->request->add(['user_id' => $user->id]);
-            } 
-        $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($subscriptions)) {
-                return response()->json($subscriptions, 200);
             }
-            if (in_array($key, $col)) {
-                $subscriptions = $subscriptions->where($key, $input[$key])->values();
+            $input = $request->all();
+            $requestKeys = collect($request->all())->keys();
+            foreach ($requestKeys as $key) {
+                if (empty($subscriptions)) {
+                    return response()->json($subscriptions, 200);
+                }
+                if (in_array($key, $col)) {
+                    $subscriptions = $subscriptions->where($key, $input[$key])->values();
+                }
             }
+            $subscriptions->each(function ($item, $key) {
+                $item->type;
+                $item->user;
+            });
+            return response()->json($subscriptions, 200);
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        $subscriptions->each(function ($item, $key) {
-            $item->type;
-            $item->user;
-        });
-        return response()->json($subscriptions, 200);
-    }catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-    }
-
     }
 
     /**

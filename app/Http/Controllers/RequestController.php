@@ -292,8 +292,7 @@ class RequestController extends Controller
                         HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
                         Response::HTTP_BAD_REQUEST
                     );
-            }
-            $input = $request->all();
+            } 
             $requests = RequestOrder::all();
             if ($requests->count() <= 0) {
                 return response()
@@ -307,6 +306,7 @@ class RequestController extends Controller
             if($user){
                 $request->request->add(['requester_id' => $user->id]);
             } 
+            $input = $request->all(); 
             $requestKeys = collect($request->all())->keys();
             foreach ($requestKeys as $key) {
                 if (in_array($key, $col)) {

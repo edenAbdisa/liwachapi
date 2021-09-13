@@ -127,6 +127,8 @@ class MediaController extends Controller
                     );
             }
             $col = DB::getSchemaBuilder()->getColumnListing('medias');
+            
+            
             $requestKeys = collect($request->all())->keys();
             foreach ($requestKeys as $key) {
                 if (in_array($key, $col)) {

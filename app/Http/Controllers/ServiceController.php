@@ -390,7 +390,7 @@ class ServiceController extends Controller
             if($user){ 
                 $request->request->add(['user_id' => $user->id]);
             }  
-            $requestKeys = collect($request->all())->keys(); 
+            $requestKeys = collect($request->all())->keys();
             
             $input = $request->all();
             foreach ($requestKeys as $key) {

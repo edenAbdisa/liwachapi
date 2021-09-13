@@ -247,8 +247,7 @@ class FlagController extends Controller
                         HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
                         Response::HTTP_BAD_REQUEST
                     );
-            }
-            $input = $request->all();
+            } 
             $flags = Flag::all();
             if ($flags->count() <= 0) {
                 return response()
@@ -263,6 +262,7 @@ class FlagController extends Controller
                 $request->request->add(['flagged_by_id' => $user->id]);
             }
             $requestKeys = collect($request->all())->keys();
+            $input = $request->all();
             foreach ($requestKeys as $key) {
                 if (in_array($key, $col)) {
                     $flags = $flags->where($key, $input[$key])->values();
