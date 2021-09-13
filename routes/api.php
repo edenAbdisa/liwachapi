@@ -83,7 +83,7 @@ Route::group(['middleware' => ['auth:api','scope:admin']], function () {
     Route::get('/user/count', 'UserController@userCount');
     Route::get('/user/countByDate/{attribute}/{start}/{end}', 'UserController@userCountByDate');
     Route::get('/user/internal/{status}', 'UserController@internalUsers');
-    Route::get('/user/organization/{status}', 'UserController@organizationByStatus');
+    Route::get('/user/{status}', 'UserController@userByStatus');
     Route::post('/category', 'CategoryController@store');
     Route::put('/category/{id}', 'CategoryController@update');
     Route::delete('/category/{id}', 'CategoryController@destroy');

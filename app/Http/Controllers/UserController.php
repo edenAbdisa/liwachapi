@@ -87,9 +87,9 @@ class UserController extends Controller
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
-    public function organizationByStatus($status)
+    public function userByStatus($status)
     {
-        $user = User::where('status', '=', $status)->where('type', '=', 'organization')->get()->each(
+        $user = User::where('status', '=', $status)->get()->each(
             function ($item, $key) {
                 $item->address;
                 $item->membership;
