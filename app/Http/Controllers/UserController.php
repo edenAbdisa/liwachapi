@@ -404,6 +404,10 @@ class UserController extends Controller
         $input = $request->all();
         $users = User::all();
         $col = DB::getSchemaBuilder()->getColumnListing('users');
+        /* $user = $request->user();
+            if($user){
+                $request->request->add(['id' => $user->id]);
+            }  */
         $requestKeys = collect($request->all())->keys();
         foreach ($requestKeys as $key) {
             if (empty($users)) {

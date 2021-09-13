@@ -258,6 +258,10 @@ class FlagController extends Controller
                     );
             }
             $col = DB::getSchemaBuilder()->getColumnListing('flags');
+            $user = $request->user();
+            if($user){
+                $request->request->add(['flagged_by_id' => $user->id]);
+            }
             $requestKeys = collect($request->all())->keys();
             foreach ($requestKeys as $key) {
                 if (in_array($key, $col)) {

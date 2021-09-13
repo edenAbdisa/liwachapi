@@ -211,6 +211,10 @@ class SubscriptionController extends Controller
         $input = $request->all();
         $subscriptions = Subscription::all();
         $col = DB::getSchemaBuilder()->getColumnListing('subscriptions');
+        $user = $request->user();
+            if($user){
+                $request->request->add(['user_id' => $user->id]);
+            } 
         $requestKeys = collect($request->all())->keys();
         foreach ($requestKeys as $key) {
             if (empty($subscriptions)) {

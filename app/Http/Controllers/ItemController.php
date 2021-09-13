@@ -326,6 +326,11 @@ class ItemController extends Controller
                     );
             }
             $col = DB::getSchemaBuilder()->getColumnListing('items');
+            $user = $request->user();
+            if($user){
+                $request->request->add(['user_id' => $user->id]);
+            }
+            
             $requestKeys = collect($request->all())->keys();
             foreach ($requestKeys as $key) {
                 if (in_array($key, $col)) {

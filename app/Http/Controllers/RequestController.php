@@ -303,7 +303,10 @@ class RequestController extends Controller
                     );
             }
             $col = DB::getSchemaBuilder()->getColumnListing('requests');
-            $request->request->add(['requester_id' => $user->id]);
+            $user = $request->user();
+            if($user){
+                $request->request->add(['requester_id' => $user->id]);
+            } 
             $requestKeys = collect($request->all())->keys();
             foreach ($requestKeys as $key) {
                 if (in_array($key, $col)) {
