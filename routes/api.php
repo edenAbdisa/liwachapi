@@ -107,6 +107,7 @@ Route::group(['middleware' => ['auth:api','scope:admin']], function () {
 });
 
 
+Route::post('/item/searchAll', 'ItemController@search');
 Route::post('/user', 'UserController@store');
 Route::post('/user/login', 'UserController@login');
 Route::post('/service/byLocation', 'ServiceController@serviceByLocation');
