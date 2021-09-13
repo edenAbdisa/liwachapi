@@ -325,6 +325,7 @@ class ItemController extends Controller
                     );
             }
             $col = DB::getSchemaBuilder()->getColumnListing('items');
+            $request->request->add(['status' => 'active']);
             $user = $request->user();
             if($user){
                 $request->request->add(['user_id' => $user->id]);
@@ -337,6 +338,7 @@ class ItemController extends Controller
                     $items = $items->where($key, $input[$key])->values();
                 }
             }
+           
             $items->each(function ($item, $key) {
                 $item->media;
                 $item->bartering_location;

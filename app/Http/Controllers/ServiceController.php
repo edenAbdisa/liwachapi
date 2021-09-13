@@ -390,6 +390,7 @@ class ServiceController extends Controller
             if($user){ 
                 $request->request->add(['user_id' => $user->id]);
             }  
+            
             $requestKeys = collect($request->all())->keys();
             
             $input = $request->all();
@@ -398,6 +399,7 @@ class ServiceController extends Controller
                     $services = $services->where($key, $input[$key])->values();
                 }
             }
+            $services=$services->where('status','!=', 'deleted')->values();
             $services->each(function ($item, $key) {
                 $item->media;
                 $item->bartering_location;
