@@ -271,7 +271,7 @@ class UserController extends Controller
                 'email' => ['required','max:255'],
                 'phone_number' => ['required','max:30'], 
                 'birthdate' => ['required','max:15'],
-                'type' => ['required',Rule::in(['user','organization','hr'])], 
+                'type' => ['required',Rule::in(['user','organization','hr','operations'])], 
                 'membership_id' => ['required','numeric'],
                 'address.latitude' => ['required', 'numeric'],
                 'address.longitude' => ['required', 'numeric'],

@@ -338,7 +338,7 @@ class ItemController extends Controller
                     $items = $items->where($key, $input[$key])->values();
                 }
             }
-            $items=$items->where('status','!=', 'deleted')->values();
+            //$items=$items->where('status','!=', 'deleted')->values();
             $items->each(function ($item, $key) {
                 $item->media;
                 $item->bartering_location;
