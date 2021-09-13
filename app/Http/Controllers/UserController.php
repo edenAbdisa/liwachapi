@@ -141,7 +141,7 @@ class UserController extends Controller
         try {
             $validatedData = Validator::make($request->all(), [ 
                 'email' => ['required','max:255'],
-                'password' => ['required','max:255']
+                'password' => ['required','max:12']
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -269,6 +269,7 @@ class UserController extends Controller
                 'first_name' => ['required','max:20'],
                 'last_name' => ['required','max:20'],
                 'email' => ['required','max:255'],
+                'password' => ['required','max:12'],
                 'phone_number' => ['required','max:30'], 
                 'birthdate' => ['required','max:15'],
                 'type' => ['required',Rule::in(['user','organization','hr','operations'])], 
