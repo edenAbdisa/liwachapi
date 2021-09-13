@@ -38,7 +38,12 @@ Route::group(['middleware' => ['auth:api','scope:user,admin,organization']], fun
     Route::post('/type/search', 'TypeController@search');
     Route::post('/service/search', 'ServiceController@search');
     Route::put('/service/{id}', 'ServiceController@update');
-    Route::post('/reporttype/search', 'ReportTypeController@search');
+    Route::post('/reporttype/search', 'ReportTypeController@search');    
+    Route::put('/flag/{id}', 'FlagController@update');
+    Route::put('/item/{id}', 'ItemController@update');    
+    Route::delete('/item/{id}', 'ItemController@destroy');
+    
+    Route::delete('/service/{id}', 'ServiceController@destroy');
 });
 Route::group(['middleware' => ['auth:api','scope:organization']], function () {  
 });
@@ -47,15 +52,11 @@ Route::group(['middleware' => ['auth:api','scope:user,organization']], function 
     Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
     Route::get('/itemswaptype', 'ItemSwapTypeController@index');
     Route::post('/flag', 'FlagController@store');
-    Route::put('/flag/{id}', 'FlagController@update');
-    Route::put('/item/{id}', 'ItemController@update');
-    Route::delete('/item/{id}', 'ItemController@destroy');
     Route::get('/subscription', 'SubscriptionController@index');
     Route::post('/subscription/search', 'SubscriptionController@search');
     Route::post('/subscription', 'SubscriptionController@store');
     Route::put('/subscription/{id}', 'SubscriptionController@update');
     Route::delete('/subscription/{id}', 'SubscriptionController@destroy');
-    Route::delete('/service/{id}', 'ServiceController@destroy');
     Route::get('/message', 'MessageController@index');
     Route::post('/message/search', 'MessageController@search');
     Route::post('/message', 'MessageController@store');
