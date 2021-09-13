@@ -82,14 +82,14 @@ class UserController extends Controller
     }
     public function internalUsers($status)
     {
-        $user = User::where('status', '=', $status)->orWhereNull('status')->where('type', '!=', 'user')->where('type', '!=', 'org')->orWhereNull('type')->get();
+        $user = User::where('status', '=', $status)->orWhereNull('status')->where('type', '!=', 'user')->where('type', '!=', 'organization')->orWhereNull('type')->get();
         return (new UserResource($user))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
     public function organizationByStatus($status)
     {
-        $user = User::where('status', '=', $status)->where('type', '=', 'org')->get()->each(
+        $user = User::where('status', '=', $status)->where('type', '=', 'organization')->get()->each(
             function ($item, $key) {
                 $item->address;
                 $item->membership;
