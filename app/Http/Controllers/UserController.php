@@ -140,8 +140,8 @@ class UserController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [ 
-                'email' => ['required','max:255'],
-                'password' => ['required','max:12']
+                'email' => ['required'],
+                'password' => ['required']
             ]);
             if ($validatedData->fails()) {
                 return response()
