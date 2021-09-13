@@ -324,8 +324,7 @@ class ItemController extends Controller
                         Response::HTTP_OK
                     );
             }
-            $col = DB::getSchemaBuilder()->getColumnListing('items');
-            $request->request->add(['status' => 'active']);
+            $col = DB::getSchemaBuilder()->getColumnListing('items'); 
             $user = $request->user();
             if($user){
                 $request->request->add(['user_id' => $user->id]);
@@ -338,7 +337,7 @@ class ItemController extends Controller
                     $items = $items->where($key, $input[$key])->values();
                 }
             }
-            //$items=$items->where('status','!=', 'deleted')->values();
+            $items=$items->where('status','!=', 'deleted')->values();
             $items->each(function ($item, $key) {
                 $item->media;
                 $item->bartering_location;
