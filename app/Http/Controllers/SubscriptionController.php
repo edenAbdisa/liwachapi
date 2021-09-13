@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Subscription;
+use App\Models\Type;
 use Illuminate\Http\Request;
 use Gate;
 use App\Http\Resources\SubscriptionResource;
@@ -110,7 +111,7 @@ class SubscriptionController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
-                'type_id' => ['numeric']
+                'type_id' => ['required','numeric']
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -119,19 +120,30 @@ class SubscriptionController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $subscription = Subscription::create($request->all());
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        //dd("line 81"); 
+            $type = Type::where('id', $request->type_id)->where('status', '!=', 'deleted')->first();
+            if (!$type) {
+                                return response()
+                                    ->json(
+                                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Type doesnt exist.", "", "A type doesnt exist by the given id."),
+                                        Response::HTTP_BAD_REQUEST
+                                    );
+                            }
+        $subscription = new Subscription($request->all()); 
+        $subscription->user_id =$request->user()->id;  
         if ($subscription->save()) {
             $subscription->type;
             $subscription->user;
-            return (new SubscriptionResource($subscription))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
+            return  response()
+            ->json(
+                HelperClass::responeObject($subscription, true, Response::HTTP_CREATED, "Subscription created.", "You have subscribed to $type->name .", ""),
+                Response::HTTP_CREATED
+            );
         } else {
-            return response()
-                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+            return  response()
+            ->json(
+                HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Subscription couldn't be saved.", "",  "Subscription couldn't be saved"),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     } catch (ModelNotFoundException $ex) { // User not found
         return response()

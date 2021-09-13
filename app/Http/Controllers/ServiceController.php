@@ -276,9 +276,17 @@ class ServiceController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-            $addresses = Address::where('latitude', $input['latitude'])
-                ->where('longitude', $input['longitude'])
-                ->where('type', 'service')->get();
+            $addresses = DB::table("addresses")
+            ->select(
+                "*",
+                DB::raw("6371 * acos(cos(radians(" . $request->latitude . ")) * cos(radians(latitude)) 
+                        * cos(radians(longitude) - radians(" . $request->longitude . ")) 
+                        + sin(radians(" . $request->latitude . ")) 
+                        * sin(latitude))) AS distance")
+            )
+            ->having("distance", "<", 20)
+            ->orderBy('distance', 'asc')
+            ->where('type', 'service')->get();
             if ($addresses->count() <= 0) {
                 return response()
                     ->json(

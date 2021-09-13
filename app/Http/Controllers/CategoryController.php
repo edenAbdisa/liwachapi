@@ -105,7 +105,7 @@ class CategoryController extends Controller
         try {
             $validatedData = Validator::make($request->all(), [
                 'name' => ['required', 'max:30'],
-                'used_for' => ['required', 'max:50']
+                'used_for' => ['required', 'max:50',Rule::in(['item', 'service'])]
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -293,7 +293,11 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {            
+        try { 
+            $validatedData = Validator::make($request->all(), [
+                'name' => ['max:30'],
+                'used_for' => ['max:70',Rule::in(['item', 'service','user'])]
+            ]);           
             $types=Type::where('category_id',$id)->get();
             foreach($types as $t){
                 $item=Item::where('type_id',$t->id)->get()->count();

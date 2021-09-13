@@ -129,7 +129,7 @@ class FlagController extends Controller
             if(!$flagged_item){
                 return response()
                 ->json(
-                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Not valid "+$request->type+" id passed", "", "$request->type doesnt exist by this id."),
+                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Not valid $request->type id passed", "", "$request->type doesnt exist by this id."),
                     Response::HTTP_BAD_REQUEST
                 ); 
             }

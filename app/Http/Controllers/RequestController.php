@@ -138,103 +138,88 @@ class RequestController extends Controller
      * )
      */
     public function store(Request $request)
-    {try {
-        $validatedData = Validator::make($request->all(), [
-            'requester_id' => ['numeric'],
-            'requested_item_id' => ['numeric'],
-            'requester_item_id' => ['numeric'],
-            'rating' => ['numeric'],
-            'type' => ['max:10'],
-            'status' => ['max:15']
-        ]);
-        if ($validatedData->fails()) {
+    {        
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'requester_id' => ['numeric'],
+                'requested_item_id' => ['required','numeric'],
+                'requester_item_id' => ['required','numeric'],
+                'rating' => ['required','numeric'],
+                'type' => ['required','max:10'],
+                'status' => ['max:15']
+            ]);
+            if ($validatedData->fails()) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
+                        Response::HTTP_BAD_REQUEST
+                    );
+            }
+            $user =$request->user();
+            $request_already_exist = RequestOrder::where('requester_id',  $user->id)
+                ->where('status', '!=', 'expired')
+                ->where('requested_item_id', $request->requested_item_id)->first();
+            if ($request_already_exist) { 
+                return response()
+                    ->json(
+                        HelperClass::responeObject($request_already_exist, false, Response::HTTP_CONFLICT, 'Request already sent.', "",  "Request was already sent for this item."),
+                        Response::HTTP_CONFLICT
+                    );
+            }
+            $requestOrder = new RequestOrder($request->all()); 
+            $requestOrder->status = "pending";
+            $requestOrder->requester_id = $user->id;
+            $requestOrder->token = Hash::make(Str::random());
+            if ($requestOrder->save()) {
+                $requestOrder->requester;
+                $requestOrder->requested_item;
+                $requestOrder->requester_item;
+                if (strcmp($requestOrder->type,'item')==0) {
+                    $requested_data = Item::where('id', $request->requested_item_id)->first();
+                }else if(strcmp($requestOrder->type,'service')==0){
+                    $requested_data = Service::where('id', $request->requested_item_id)->first();
+                }
+                if(!$requested_data){
+                    return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Not valid $requestOrder->type id passed", "", "$requestOrder->type doesnt exist by this id."),
+                        Response::HTTP_BAD_REQUEST
+                    ); 
+                }
+                $requested_data->number_of_request = (int)$requested_data->number_of_request + 1;
+                if (!$requested_data->save()) {
+                    return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Internal error", "", "The number of request on $requestOrder->type couldnt be updated."),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    );
+                }
+                //Make a count down to deduct from the limit of post of the user
+                return response()
+                ->json(
+                    HelperClass::responeObject($requestOrder, true, Response::HTTP_CREATED, "Request saved.", "", "Request has been sent for this item."),
+                    Response::HTTP_CREATED
+                ); 
+            } else {
+                return response()
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "This request couldnt be saved.", "", "This request couldnt be saved due to internal error."),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
+            }
+        } catch (ModelNotFoundException $ex) { // User not found
             return response()
                 ->json(
-                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Validation failed check JSON request", "", $validatedData->errors()),
-                    Response::HTTP_BAD_REQUEST
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
                 );
         }
-        $request_already_exist = RequestOrder::where('requester_id', $request->requester_id)
-            ->where('status', '!=', 'expired')
-            ->where('requested_item_id', $request->requested_item_id)->first();
-        if ($request_already_exist) {
-            //Can add set data to send a datamessage fitsums
-            return (new RequestResource($request_already_exist))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        }
-        $requestOrder = new RequestOrder($request->all());
-        $requestOrder->status = "pending";
-        $requestOrder->token = Hash::make(Str::random());
-        if ($requestOrder->save()) {
-            $requestOrder->requester;
-            $requestOrder->requested_item;
-            $requestOrder->requester_item;
-            if ($requestOrder->type === 'item') {
-                $requested_item = Item::where('id', $request->requested_item_id)->first();
-                $requested_item->number_of_request = (int)$requested_item->number_of_request + 1;
-                if (!$requested_item->save()) {
-                    return response()
-                        ->json([
-                            'errors' => [
-                                [
-                                    'status' => 500,
-                                    'title' => 'Internal server error',
-                                    'message' => 'The number of request couldnt be updated'
-                                ],
-                            ]
-                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
-                }
-                // $requester_item=Item::where('id',$request->requester_item_id);
-                // $requester_item->number_of_request=$requester_item->number_of_request+1;
-                // $requester_item->save();
-            } else {
-                $requested_service = Service::where('id', $request->requested_item_id)->first();
-                $requested_service->number_of_request = (int)$requested_service->number_of_request + 1;
-                if (!$requested_service->save()) {
-                    return response()
-                        ->json([
-                            'errors' => [
-                                [
-                                    'status' => 500,
-                                    'title' => 'Internal server error',
-                                    'message' => 'The number of request couldnt be updated'
-                                ],
-                            ]
-                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
-                }
-                // $requester_service=Service::where('id',$request->requester_item_id);
-                // $requester_service->number_of_request=$requester_service->number_of_request+1;
-                // $requester_service->save();
-            }
-            return (new RequestResource($requestOrder))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        } else {
-            return response()
-                ->json([
-                    'errors' => [
-                        [
-                            'status' => 500,
-                            'title' => 'Internal server error',
-                            'message' => 'A more detailed error message to show the end user'
-                        ],
-                    ]
-                ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    } catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    }
     }
     public function requestCountByDate($attribute, $start, $end)
     {
@@ -292,6 +277,7 @@ class RequestController extends Controller
     public function search(Request $request)
     {
         try {
+            $user = $request->user();
             $validatedData = Validator::make($request->all(), [
                 'requester_id' => ['numeric'],
                 'requested_item_id' => ['numeric'],
@@ -307,40 +293,44 @@ class RequestController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $input = $request->all();
-        $requests = RequestOrder::all();
-        $col = DB::getSchemaBuilder()->getColumnListing('requests');
-        $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($requests)) {
-                return response()->json($requests, 200);
+            $input = $request->all();
+            $requests = RequestOrder::all();
+            if ($requests->count() <= 0) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject($requests, true, Response::HTTP_OK, 'List of request.', "There is no request.", ""),
+                        Response::HTTP_OK
+                    );
             }
-            if (in_array($key, $col)) {
-                $requests = $requests->where($key, $input[$key])->values();
+            $col = DB::getSchemaBuilder()->getColumnListing('requests');
+            $request->request->add(['requester_id' => $user->id]);
+            $requestKeys = collect($request->all())->keys();
+            foreach ($requestKeys as $key) {
+                if (in_array($key, $col)) {
+                    $requests = $requests->where($key, $input[$key])->values();
+                }
             }
+            $requests->each(function ($item, $key) {
+                $item->requester;
+                $item->requested_item;
+                $item->requester_item;
+                $item->requested_item->type;
+                $item->requester_item->type;
+            });
+            return response()->json($requests, 200);
+        } catch (ModelNotFoundException $ex) { // User not found
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+        } catch (Exception $ex) { // Anything that went wrong
+            return response()
+                ->json(
+                    HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
         }
-        $requests->each(function ($item, $key) {
-            $item->requester;
-            $item->requested_item;
-            $item->requester_item;
-            $item->requested_item->type;
-            $item->requester_item->type;
-        });
-        return response()->json($requests, 200);
-    }catch (ModelNotFoundException $ex) { // User not found
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-    } catch (Exception $ex) { // Anything that went wrong
-        return response()
-            ->json(
-                HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal error occured.', "", $ex->getMessage()),
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-    }
-
     }
 
     /**
@@ -405,33 +395,45 @@ class RequestController extends Controller
                     );
             }
             $input = $request->all();
-            $request = RequestOrder::where('id', $id)->first();
-            if (in_array('status', $input)) {
-                if ($input['status'] === 'bartered') {
-                    if ($request->type === 'item') {
-                        $requested_item = Item::where('id', $request->requested_item_id);
-                        $requested_item->status = 'bartered';
-                        $requested_item->save();
-                        $requester_item = Item::where('id', $request->requester_item_id);
-                        $requester_item->status = 'bartered';
-                        $requester_item->save();
-                    } else {
-                        $requested_service = Service::where('id', $request->requested_item_id);
-                        $requested_service->status = 'bartered';
-                        $requested_service->save();
-                        $requester_service = Service::where('id', $request->requester_item_id);
-                        $requester_service->status = 'bartered';
-                        $requester_service->save();
-                    }
-                }
+            $requestOrder = RequestOrder::where('id', $id)->where('status', '!=', 'declined')->first();
+            if(!$requestOrder){
+                return response()
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Request doesnt exist", "", "A request doesn't exist by this id."),
+                    Response::HTTP_BAD_REQUEST
+                ); 
             }
-            if ($request->fill($input)->save()) {
-                $request->requester;
-                $request->requested_item;
-                $request->requester_item;
-                return (new RequestResource($request))
-                    ->response()
-                    ->setStatusCode(Response::HTTP_CREATED);
+            if ($request->status) {
+                if (strcmp($request->status, 'bartered')==0) {
+                    if (strcmp($requestOrder->type,'item')==0) {
+                        $requested_data = Item::where('id', $request->requested_item_id)->first();
+                        $requester_data = Item::where('id', $request->requester_item_id)->first();
+                    }else if(strcmp($requestOrder->type,'service')==0){
+                        $requested_data = Service::where('id', $request->requested_item_id)->first();
+                        $requester_data = Service::where('id', $request->requester_item_id)->first();
+                    }
+                    if(!$requested_data){
+                        return response()
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_BAD_REQUEST, "Not valid $requestOrder->type id passed", "", "$requestOrder->type doesnt exist by this id."),
+                            Response::HTTP_BAD_REQUEST
+                        ); 
+                    }
+                    $requested_data->status = 'bartered';
+                    $requested_data->save();
+                    $requester_data->status = 'bartered';
+                    $requester_data->save();
+                }
+            } 
+            if ($requestOrder->fill($input)->save()) {
+                $requestOrder->requester;
+                $requestOrder->requested_item;
+                $requestOrder->requester_item;
+                return response()
+                ->json(
+                    HelperClass::responeObject($requestOrder, true, Response::HTTP_CREATED, "Request updated", "", "This request is updated sucessfully."),
+                    Response::HTTP_CREATED
+                );
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()

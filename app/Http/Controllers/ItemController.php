@@ -126,6 +126,7 @@ class ItemController extends Controller
                 )
                 ->having("distance", "<", 20)
                 ->orderBy('distance', 'asc')
+                ->where('type', 'item')
                 ->get();
             /* $addresses = Address:: where('latitude', $input['latitude'])
                 ->where('longitude', $input['longitude'])

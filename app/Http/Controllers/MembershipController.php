@@ -211,12 +211,16 @@ class MembershipController extends Controller
             }
             $input = $request->all();
             $memberships = Membership::all();
+            if ($memberships->count() <= 0) {
+                return response()
+                    ->json(
+                        HelperClass::responeObject($memberships, true, Response::HTTP_OK, 'List of membership.', "There is no memebrship by this search.", ""),
+                        Response::HTTP_OK
+                    );
+            }
             $col = DB::getSchemaBuilder()->getColumnListing('memberships');
             $requestKeys = collect($request->all())->keys();
             foreach ($requestKeys as $key) {
-                if (empty($memberships)) {
-                    return response()->json($memberships, 200);
-                }
                 if (in_array($key, $col)) {
                     if ($key == 'name') {
                         $input[$key] = Str::ucfirst($input[$key]);

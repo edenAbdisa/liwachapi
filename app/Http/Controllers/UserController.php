@@ -150,7 +150,7 @@ class UserController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->where('status','!=','blocked')->first();
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant', [$user->type])->accessToken;
@@ -202,8 +202,7 @@ class UserController extends Controller
     public function logout(Request $request)
     {
         try{
-        $token = $request->user()->token();
-        //$token = User::where('email', $request->email)->first()->token();
+        $token = $request->user()->token(); 
         $token->revoke();
         $user = User::where('id', $token->user_id)->first();
         $user['remember_token'] = '';

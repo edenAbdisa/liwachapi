@@ -109,7 +109,9 @@ class MessageController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
-                'type' => ['max:10']
+                'type' => ['required','max:10'],
+                'chat_id' => ['required'],
+                'content'=> ['required']
             ]);
             if ($validatedData->fails()) {
                 return response()
@@ -118,19 +120,23 @@ class MessageController extends Controller
                         Response::HTTP_BAD_REQUEST
                     );
             }
-        $message = Message::create($request->all());
-        //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-        //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-        //dd("line 81"); 
+        $user =$request->user();
+        $message = new Message($request->all());
+        $message->sender_id=$user->id;
         if ($message->save()) {
             $message->bartering_location;
             $message->type;
-            return (new MessageResource($message))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
+            return response()
+                    ->json(
+                        HelperClass::responeObject($message, true, Response::HTTP_CREATED, "Message created.", "Message sent.", ""),
+                        Response::HTTP_CREATED
+            );
         } else {
             return response()
-                ->json("This resource couldn't be saved due to internal error", Response::HTTP_INTERNAL_SERVER_ERROR);
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Message couldnt be saved.", "", "Message not sent."),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
         }
     } catch (ModelNotFoundException $ex) { // User not found
         return response()

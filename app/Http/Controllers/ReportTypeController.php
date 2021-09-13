@@ -131,50 +131,26 @@ class ReportTypeController extends Controller
                 $input = $request->all();
                 $input['report_detail'] = Str::ucfirst($input['report_detail']);
                 $reporttype = new ReportType($input);
-                $reporttype->status = "active";
-                //CHECK IF THE SESSION COOKIE OR THE TOKEN IS RIGH
-                //IF IT ISNT RETURN HTTP_FORBIDDEN OR HTTP_BAD_REQUEST
-                //dd("line 81"); 
+                $reporttype->status = "active";  
                 if ($reporttype->save()) {
                     return response()
-                        ->json([
-                            'data' => $reporttype,
-                            'success' => true,
-                            'errors' => [
-                                [
-                                    'status' => Response::HTTP_CREATED,
-                                    'title' => 'Report type created.',
-                                    'message' => "The report type is created sucessfully."
-                                ],
-                            ]
-                        ], Response::HTTP_CREATED);
+                    ->json(
+                        HelperClass::responeObject($reporttype, true, Response::HTTP_CREATED, "Report type created.", "The report type is created sucessfully.", ""),
+                        Response::HTTP_CREATED
+                    );
                 } else {
                     return response()
-                        ->json([
-                            'data' => $reporttype,
-                            'success' => false,
-                            'errors' => [
-                                [
-                                    'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                                    'title' => 'Internal error',
-                                    'message' => "This report type couldnt be saved."
-                                ],
-                            ]
-                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Internal error", "", "The report type couldn't be saved due to internal error"),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
                 }
             } else {
                 return response()
-                    ->json([
-                        'data' => $reportType,
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_CONFLICT,
-                                'title' => 'Report type already exist.',
-                                'message' => "This report type already exist in the database."
-                            ],
-                        ]
-                    ], Response::HTTP_CONFLICT);
+                    ->json(
+                        HelperClass::responeObject($reportType, false, Response::HTTP_CONFLICT, 'Report already exist.', "",  "This report already exist in the database."),
+                        Response::HTTP_CONFLICT
+                    );
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
@@ -244,17 +220,28 @@ class ReportTypeController extends Controller
             }
         $input = $request->all();
         $reporttypes = ReportType::all();
+        if ($reporttypes->count() <= 0) {
+            return response()
+                ->json(
+                    HelperClass::responeObject($reporttypes, true, Response::HTTP_OK, 'List of report.', "There is no report type by this search.", ""),
+                    Response::HTTP_OK
+                );
+        }
         $col = DB::getSchemaBuilder()->getColumnListing('report_types');
         $requestKeys = collect($request->all())->keys();
-        foreach ($requestKeys as $key) {
-            if (empty($reporttypes)) {
-                return response()->json($reporttypes, 200);
-            }
+        foreach ($requestKeys as $key) { 
             if (in_array($key, $col)) {
+                if ($key == 'report_detail') {
+                    $input[$key] = Str::ucfirst($input[$key]);
+                }
                 $reporttypes = $reporttypes->where($key, $input[$key])->values();
             }
         }
-        return response()->json($reporttypes, 200);
+        return response()
+        ->json(
+            HelperClass::responeObject($reporttypes, true, Response::HTTP_OK, 'List of report.', "List of report by this search.", ""),
+            Response::HTTP_OK
+        ); 
     }catch (ModelNotFoundException $ex) { // User not found
         return response()
             ->json(
@@ -334,17 +321,10 @@ class ReportTypeController extends Controller
             $reporttype_to_be_edited = ReportType::where('id', $id)->first();
             if (!$reporttype_to_be_edited) {
                 return response()
-                    ->json([
-                        'data' => null,
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_CONFLICT,
-                                'title' => 'Report type doesnt exist.',
-                                'message' => "This report type doesnt exist in the database."
-                            ],
-                        ]
-                    ], Response::HTTP_CONFLICT);
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, 'Report type doesnt exist.', "This report type doesnt exist in the database.", ""),
+                            Response::HTTP_OK
+                        ); 
             }
             $reason_used_to_flag = Flag::where('reason_id', $id)->get()->count();
             if ($reason_used_to_flag > 0) {
@@ -360,47 +340,26 @@ class ReportTypeController extends Controller
                     $used_for_is_same = strcmp($reporttype->used_for, $request->used_for) == 0 ? true : false;
                     if ($used_for_is_same) {
                         return response()
-                            ->json([
-                                'data' => $reporttype,
-                                'success' => false,
-                                'errors' => [
-                                    [
-                                        'status' => Response::HTTP_CONFLICT,
-                                        'title' => 'Report type already exist.',
-                                        'message' => "This report type already exist in the database."
-                                    ],
-                                ]
-                            ], Response::HTTP_CONFLICT);
+                    ->json(
+                        HelperClass::responeObject($reporttype, false, Response::HTTP_CONFLICT, 'Report type already exist.', "", "This report type already exist in the database."),
+                        Response::HTTP_CONFLICT
+                    );
                     }
                     $input['report_detail'] = Str::ucfirst($input['report_detail']);
                 }
             }
             if ($reporttype_to_be_edited->fill($input)->save()) {
                 return response()
-                    ->json([
-                        'data' => $reporttype_to_be_edited,
-                        'success' => true,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_CREATED,
-                                'title' => 'Report type updated.',
-                                'message' => "The report type is updated sucessfully."
-                            ],
-                        ]
-                    ], Response::HTTP_CREATED);
+                    ->json(
+                        HelperClass::responeObject($reporttype_to_be_edited, true, Response::HTTP_CREATED,'Report type updated.', "The report type is updated sucessfully.", ""),
+                        Response::HTTP_CREATED
+                    );
             } else {
                 return response()
-                    ->json([
-                        'data' => $reporttype,
-                        'success' => false,
-                        'errors' => [
-                            [
-                                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                                'title' => 'Internal error',
-                                'message' => "This report type couldnt be updated."
-                            ],
-                        ]
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Report type couldnt be updated.", "", "This report type couldnt be updated due to internal error"),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
             }
         } catch (ModelNotFoundException $ex) { // User not found
             return response()
