@@ -60,8 +60,8 @@ class MediaController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
-                'item_id' => ['numeric'],
-                'type' => ['max:10', Rule::in(['item', 'service', 'user'])]
+                'item_id' => ['required','numeric'],
+                'type' => ['required','max:10', Rule::in(['item', 'service', 'user'])]
             ]);
             if ($validatedData->fails()) {
                 return response()
