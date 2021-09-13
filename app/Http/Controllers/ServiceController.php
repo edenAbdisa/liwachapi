@@ -618,8 +618,8 @@ class ServiceController extends Controller
             $service->save();
             return response()
                 ->json(
-                    HelperClass::responeObject(null, true, Response::HTTP_NO_CONTENT, 'Successfully deleted.', "Service is deleted sucessfully.", ""),
-                    Response::HTTP_NO_CONTENT
+                    HelperClass::responeObject(null, true, Response::HTTP_OK, 'Successfully deleted.', "Service is deleted sucessfully.", ""),
+                    Response::HTTP_OK
                 );
         } catch (ModelNotFoundException $ex) {
             return response()
