@@ -77,7 +77,7 @@ class RequestController extends Controller
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'Internal server error.', "", $ex->getMessage()),
-                    Response::HTTP_UNPROCESSABLE_ENTITY
+                    Response::HTTP_INTERNAL_SERVER_ERROR
                 );
         }
     }

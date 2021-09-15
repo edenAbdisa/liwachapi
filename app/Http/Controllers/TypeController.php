@@ -361,8 +361,8 @@ class TypeController extends Controller
                     if ($category_is_same) {
                         return response()
                             ->json(
-                                HelperClass::responeObject($type, false, Response::HTTP_CONFLICT, 'Type already exist.', "", "This type already exist in the database."),
-                                Response::HTTP_CONFLICT
+                                HelperClass::responeObject($type, false, Response::HTTP_OK, 'Type already exist.', "", "This type already exist in the database."),
+                                Response::HTTP_OK
                             );
                     }
                     $input['name'] = Str::ucfirst($input['name']);

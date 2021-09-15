@@ -318,8 +318,8 @@ class MembershipController extends Controller
                 if ($membership) {
                     return response()
                     ->json(
-                        HelperClass::responeObject($membership, false, Response::HTTP_CONFLICT, 'Membership already exist.', "",  "This memebrship already exist in the database."),
-                        Response::HTTP_CONFLICT
+                        HelperClass::responeObject($membership, false, Response::HTTP_OK, 'Membership already exist.', "",  "This memebrship already exist in the database."),
+                        Response::HTTP_OK
                     );
                 }
                 $input['name'] = Str::ucfirst($input['name']);

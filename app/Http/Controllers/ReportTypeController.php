@@ -341,8 +341,8 @@ class ReportTypeController extends Controller
                     if ($used_for_is_same) {
                         return response()
                     ->json(
-                        HelperClass::responeObject($reporttype, false, Response::HTTP_CONFLICT, 'Report type already exist.', "", "This report type already exist in the database."),
-                        Response::HTTP_CONFLICT
+                        HelperClass::responeObject($reporttype, false, Response::HTTP_OK, 'Report type already exist.', "", "This report type already exist in the database."),
+                        Response::HTTP_OK
                     );
                     }
                     $input['report_detail'] = Str::ucfirst($input['report_detail']);

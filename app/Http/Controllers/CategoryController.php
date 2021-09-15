@@ -345,8 +345,8 @@ class CategoryController extends Controller
                         $category->type;
                         return response()
                             ->json(
-                                HelperClass::responeObject($category, false, Response::HTTP_CONFLICT, 'Category already exist.', "", "This category already exist in the database."),
-                                Response::HTTP_CONFLICT
+                                HelperClass::responeObject($category, false, Response::HTTP_OK, 'Category already exist.', "", "This category already exist in the database."),
+                                Response::HTTP_OK
                             );
                     }
                 }
