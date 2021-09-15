@@ -44,6 +44,7 @@ class ItemController extends Controller
                     $item->user;
                     $item->media;
                     $item->request;
+                    $item->request->requester_item;
                 });
 
             return response()
