@@ -203,10 +203,7 @@ class MessageController extends Controller
             } 
             $messages = Message::all();
             $col = DB::getSchemaBuilder()->getColumnListing('messages');
-            $user = $request->user();
-            if($user){
-                $request->request->add(['sender_id' => $user->id]);
-            }
+             
             $input = $request->all();
             $requestKeys = collect($request->all())->keys();
             foreach ($requestKeys as $key) {
