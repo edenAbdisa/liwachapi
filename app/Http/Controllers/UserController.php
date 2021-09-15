@@ -274,8 +274,8 @@ class UserController extends Controller
                 'birthdate' => ['required','max:15'],
                 'type' => ['required',Rule::in(['user','organization','hr','operations'])], 
                 'membership_id' => ['required','numeric'],
-                'address.latitude' => ['required', 'numeric'],
-                'address.longitude' => ['required', 'numeric'],
+                'address.latitude' => ['required'],
+                'address.longitude' => ['required'],
                 'address.country' => ['required', 'max:50'],
                 'address.city' => ['required', 'max:50'],
                 'address.type' => ['required', 'max:10', Rule::in(['user'])]
