@@ -44,7 +44,9 @@ class ItemController extends Controller
                     $item->user;
                     $item->media;
                     $item->request;
-                    $item->request->requester_item;
+                    $item->request->each(function($req, $key){
+                        $req->requester_item;
+                    });
                 });
 
             return response()
@@ -262,6 +264,9 @@ class ItemController extends Controller
                     });
                     $item->user;
                     $item->request;
+                    $item->request->each(function($req, $key){
+                        $req->requester_item;
+                    });
                     return
                         response()
                         ->json(
@@ -348,6 +353,9 @@ class ItemController extends Controller
                     $type->type;
                 });
                 $item->request;
+                $item->request->each(function($req, $key){
+                    $req->requester_item;
+                });
             });
             return response()
                 ->json(
@@ -450,6 +458,9 @@ class ItemController extends Controller
                 $item->request;
                 $item->itemSwapType->each(function ($type, $key) {
                     $type->type;
+                });
+                $item->request->each(function($req, $key){
+                    $req->requester_item;
                 });
                 return response()
                     ->json(
