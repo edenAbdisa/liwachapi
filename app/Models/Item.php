@@ -37,7 +37,7 @@ class Item extends Model
     }
     public function request()
     {
-        return $this->hasMany(RequestOrder::class, 'requested_item_id');
+        return $this->hasMany(RequestOrder::class, 'requester_item_id');
     }
     public function media()
     {

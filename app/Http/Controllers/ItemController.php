@@ -58,7 +58,7 @@ class ItemController extends Controller
             return response()
                 ->json(
                     HelperClass::responeObject(null, false, RESPONSE::HTTP_UNPROCESSABLE_ENTITY, 'The model doesnt exist.', "", $ex->getMessage()),
-                    Response::HTTP_UNPROCESSABLE_ENTITY
+                    Response::HTTP_INTERNAL_SERVER_ERROR
                 );
         } catch (Exception $ex) {
             return response()
