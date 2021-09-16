@@ -356,6 +356,7 @@ class ItemController extends Controller
                 $item->request->each(function($req, $key){
                     $req->requester_item;
                 });
+                
             });
             return response()
                 ->json(

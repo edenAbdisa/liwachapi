@@ -56,6 +56,9 @@ class ServiceController extends Controller
                     $item->type;
                     $item->user;
                     $item->request;
+                    $item->request->each(function($req, $key){
+                        $req->requester_item;
+                    });
                     $item->serviceSwapType->each(function ($type, $key) {
                         $type->type;
                     });
@@ -409,6 +412,9 @@ class ServiceController extends Controller
                 $item->serviceSwapType->each(function ($type, $key) {
                     $type->type;
                 });
+                $item->request->each(function($req, $key){
+                    $req->requester_item;
+                });
             });
             return response()
                 ->json(
@@ -546,6 +552,9 @@ class ServiceController extends Controller
                 $service->request;
                 $service->serviceSwapType->each(function ($type, $key) {
                     $type->type;
+                });
+                $service->request->each(function($req, $key){
+                    $req->requester_item;
                 });
                 return response()
                 ->json(
