@@ -17,8 +17,8 @@ class CreateUserTransactionsTable extends Migration
             $table->id();
             $table->bigInteger('user_id')->unsigned()->nullable();
             $table->date('refreshed_on');
-            $table->integer('limit_of_post')->nullable();
-            $table->integer('transaction_limit')->nullable();
+            $table->integer('left_limit_of_post')->nullable();
+            $table->integer('left_transaction_limit')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
