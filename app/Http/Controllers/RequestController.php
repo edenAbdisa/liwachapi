@@ -7,6 +7,8 @@ use App\Models\RequestOrder;
 use App\Models\Item;
 use App\Models\Service;
 use Illuminate\Http\Request;
+
+use App\Models\UserTransaction;
 use Gate;
 use App\Http\Resources\RequestResource;
 use Symfony\Component\HttpFoundation\Response;
@@ -140,6 +142,17 @@ class RequestController extends Controller
     public function store(Request $request)
     {        
         try {
+            $user = $request->user();               
+            $usertransaction = UserTransaction::where('user_id', $user->id)->first();  
+            if((int)$usertransaction->left_transaction_limit<=0){
+                return
+                response()
+                ->json(
+                    HelperClass::responeObject($usertransaction, true, Response::HTTP_OK, "Doesnt have transaction left.", "This user doesnt have transaction left.", ""),
+                    Response::HTTP_OK
+                );
+            } 
+
             $validatedData = Validator::make($request->all(), [
                 'requester_id' => ['numeric'],
                 'requested_item_id' => ['required','numeric'],
@@ -193,6 +206,16 @@ class RequestController extends Controller
                         HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Internal error", "", "The number of request on $requestOrder->type couldnt be updated."),
                         Response::HTTP_INTERNAL_SERVER_ERROR
                     );
+                }
+                if($usertransaction){
+                    $usertransaction->left_transaction_limit = (int)$usertransaction->left_transaction_limit - 1;
+                    if (!$usertransaction->save()) {
+                        return response()
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Internal error", "", "The number of user transaction couldnt be updated."),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
+                    }
                 }
                 //Make a count down to deduct from the limit of post of the user
                 return response()

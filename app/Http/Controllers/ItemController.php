@@ -9,6 +9,7 @@ use App\Models\Type;
 use App\Models\Item;
 use App\Models\Media;
 use Illuminate\Http\Request;
+use App\Models\UserTransaction;
 use Gate;
 use App\Http\Resources\ItemResource;
 use App\Http\Resources\AddressResource;
@@ -180,7 +181,16 @@ class ItemController extends Controller
         //the memebrship of this user enables the user to enter a new product
         try {
             //check memebrship and decide if they can upload item.
-            $user = $request->user();            
+            $user = $request->user();               
+            $usertransaction = UserTransaction::where('user_id', $user->id)->first();  
+            if((int)$usertransaction->left_limit_of_post<=0){
+                return
+                response()
+                ->json(
+                    HelperClass::responeObject($usertransaction, false, Response::HTTP_OK, "Doesnt have transaction left.","","This user doesnt have transaction left."),
+                    Response::HTTP_OK
+                );
+            }       
             $validatedData = Validator::make($request->all(), [
                 'name' => ['required', 'max:50'],
                 'description' => ['required', 'max:255'],
@@ -239,6 +249,16 @@ class ItemController extends Controller
                                     HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
                                     Response::HTTP_INTERNAL_SERVER_ERROR
                                 );
+                        }
+                    }
+                    if($usertransaction){
+                        $usertransaction->left_limit_of_post = (int)$usertransaction->left_limit_of_post - 1;
+                        if (!$usertransaction->save()) {
+                            return response()
+                            ->json(
+                                HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Internal error", "", "The number of user transaction couldnt be updated."),
+                                Response::HTTP_INTERNAL_SERVER_ERROR
+                            );
                         }
                     }
                     /* $itemMedia = $request->media;

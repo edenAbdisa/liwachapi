@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserTransaction;
 use Exception;
 use App\Models\ServiceSwapType;
 use App\Models\Service;
@@ -130,6 +131,16 @@ class ServiceController extends Controller
     public function store(Request $request)
     {
         try {
+            $user = $request->user();               
+            $usertransaction = UserTransaction::where('user_id', $user->id)->first();  
+            if((int)$usertransaction->left_limit_of_post<=0){
+                return
+                response()
+                ->json(
+                    HelperClass::responeObject($usertransaction, false, Response::HTTP_OK, "Doesnt have transaction left.","", "This user doesnt have transaction left."),
+                    Response::HTTP_OK
+                );
+            } 
             $validatedData = Validator::make($request->all(), [
                 'name' => ['required', 'max:50'],
                 'description' => ['required', 'max:255'],
@@ -188,6 +199,16 @@ class ServiceController extends Controller
                                     HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Inernal error", "", "The swap type $swap resource couldn't be saved due to internal error"),
                                     Response::HTTP_INTERNAL_SERVER_ERROR
                                 );
+                        }
+                    }
+                    if($usertransaction){
+                        $usertransaction->left_limit_of_post = (int)$usertransaction->left_limit_of_post - 1;
+                        if (!$usertransaction->save()) {
+                            return response()
+                            ->json(
+                                HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Internal error", "", "The number of user transaction couldnt be updated."),
+                                Response::HTTP_INTERNAL_SERVER_ERROR
+                            );
                         }
                     }
                     /* $serviceMedia = $request->media;

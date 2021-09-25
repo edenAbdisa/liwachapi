@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Address;
 use App\Models\Membership;
+use App\Models\UserTransaction;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
@@ -299,6 +300,14 @@ class UserController extends Controller
                     Response::HTTP_CONFLICT
                 );
             }
+            $membership = Membership::where('id', $request->membership_id)->where('status','=','active')->first();
+            if(!$membership){
+                return response()
+                ->json(
+                    HelperClass::responeObject(null, false, Response::HTTP_CONFLICT,'Membership doesnt exist.', "",  "Membership doesnt exist."),
+                    Response::HTTP_CONFLICT
+                );
+            }
             $user = new User($input);
             $user->password = Hash::make($request->password);
             $user->remember_token  = $user->createToken('Laravel Password Grant')->accessToken;
@@ -310,6 +319,18 @@ class UserController extends Controller
             $user->status = "active";
                 $user->address_id = $address->id;
                 if($user->save()){
+                    $user_transactions = new UserTransaction();
+                    $user_transactions->refreshed_on=$user->created_at;
+                    $user_transactions->user_id=$user->id;
+                    $user_transactions->left_limit_of_post=$membership->limit_of_post;
+                    $user_transactions->left_transaction_limit=$membership->transaction_limit;
+                    if(!$user_transactions->save()){
+                        return response()
+                        ->json(
+                            HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR,'Internal error', "",  "User registered but user's transaction couldnt be saved."),
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
+                    }
                     $user->address;
                     $user->membership;
                     return response()
