@@ -510,7 +510,7 @@ class ItemController extends Controller
      * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         try {
             $item = Item::find($id);
@@ -522,7 +522,19 @@ class ItemController extends Controller
                     );
             }
             $item->status = 'deleted';
-            $item->save();
+            $item->save();            
+            $user = $request->user();               
+            $usertransaction = UserTransaction::where('user_id', $user->id)->first(); 
+            if($usertransaction){
+                $usertransaction->left_limit_of_post = (int)$usertransaction->left_limit_of_post + 1;
+                if (!$usertransaction->save()) {
+                    return response()
+                    ->json(
+                        HelperClass::responeObject(null, false, Response::HTTP_INTERNAL_SERVER_ERROR, "Internal error", "", "The number of user transaction couldnt be updated."),
+                        Response::HTTP_INTERNAL_SERVER_ERROR
+                    );
+                }
+            }
             return response()
                 ->json(
                     HelperClass::responeObject(null, true, Response::HTTP_OK, 'Successfully deleted.', "Item is deleted sucessfully.", ""),
