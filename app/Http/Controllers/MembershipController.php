@@ -312,18 +312,17 @@ class MembershipController extends Controller
                             HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, 'Membership doesnt exist.', "This membership doesnt exist in the database.", ""),
                             Response::HTTP_OK
                         );
-            }
-            if ($request->name) {
+            } 
                 $membership = Membership::where('name', Str::ucfirst($request->name))->first();
                 if ($membership) {
                     return response()
                     ->json(
-                        HelperClass::responeObject($membership, false, Response::HTTP_OK, 'Membership already exist.', "",  "This memebrship already exist in the database."),
+                        HelperClass::responeObject($membership, false, Response::HTTP_OK, 'Membership already exist.', "",  "This membership already exist in the database."),
                         Response::HTTP_OK
                     );
                 }
                 $input['name'] = Str::ucfirst($input['name']);
-            }
+          
 
             if ($membership_to_be_updated->fill($input)->save()) {
                 return response()
