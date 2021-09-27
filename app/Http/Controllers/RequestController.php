@@ -515,15 +515,15 @@ class RequestController extends Controller
     {
         //decrese the number of request in both item and service
         try {
-            $request = RequestOrder::find($id);
-            if (!$request) {
+            $requestorder = RequestOrder::find($id);
+            if (!$requestorder) {
                 response()
                     ->json(
                         HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, "Resource Not Found", '', "Request by this id doesnt exist."),
                         Response::HTTP_NOT_FOUND
                     );
             }
-            $request->delete();
+            $requestorder->delete();
             $user = $request->user();               
             $usertransaction = UserTransaction::where('user_id', $user->id)->first(); 
             if($usertransaction){
