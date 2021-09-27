@@ -137,6 +137,7 @@ class TypeController extends Controller
             if (!$type) {
                 $type = new Type($request->all());
                 $type->status = "active";
+                $type->name=Str::ucfirst($request->name);
                 $type->used_for = $category->used_for; 
                 if ($type->save()) {
                     $type->category;

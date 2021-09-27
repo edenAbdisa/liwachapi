@@ -124,6 +124,7 @@ class MembershipController extends Controller
                 $input['name'] = Str::ucfirst($input['name']);
                 $membership = new Membership($input);
                 $membership->status = "active"; 
+                $membership->name=Str::ucfirst($request->name);  
                 if ($membership->save()) {
                     return response()
                     ->json(

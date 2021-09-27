@@ -121,6 +121,7 @@ class CategoryController extends Controller
                 $input['name'] = Str::ucfirst($input['name']);
                 $category = new Category($input);
                 $category->status = "active";
+                $category->name=Str::ucfirst($request->name);
                 if ($category->save()) {
                     return response()
                         ->json(

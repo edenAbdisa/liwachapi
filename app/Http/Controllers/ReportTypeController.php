@@ -131,7 +131,8 @@ class ReportTypeController extends Controller
                 $input = $request->all();
                 $input['report_detail'] = Str::ucfirst($input['report_detail']);
                 $reporttype = new ReportType($input);
-                $reporttype->status = "active";  
+                $reporttype->status = "active";
+                $reporttype->report_detail=Str::ucfirst($request->report_detail);  
                 if ($reporttype->save()) {
                     return response()
                     ->json(
