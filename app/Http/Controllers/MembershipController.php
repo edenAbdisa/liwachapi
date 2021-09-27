@@ -292,6 +292,7 @@ class MembershipController extends Controller
 
         try {
             $validatedData = Validator::make($request->all(), [
+                
                 'name' => ['max:30'],
                 'status' => ['max:50'],
                 'limit_of_post' => ['numeric', 'min:0', 'not_in:0'],
@@ -312,9 +313,10 @@ class MembershipController extends Controller
                             HelperClass::responeObject(null, false, Response::HTTP_NOT_FOUND, 'Membership doesnt exist.', "This membership doesnt exist in the database.", ""),
                             Response::HTTP_OK
                         );
-            } 
+            }
+            if ($request->name) {
                 $membership = Membership::where('name', Str::ucfirst($request->name))->first();
-                if ($membership) {
+                if ($membership->id!=$id) {
                     return response()
                     ->json(
                         HelperClass::responeObject($membership, false, Response::HTTP_OK, 'Membership already exist.', "",  "This membership already exist in the database."),
@@ -322,7 +324,7 @@ class MembershipController extends Controller
                     );
                 }
                 $input['name'] = Str::ucfirst($input['name']);
-          
+            }
 
             if ($membership_to_be_updated->fill($input)->save()) {
                 return response()
