@@ -316,12 +316,14 @@ class MembershipController extends Controller
             }
             if ($request->name) {
                 $membership = Membership::where('name', Str::ucfirst($request->name))->first();
-                if ($membership->id!=$id) {
+                if ($membership) {
+                    if($membership->id!=$id){
                     return response()
                     ->json(
                         HelperClass::responeObject($membership, false, Response::HTTP_OK, 'Membership already exist.', "",  "This membership already exist in the database."),
                         Response::HTTP_OK
                     );
+                }
                 }
                 $input['name'] = Str::ucfirst($input['name']);
             }
