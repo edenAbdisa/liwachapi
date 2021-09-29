@@ -17,7 +17,7 @@ use Illuminate\Http\Controllers;
 Route::middleware('auth:api')->group(function () {
    
 }); 
-Route::group(['middleware' => ['auth:api','scope:user,admin,organization']], function () { 
+//Route::group(['middleware' => ['auth:api','scope:user,admin,organization']], function () { 
 //Route::middleware(['auth:api', 'scope:user,admin,organization'])->group(function () {
     Route::get('/user', 'UserController@index');
     Route::get('/users', 'UserController@index');
@@ -44,10 +44,10 @@ Route::group(['middleware' => ['auth:api','scope:user,admin,organization']], fun
     Route::delete('/item/{id}', 'ItemController@destroy');
     
     Route::delete('/service/{id}', 'ServiceController@destroy');
-});
+//});
 Route::group(['middleware' => ['auth:api','scope:organization']], function () {  
 });
-Route::group(['middleware' => ['auth:api','scope:user,organization']], function () { 
+//Route::group(['middleware' => ['auth:api','scope:user,organization']], function () { 
     Route::delete('/user/{id}', 'UserController@destroy');
     Route::get('/serviceswaptype', 'ServiceSwapTypeController@index');
     Route::get('/itemswaptype', 'ItemSwapTypeController@index');
@@ -71,9 +71,9 @@ Route::group(['middleware' => ['auth:api','scope:user,organization']], function 
     Route::post('/item', 'ItemController@store');
     Route::post('/service', 'ServiceController@store');
     
-});
+//});
 //Route::middleware(['auth:api', 'scope:admin'])->group(function () {
-Route::group(['middleware' => ['auth:api','scope:admin']], function () {
+//Route::group(['middleware' => ['auth:api','scope:admin']], function () {
  
     Route::get('/address', 'AddressController@index');
     Route::post('/address/search', 'AddressController@search');
@@ -105,7 +105,7 @@ Route::group(['middleware' => ['auth:api','scope:admin']], function () {
     Route::delete('/reporttype/{id}', 'ReportTypeController@destroy');
     Route::get('/request/countByDate/{attribute}/{start}/{end}', 'RequestController@requestCountByDate');
     Route::get('/request/count/{type}', 'RequestController@requestCount');
-});
+//});
 
 
 Route::post('/item/searchAll', 'ItemController@search');
